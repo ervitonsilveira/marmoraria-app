@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.32.2';
+const APP_VERSION='1.32.3';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1221,6 +1221,7 @@ function saveOrcamento(id){
  const snap={parts:orcCustoParts(base),lucroBruto:orcLucroBruto(base),subtotal:orcSubtotal(base)};
  snap.linhas=linhasCliente(Object.assign({},base,{snap:{parts:snap.parts,lucroBruto:snap.lucroBruto,subtotal:snap.subtotal}}));
  const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),dataEntrega:($('oEntrega')||{}).value||'',fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
+ let salvoId=id;
  if(id){
   Object.assign(byId(data.orcamentos,id),fields);
   const ped=act(data.pedidos).find(x=>x.orcamentoId===id),novo=orcTotal(byId(data.orcamentos,id));
@@ -1228,11 +1229,15 @@ function saveOrcamento(id){
  }
  else{
   data.seq.orcamento=(data.seq.orcamento||0)+1;
-  data.orcamentos.push(Object.assign({id:uid(),numero:data.seq.orcamento,status:'rascunho',createdAt:t,deleted:false},fields));
+  const novo=Object.assign({id:uid(),numero:data.seq.orcamento,status:'rascunho',createdAt:t,deleted:false},fields);
+  data.orcamentos.push(novo);salvoId=novo.id;
  }
  save();closeModal();
  if(id){renderAll();toast('Orçamento salvo.');}
- else{orcFilter='todos';go('pageOrcamentos');toast('Orçamento criado'+(novoCli?' e cliente cadastrado':'')+'.');}
+ else{orcFilter='todos';go('pageOrcamentos');toast('Orçamento criado.');}
+ // 1.32.3: mostra as opções seguintes (WhatsApp e gerar obra)
+ viewOrcamento(salvoId);
+ setTimeout(()=>{const a=$('orcAcoes');if(a)a.scrollIntoView({behavior:'smooth',block:'start'});},250);
 }
 function delOrcamento(id){
  const o=byId(data.orcamentos,id);if(!o)return;
@@ -1290,13 +1295,12 @@ function viewOrcamento(id){
   '<div class="total-line"><span>Total</span><span class="tv">'+money(orcTotal(o))+'</span></div>'+
   (o.obs?'<div class="section-title">Observações e negociação</div><div style="white-space:pre-wrap;font-size:14px">'+esc(o.obs)+'</div>':'')+
   '<div class="section-title">Custo real e lucro <span style="text-transform:none;letter-spacing:0">(só você vê)</span></div><div class="peca" style="margin-top:0">'+resumoHtml(o)+'</div>'+
-  (pedido||o.status==='aprovado'?'':
-   '<div class="section-title">Situação</div><div class="chip-row">'+['rascunho','enviado','recusado'].map(k=>'<button class="chip'+(o.status===k?' active':'')+'" onclick="setOrcStatus(\''+id+'\',\''+k+'\')">'+ORC_STATUS[k].l+'</button>').join('')+'</div>')+
   (o.obs?'<label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px"><input type="checkbox" id="shObs" style="width:auto"><span>Incluir as observações na proposta enviada</span></label>':'')+
-  '<div style="margin-top:14px"><button class="btn ok" onclick="enviarWhatsApp(\''+id+'\')">Enviar ao cliente no WhatsApp</button></div>'+
+  '<div id="orcAcoes" class="section-title">Próximos passos</div>'+
+  '<div><button class="btn ok" onclick="enviarWhatsApp(\''+id+'\')">📲 Enviar ao cliente no WhatsApp</button></div>'+
   (pedido
     ?'<div style="margin-top:10px"><button class="btn ghost" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+pedido.id+'\')">Ver obra gerada</button></div>'
-    :(o.status!=='recusado'?'<div style="margin-top:10px"><button class="btn ok" onclick="aprovarEgerar(\''+id+'\')">Aprovar e gerar obra</button></div>':''))+
+    :(o.status!=='recusado'?'<div style="margin-top:10px"><button class="btn" onclick="aprovarEgerar(\''+id+'\')">✓ Aprovar e gerar obra</button></div>':''))+
   '<div style="margin-top:10px"><button class="btn sec" style="color:var(--danger)" onclick="delOrcamento(\''+id+'\')">Excluir orçamento</button></div>');
 }
 function aprovarEgerar(id){

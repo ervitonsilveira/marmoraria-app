@@ -1,8 +1,8 @@
 {
- "version": "1.32.2",
- "interfaceVersion": 13202,
- "notes": "Início de volta na barra de baixo",
- "publishedAt": "2026-10-22T20:50:01",
+ "version": "1.32.3",
+ "interfaceVersion": 13203,
+ "notes": "Orçamento: depois de salvar mostra WhatsApp e gerar obra; sem Situação",
+ "publishedAt": "2026-10-22T20:54:19",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",
