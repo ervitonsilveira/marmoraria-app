@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.17.0';
+const APP_VERSION='1.18.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -2365,6 +2365,7 @@ function exportMontador(){
 function montadorInit(){
  document.body.classList.add('montador');
  $('appSub').textContent='Montador · só consulta';
+ document.title='Itapiruba Montador';{const m=document.querySelector('meta[name=apple-mobile-web-app-title]');if(m)m.content='Montador';}
  const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
  const home=$('pageHome');if(home)home.innerHTML='<div id="mHome"></div>';
  const ped=$('pagePedidos');if(ped)ped.insertAdjacentHTML('afterbegin','<div id="mTopo"></div>');
@@ -2506,8 +2507,9 @@ function fbIniciar(){
    await carregaScript(b+'firebase-app-compat.js');
    await carregaScript(b+'firebase-auth-compat.js');
    await carregaScript(b+'firebase-firestore-compat.js');
-   firebase.initializeApp(FB_CFG);sync.db=firebase.firestore();
-   firebase.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();});
+   // app com nome próprio no montador: no mesmo iPhone o login do admin e o do montador não se misturam
+   sync.app=firebase.initializeApp(FB_CFG,MONTADOR?'montador':'[DEFAULT]');sync.db=sync.app.firestore();
+   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();});
    return true;
   }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
  })();
@@ -2676,14 +2678,14 @@ async function syncEntrar(criar){
  const email=emailDoApp(),senha=($('sySenha')||{}).value||'';
  if(senha.length<6){toast('A senha precisa ter pelo menos 6 caracteres.');return;}
  try{
-  if(criar)await firebase.auth().createUserWithEmailAndPassword(email,senha);
-  else await firebase.auth().signInWithEmailAndPassword(email,senha);
+  if(criar)await sync.app.auth().createUserWithEmailAndPassword(email,senha);
+  else await sync.app.auth().signInWithEmailAndPassword(email,senha);
   syncLS('ativo',true);toast('Conectado.');openSync();
  }catch(e){toast(traduzErroFb(e));}
 }
 async function syncSair(){
  if(!confirm('Sair da sincronização neste aparelho? Os dados continuam aqui.'))return;
- try{await firebase.auth().signOut();}catch(e){}
+ try{await sync.app.auth().signOut();}catch(e){}
  syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();
 }
 
