@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.20.0';
+const APP_VERSION='1.21.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1426,7 +1426,7 @@ function tempoHtml(p){
 }
 function renderPedidos(){
  renderPedFilters();
- let list=act(data.pedidos).slice().sort((a,b)=>(b.numero||0)-(a.numero||0));
+ let list=act(data.pedidos).slice().sort((a,b)=>(retNovos(b.id)?1:0)-(retNovos(a.id)?1:0)||(b.numero||0)-(a.numero||0));
  if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
  else if(pedFilter==='concluido')list=list.filter(p=>p.status==='concluido');
  const el=$('pedidosList');
@@ -2475,6 +2475,17 @@ function openSettingsM(){
   '</div>'+
   '<div class="hint" style="margin-top:12px">Como atualizar: o escritório manda o arquivo pelo WhatsApp → baixe no celular → toque em "Receber dados do escritório" e escolha o arquivo.</div>');
 }
+if(!MONTADOR){
+ const _renderHomeAdmin=renderHome;
+ renderHome=function(){
+  _renderHomeAdmin();
+  const home=$('pageHome');if(!home)return;
+  let el=$('homeRetornos');
+  if(!el){el=document.createElement('div');el.id='homeRetornos';home.insertBefore(el,home.firstChild);}
+  const n=retornosNovosTotal();
+  el.innerHTML=n?'<div class="fin-alert" style="margin:0 0 12px" onclick="go(\'pagePedidos\')"><span style="font-size:20px">📷</span><div style="flex:1"><b>'+n+(n>1?' retornos novos':' retorno novo')+' dos montadores</b><div style="font-size:12px">Toque para ver nas Obras</div></div><span style="color:var(--brand);font-weight:600">Ver ›</span></div>':'';
+ };
+}
 if(MONTADOR){
  renderHome=renderHomeM;renderClientes=renderClientesM;viewCliente=viewClienteM;renderPedidos=renderPedidosM;viewPedido=viewPedidoM;
  renderOrcamentos=function(){};renderFinanceiro=function(){};openSettings=openSettingsM;
@@ -2513,7 +2524,7 @@ function fbIniciar(){
    await carregaScript(b+'firebase-firestore-compat.js');
    // app com nome próprio no montador: no mesmo iPhone o login do admin e o do montador não se misturam
    sync.app=firebase.initializeApp(FB_CFG,MONTADOR?'montador':'[DEFAULT]');sync.db=sync.app.firestore();
-   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
+   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u&&!MONTADOR&&typeof Android!=='undefined'&&Android.askNotifyPermission){try{Android.askNotifyPermission();}catch(e){}}if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
    return true;
   }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
  })();
@@ -2580,7 +2591,7 @@ async function syncLigar(){
  }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);atualizaSyncUI();return;}
  SYNC_COLS.forEach(k=>ouvir(k,r=>mergeRemoto(k,k,r)));
  ouvir('fotos',aplicaFoto);
- ouvir('retornos',r=>mergeRemoto('retornos','retornos',r));
+ ouvir('retornos',r=>{const novo=!(data.retornos||[]).some(x=>x.id===r.id),m=mergeRemoto('retornos','retornos',r);if(novo&&m)avisaRetorno(r);return m;});
  ouvir('meta',r=>{
   if(r.id!=='config'||!r.config)return false;
   const h=hashStr(JSON.stringify({config:r.config,seq:r.seq}));
@@ -2821,11 +2832,35 @@ async function enviarRetornoM(pid){
  toast('Enviando…');
  try{
   for(const it of itens)await fsCol('retornos').doc(it.id).set(it);
-  data.retornos=(data.retornos||[]).concat(itens);mRetFotos=[];save(true);
+  itens.forEach(it=>{if(!(data.retornos||[]).some(x=>x.id===it.id))data.retornos.push(it);});mRetFotos=[];save(true);
   toast('Enviado ao escritório.');viewPedido(pid);
  }catch(e){toast(traduzErroFb(e));}
 }
 // ---- administrador: avisos de retorno novo ----
+// ---- notificação de retorno novo (administrador) ----
+let _retFila={},_retFilaT=null;
+function avisaRetorno(r){
+ if(MONTADOR||!r||r.deleted||retVistos()[r.id])return;
+ let jaAvisados={};try{jaAvisados=JSON.parse(localStorage.getItem(STORE_KEY+'.retAvisados')||'{}');}catch(e){}
+ if(jaAvisados[r.id])return;
+ if(r.createdAt&&Date.now()-new Date(r.createdAt).getTime()>3*864e5)return;   // não avisa coisa antiga
+ jaAvisados[r.id]=1;try{localStorage.setItem(STORE_KEY+'.retAvisados',JSON.stringify(jaAvisados));}catch(e){}
+ (_retFila[r.pedidoId]=_retFila[r.pedidoId]||[]).push(r);
+ clearTimeout(_retFilaT);_retFilaT=setTimeout(dispararAvisos,1200);   // junta foto + texto do mesmo envio
+}
+function dispararAvisos(){
+ Object.keys(_retFila).forEach(pid=>{
+  const rs=_retFila[pid],p=byId(data.pedidos,pid),quem=(rs.find(x=>x.autor&&!/@/.test(x.autor))||{}).autor||'Montador';
+  const nf=rs.filter(x=>x.foto).length,txt=rs.map(x=>x.texto).filter(Boolean).join(' · ');
+  const titulo='📷 Retorno de '+quem+(p?' · Obra Nº '+(p.numero||''):'');
+  const corpo=(p?clienteName(p.clienteId)+': ':'')+(txt||'')+(nf?(txt?' · ':'')+nf+(nf>1?' fotos':' foto'):'');
+  if(typeof Android!=='undefined'&&Android.notify){try{Android.notify(titulo,corpo);}catch(e){}}
+  toast(titulo);
+ });
+ _retFila={};
+ try{renderAll();}catch(e){}
+}
+function retornosNovosTotal(){const v=retVistos();return act(data.retornos||[]).filter(r=>!v[r.id]&&byId(data.pedidos,r.pedidoId)).length;}
 let _retVistos=null;   // cópia em memória (vale mesmo se o armazenamento falhar)
 function retVistos(){if(!_retVistos){try{_retVistos=JSON.parse(localStorage.getItem(STORE_KEY+'.retVistos')||'{}');}catch(e){_retVistos={};}}return _retVistos;}
 function retNovos(pid){const v=retVistos();return retornosDa(pid).filter(r=>!v[r.id]).length;}
