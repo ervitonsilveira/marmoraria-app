@@ -1,8 +1,8 @@
 {
- "version": "1.27.2",
- "interfaceVersion": 12702,
- "notes": "APKs 1.27.2 do administrador e do montador",
- "publishedAt": "2026-10-22T20:02:38",
+ "version": "1.28.0",
+ "interfaceVersion": 12800,
+ "notes": "Excluir cliente a qualquer momento, com opção de levar orçamentos e obras",
+ "publishedAt": "2026-10-22T20:12:54",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",

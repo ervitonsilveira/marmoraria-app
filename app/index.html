@@ -423,7 +423,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.27.2';
+const APP_VERSION='1.28.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -657,11 +657,14 @@ function saveCliente(id,depoisOrc){
  save();closeModal();renderAll();
  if(depoisOrc)editOrcamento(null,cid);else toast('Cliente salvo.');
 }
-function delCliente(id){
+function delCliente(id){   // 1.28.0: pode excluir sempre, mesmo com obra concluída; opção de levar orçamentos e obras junto
  const c=byId(data.clientes,id);if(!c)return;
- const n=act(data.orcamentos).filter(o=>o.clienteId===id).length;
- if(!confirm('Excluir o cliente "'+c.nome+'"?'+(n?'\n\nEle tem '+n+' orçamento(s). Os orçamentos continuam, mas ficam sem cliente.':'')))return;
- logExclusao('Cliente',c.nome+(c.telefone?' · '+c.telefone:'')+(n?' · tinha '+n+' orçamento(s)':''));
+ const orcs=act(data.orcamentos).filter(o=>o.clienteId===id),obras=act(data.pedidos).filter(p=>p.clienteId===id);
+ if(!confirm('Excluir o cliente "'+c.nome+'"?'))return;
+ let tudo=false;
+ if(orcs.length||obras.length)tudo=confirm('Ele tem '+orcs.length+' orçamento(s) e '+obras.length+' obra(s).\n\nOK = excluir tudo junto\nCancelar = excluir só o cliente (orçamentos e obras ficam sem cliente)\n\nOs lançamentos do Financeiro não são apagados.');
+ logExclusao('Cliente',c.nome+(c.telefone?' · '+c.telefone:'')+(tudo?' · com '+orcs.length+' orçamento(s) e '+obras.length+' obra(s)':''));
+ if(tudo){orcs.forEach(o=>softDelete(data.orcamentos,o.id));obras.forEach(p=>softDelete(data.pedidos,p.id));}
  softDelete(data.clientes,id);save();closeModal();renderAll();toast('Cliente excluído.');
 }
 function clienteName(id){const c=byId(data.clientes,id);return c?c.nome:'(sem cliente)';}
@@ -704,7 +707,8 @@ function viewCliente(id){
   '<div class="detail-row"><span class="dk">Telefone</span><span class="dv">'+(c.telefone?esc(c.telefone):'—')+'</span></div>'+
   '<div class="btn-row" style="margin-top:12px">'+
    '<button class="btn" onclick="closeModal();newOrcamento(\''+id+'\')">+ Orçamento</button>'+
-   '<button class="btn sec" onclick="editCliente(\''+id+'\')">Editar</button></div>'+
+   '<button class="btn sec" onclick="editCliente(\''+id+'\')">Editar</button>'+
+   '<button class="btn sec" style="color:var(--st-pagat)" onclick="delCliente(\''+id+'\')">Excluir</button></div>'+
   (temTel?'<div style="margin-top:10px"><button class="btn ok" onclick="abrirWhatsAppCliente(\''+id+'\')">Falar no WhatsApp</button></div>':'')+
   '<div class="section-title">Orçamentos'+(orcs.length?' ('+orcs.length+')':'')+'</div><div class="card">'+orcHtml+'</div>'+
   '<div class="section-title">Obras'+(obras.length?' ('+obras.length+')':'')+'</div><div class="card">'+obraHtml+'</div>'+
@@ -712,7 +716,7 @@ function viewCliente(id){
   '<div class="detail-row"><span class="dk">Total em obras</span><span class="dv">'+money(totObras)+'</span></div>'+
   '<div class="detail-row"><span class="dk">Recebido</span><span class="dv" style="color:var(--ok)">'+money(recebido)+'</span></div>'+
   '<div class="detail-row"><span class="dk">A receber</span><span class="dv" style="color:'+(aReceber>0.009?'var(--warn)':'var(--ok)')+'">'+money(aReceber)+'</span></div>'+
-  '<div style="margin-top:16px"><button class="btn sec" style="color:var(--danger)" onclick="delCliente(\''+id+'\')">Excluir cliente</button></div>');
+  '');
 }
 
 /* ---------- Registro de exclusões ---------- */
