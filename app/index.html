@@ -417,7 +417,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.25.0';
+const APP_VERSION='1.26.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -2465,7 +2465,7 @@ function exportMontador(){
 }
 // ---- lado do montador ----
 function montadorInit(){
- document.body.classList.add('montador');
+ document.body.classList.add('montador','dark');   // montador sempre no tema escuro
  $('appSub').textContent='Montador';
  document.title='Itapiruba Montador';{const m=document.querySelector('meta[name=apple-mobile-web-app-title]');if(m)m.content='Montador';}
  const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
@@ -2613,7 +2613,6 @@ function openSettingsM(){
    (sync.user?'<div class="list-item" onclick="syncSair()"><div class="body"><div class="t" style="color:var(--st-pagat)">Sair</div><div class="s">'+esc(syncLS('nome')||'')+'</div></div></div>':'')+
    '<div class="list-item" onclick="receberDadosM()"><div class="body"><div class="t">Receber dados do escritório (arquivo)</div><div class="s">'+esc(mDadosInfo())+'</div></div></div>'+
    '<div class="list-item" onclick="verificarAtualizacao()"><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir</div></div></div>'+
-   '<div class="list-item" onclick="toggleDark()"><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
   '</div>'+
   '<div class="hint" style="margin-top:12px">Como atualizar: o escritório manda o arquivo pelo WhatsApp → baixe no celular → toque em "Receber dados do escritório" e escolha o arquivo.</div>');
 }
