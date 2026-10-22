@@ -326,8 +326,8 @@ nav.tabbar button.active{color:var(--brand)}
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo orçamento</button>
    <button class="btn sec" onclick="newCliente()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Novo cliente</button>
-   <button class="btn ok" onclick="newLancamento('receita')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Nova receita</button>
+   <button class="btn ok" onclick="go('pageRecebimentos')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Receber</button>
    <button class="btn danger" onclick="newLancamento('despesa')">
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Nova despesa</button>
   </div>
@@ -384,7 +384,7 @@ nav.tabbar button.active{color:var(--brand)}
   <div id="finAlerta"></div>
   <div class="section-title">Ferramentas</div>
   <div class="tools">
-   <button class="tool" onclick="newLancamento('receita')"><span class="ic" style="background:var(--st-rec-soft);color:var(--st-rec)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Nova receita</button>
+   <button class="tool" onclick="go('pageRecebimentos')"><span class="ic" style="background:var(--st-rec-soft);color:var(--st-rec)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>Receber</button>
    <button class="tool" onclick="newLancamento('despesa')"><span class="ic" style="background:var(--st-apag-soft);color:var(--st-apag)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></span>Nova despesa</button>
    <button class="tool" onclick="openRelatorios('caixa')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Relatórios</button>
    <button class="tool" onclick="relatorioFinanceiroExcel()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></span>Exportar Excel</button>
@@ -423,7 +423,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.29.0';
+const APP_VERSION='1.30.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1529,12 +1529,13 @@ function viewPedido(id,detalhes){
 }
 function finalizarPedido(id){   // com saldo: escolhe os pagamentos antes; sem saldo: conclui direto
  const p=byId(data.pedidos,id);if(!p)return;
- if(semParcelar(p)>0.009)registrarRecebimento(id,true);   // ainda tem valor sem parcela lançada
- else concluirObra(p);
+ if(!confirm('Finalizar a obra Nº '+(p.numero||'')+'? O recebimento é lançado na aba Receber.'))return;
+ concluirObra(p);
 }
 function concluirObra(p){
  setEtapa(p,'concluido');save();closeModal();go('pageRecebimentos');renderAll();
  toast('Obra Nº '+(p.numero||'')+' finalizada.');
+ if(round2((+p.valorTotal||0)-pedRecebido(p.id))>0.009)setTimeout(()=>verParcelasObra(p.id),200);   // já mostra o que falta receber
 }
 function novaObra(){
  openModal('Nova obra',
@@ -1916,7 +1917,7 @@ function renderFinanceiro(){
     (rec?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>')+'</div>'+
    '<div class="body"><div class="t">'+esc(l.descricao)+'</div><div class="s"><b style="color:var(--st-'+st.k+')">'+st.t+'</b>'+(sub?' · '+esc(sub):'')+'</div></div>'+
    '<div class="end"><div class="money" style="color:var(--st-'+st.k+')">'+(rec?'+':'−')+' '+money(l.valor)+'</div>'+
-    (l.pago?'':'<button class="btn sec sm" style="margin-top:4px;padding:5px 9px" onclick="event.stopPropagation();marcarPago(\''+l.id+'\')">✓ '+(rec?'Recebi':'Paguei')+'</button>')+'</div></div>';
+    (l.pago||rec?'':'<button class="btn sec sm" style="margin-top:4px;padding:5px 9px" onclick="event.stopPropagation();marcarPago(\''+l.id+'\')">✓ Paguei</button>')+'</div></div>';
  });
  el.innerHTML=h;
 }
@@ -2152,7 +2153,8 @@ function renderRecebimentos(){
   (()=>{const ult=recMes.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||'')).slice(0,12);
    return ult.length?'<div class="section-title">Recebidos em '+mesLongo(mes)+'</div><div class="card">'+ult.map(l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
     return '<div class="list-item" onclick="editLancamento(\''+l.id+'\')"><div class="body"><div class="t">'+esc(ped?clienteName(ped.clienteId):l.descricao)+'</div><div class="s">'+fmtDate(l.data)+' · '+esc(l.descricao)+'</div></div><div class="end"><div class="money" style="color:var(--st-rec)">+ '+money(l.valor)+'</div></div></div>';}).join('')+'</div>'+
-    '<div style="margin-top:12px"><button class="btn sec" onclick="go(\'pageFinanceiro\')">Ver tudo no Financeiro ›</button></div>':'';})();
+    '':'';})()+
+  '<div class="btn-row" style="margin-top:14px"><button class="btn sec" onclick="newLancamento(\'receita\')">+ Recebimento avulso</button><button class="btn sec" onclick="go(\'pageFinanceiro\')">Financeiro ›</button></div>';
 }
 /* ---- 1.27.0: obra nasce de um orçamento ---- */
 function novaObra(){
@@ -2199,6 +2201,21 @@ function voltarTela(){
   if(dx>80&&dy<70)voltarTela();
  },{passive:true});
 })();
+/* ---- 1.30.0: recebimento só na aba Receber ----
+   Qualquer lugar que abra uma receita (Financeiro, obra, relatórios, Início) leva para Receber:
+   receita de obra abre as parcelas da obra; receita avulsa abre o formulário já na aba Receber. */
+{
+ const _editLancamento=editLancamento;
+ editLancamento=function(id,tipo,pre){
+  const l=id?byId(data.lancamentos,id):null,ehRec=l?l.tipo==='receita':tipo==='receita';
+  if(ehRec&&!MONTADOR){
+   const ativa=document.querySelector('.page.active');
+   if(!ativa||ativa.id!=='pageRecebimentos'){closeModal();go('pageRecebimentos');}
+   if(l&&l.pedidoId){verParcelasObra(l.pedidoId);return;}
+  }
+  return _editLancamento(id,tipo,pre);
+ };
+}
 /* ---- Aviso de atualização no topo da tela inicial (1.22.0) ----
    Android: a tela nova chega pelo nativo (evento interfaceUpdate); APK novo vem do latest.json (publish_apk.py).
    iPhone/navegador: compara o latest.json com a versão aberta e recarrega sem cache. */
