@@ -134,6 +134,7 @@ textarea{min-height:70px;resize:vertical}
 
 /* Chips */
 .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+body.montador nav.tabbar button[data-tab="pageOrcamentos"],body.montador nav.tabbar button[data-tab="pageFinanceiro"],body.montador .admin-only{display:none!important}
 /* Caixa */
 .fin-month{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .fin-month .chip{padding:8px 16px;font-size:18px;line-height:1}
@@ -299,7 +300,7 @@ nav.tabbar button.active{color:var(--brand)}
  <section id="pageClientes" class="page">
   <div class="search"><input id="clienteSearch" placeholder="Buscar cliente…" oninput="renderClientes()"></div>
   <div class="card" id="clientesList"></div>
-  <div style="margin-top:14px"><button class="btn" onclick="newCliente()">
+  <div class="admin-only" style="margin-top:14px"><button class="btn" onclick="newCliente()">
    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo cliente</button></div>
  </section>
 
@@ -314,7 +315,7 @@ nav.tabbar button.active{color:var(--brand)}
  <section id="pagePedidos" class="page">
   <div class="chip-row" id="pedFilters" style="margin-bottom:12px"></div>
   <div class="card" id="pedidosList"></div>
-  <div style="margin-top:14px"><button class="btn" onclick="novaObra()">
+  <div class="admin-only" style="margin-top:14px"><button class="btn" onclick="novaObra()">
    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nova obra</button></div>
  </section>
 
@@ -378,8 +379,16 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.13.0';
-const STORE_KEY='marmoraria.itapiruba.v1';
+const APP_VERSION='1.14.0';
+// App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
+const MONTADOR=(function(){
+ try{
+  if(/[?&]montador\b/.test(location.search))return true;
+  if(typeof Android!=='undefined'&&Android.appInfo)return /\.montador$/.test((JSON.parse(Android.appInfo()||'{}').packageName)||'');
+ }catch(e){}
+ return false;
+})();
+const STORE_KEY=MONTADOR?'marmoraria.itapiruba.montador.v1':'marmoraria.itapiruba.v1';
 const $=id=>document.getElementById(id);
 const now=()=>new Date().toISOString();
 const uid=()=>'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -1862,6 +1871,7 @@ function openSettings(){
   '<div class="card">'+
    '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
    '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
+   '<div class="list-item" onclick="exportMontador()"><div class="body"><div class="t">Arquivo para os montadores</div><div class="s">Obras, clientes, medidas e fotos, sem nenhum valor. Mande pelo WhatsApp.</div></div></div>'+
   '</div>'+
   '<div class="hint" style="text-align:center;margin-top:22px">Marmoraria Itapiruba · versão '+APP_VERSION+'</div>'+
   '<input type="file" id="importFile" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)">');
@@ -1934,7 +1944,7 @@ async function baixarArquivo(filename,data,mime){
 }
 function exportBackup(){
  const json=JSON.stringify(backupObject(),null,2);
- if(typeof Android!=='undefined'&&Android.exportBackup){try{Android.exportBackup(json);toast('Backup gerado.');return;}catch(e){}}
+ if(typeof Android!=='undefined'&&Android.exportBackup){try{Android.exportBackup('MarmorariaItapiruba_Backup_'+isoToday()+'.json',json);toast('Backup gerado.');return;}catch(e){}}
  baixarArquivo('MarmorariaItapiruba_Backup_'+isoToday()+'.json',json,'application/json');
 }
 function importBackupPrompt(){
@@ -1949,6 +1959,8 @@ function importBackupFile(ev){
 }
 function applyBackup(text){
  const obj=JSON.parse(text);
+ if(obj&&obj.tipo==='montador'){aplicarPacoteMontador(obj);return;}
+ if(MONTADOR){toast('Use o arquivo para os montadores que o escritório envia.');return;}
  const d=obj&&obj.data?obj.data:obj;
  if(!d||!Array.isArray(d.orcamentos&&d.orcamentos)&&!Array.isArray(d.clientes)){toast('Backup não reconhecido.');return;}
  if(!confirm('Restaurar o backup substitui os dados atuais deste aparelho. Continuar?'))return;
@@ -2319,12 +2331,140 @@ function renderAll(){
 })();
 
 /* ============================================================
+   MONTADOR — app dos montadores (pacote com.marmoraria.itapiruba.montador, ou ?montador no navegador).
+   Mesmo index.html do administrador (a OTA serve os dois): aqui só trocamos as telas.
+   Só consulta e sem nenhum valor em R$: os dados chegam pelo "arquivo para os montadores",
+   que o administrador gera já sem preços, custos nem Caixa.
+   ============================================================ */
+// ---- lado do administrador: gera o arquivo sem valores ----
+function pacoteMontador(){
+ const so=(o,ks)=>{const r={};ks.forEach(k=>{if(o[k]!==undefined)r[k]=o[k];});return r;};
+ const pedidos=act(data.pedidos).map(p=>so(p,['id','numero','orcamentoId','clienteId','status','dataPrevista','historico','obs','createdAt','updatedAt']));
+ const usados=new Set(pedidos.map(p=>p.orcamentoId).filter(Boolean));
+ const orcamentos=act(data.orcamentos).filter(o=>usados.has(o.id)).map(o=>Object.assign(so(o,['id','numero','clienteId','data','status','modo','fotos','local','createdAt','updatedAt']),{
+  pecas:(o.pecas||[]).map(p=>Object.assign(so(p,['id','descricao','materialId','un','comprimento','largura','qtd']),{acabamentos:(p.acabamentos||[]).map(a=>so(a,['acabamentoId','qtd']))})),
+  itens:(o.itens||[]).map(i=>so(i,['produtoId','qtd']))}));
+ const nomes=(arr,ks)=>act(arr).map(x=>so(x,['id','nome'].concat(ks||[])));
+ return {app:'marmoraria.itapiruba',tipo:'montador',version:APP_VERSION,exportedAt:now(),data:{
+  clientes:act(data.clientes).map(c=>so(c,['id','nome','telefone','createdAt','updatedAt'])),
+  orcamentos,pedidos,materiais:nomes(data.materiais,['tipo']),produtos:nomes(data.produtos,['unidade']),acabamentos:nomes(data.acabamentos,['unidade']),
+  insumos:[],lancamentos:[],log:[],config:{empresa:{nome:data.config.empresa.nome||'Marmoraria Itapiruba'}}}};
+}
+function exportMontador(){
+ const json=JSON.stringify(pacoteMontador());
+ const nome='Montadores_MarmorariaItapiruba_'+isoToday()+'.json';
+ if(typeof Android!=='undefined'&&Android.exportBackup){try{Android.exportBackup(nome,json);toast('Salve o arquivo e mande para os montadores pelo WhatsApp.');return;}catch(e){}}
+ baixarArquivo(nome,json,'application/json');
+}
+// ---- lado do montador ----
+function montadorInit(){
+ document.body.classList.add('montador');
+ $('appSub').textContent='Montador · só consulta';
+ const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
+ const home=$('pageHome');if(home)home.innerHTML='<div id="mHome"></div>';
+}
+function mDadosInfo(){
+ return data.recebidoEm?'Dados do escritório de '+new Date(data.recebidoEm).toLocaleDateString('pt-BR')+' às '+new Date(data.recebidoEm).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Ainda sem dados do escritório.';
+}
+function mObraLinha(p){
+ const hoje=isoToday(),atr=p.status!=='concluido'&&p.dataPrevista&&p.dataPrevista<hoje;
+ return '<div class="list-item" onclick="viewPedido(\''+p.id+'\')"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>'+
+  '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+' · '+PED_LABEL[p.status]+'</div></div>'+
+  '<div class="end"><div class="cap">'+(p.status==='concluido'?'<span class="badge b-ok">Concluída</span>':p.dataPrevista?'<span class="badge '+(atr?'b-danger':'b-sent')+'">'+(atr?'atrasada · ':'entrega ')+fmtDate(p.dataPrevista).slice(0,5)+'</span>':'<span class="badge">sem data</span>')+'</div></div></div>';
+}
+function mOrdemEntrega(a,b){return (a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999')||(a.numero||0)-(b.numero||0);}
+function renderHomeM(){
+ const el=$('mHome');if(!el)return;
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido').sort(mOrdemEntrega);
+ el.innerHTML='<div class="card fin-hero"><div class="k">Obras em andamento</div><div class="v">'+ativas.length+'</div><div class="s">'+esc(mDadosInfo())+'</div></div>'+
+  '<div style="margin-top:12px"><button class="btn" onclick="receberDadosM()">⤓ Receber dados do escritório</button></div>'+
+  '<div class="section-title">Próximas entregas</div>'+
+  (ativas.length?'<div class="card">'+ativas.map(mObraLinha).join('')+'</div>':emptyBox('Nenhuma obra','Peça ao escritório o arquivo atualizado.'));
+}
+function renderClientesM(){
+ const q=normNome($('clienteSearch')?.value||'');
+ let list=act(data.clientes).sort((a,b)=>a.nome.localeCompare(b.nome));
+ if(q)list=list.filter(c=>normNome(c.nome+' '+(c.telefone||'')).includes(q));
+ const el=$('clientesList');
+ if(!list.length){el.innerHTML=emptyBox('Nenhum cliente','Peça ao escritório o arquivo atualizado.');return;}
+ el.innerHTML=list.map(c=>{const n=act(data.pedidos).filter(p=>p.clienteId===c.id).length;
+  return '<div class="list-item" onclick="viewClienteM(\''+c.id+'\')"><div class="av">'+esc(initials(c.nome))+'</div><div class="body"><div class="t">'+esc(c.nome)+'</div><div class="s">'+esc(c.telefone||'sem telefone')+(n?' · '+n+(n===1?' obra':' obras'):'')+'</div></div></div>';}).join('');
+}
+function viewClienteM(id){
+ const c=byId(data.clientes,id);if(!c)return;
+ const obras=act(data.pedidos).filter(p=>p.clienteId===id).sort(mOrdemEntrega);
+ openModal(c.nome,
+  '<div class="detail-row"><span class="dk">Telefone</span><span class="dv">'+(c.telefone?esc(c.telefone):'—')+'</span></div>'+
+  (soDigitos(c.telefone)?'<div style="margin-top:12px"><button class="btn ok" onclick="abrirWhatsAppCliente(\''+id+'\')">Falar no WhatsApp</button></div>':'')+
+  '<div class="section-title">Obras'+(obras.length?' ('+obras.length+')':'')+'</div>'+
+  (obras.length?'<div class="card">'+obras.map(p=>mObraLinha(p).replace('viewPedido(','closeModal();viewPedido(')).join('')+'</div>':'<div class="empty" style="padding:18px">Nenhuma obra.</div>'));
+}
+function renderPedidosM(){
+ renderPedFilters();
+ let list=act(data.pedidos).slice().sort(mOrdemEntrega);
+ if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
+ else if(pedFilter==='concluido')list=list.filter(p=>p.status==='concluido');
+ const el=$('pedidosList');
+ el.innerHTML=list.length?list.map(mObraLinha).join(''):emptyBox('Nenhuma obra','Peça ao escritório o arquivo atualizado.');
+}
+function viewPedidoM(id){
+ const p=byId(data.pedidos,id);if(!p)return;
+ const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId),idx=PED_FLOW.indexOf(p.status);
+ const flow='<div class="flow">'+PED_FLOW.map((s,i)=>'<span class="step '+(i<idx?'done':(i===idx?'cur':''))+'">'+PED_LABEL[s]+'</span>').join('')+'</div>';
+ const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
+ const pecas=orc?(orc.pecas||[]).map(pc=>{const u=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
+  const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
+  return '<div class="list-item" style="cursor:default;display:block"><div class="t" style="font-weight:600">'+esc(pc.descricao||'Peça')+(q>1?' · '+q+' un':'')+'</div>'+
+   '<div class="s" style="color:var(--muted);font-size:13px;margin-top:2px">'+esc(nm(data.materiais,pc.materialId)||'material não informado')+'</div>'+
+   '<div style="font-size:15px;margin-top:4px"><b>'+fmtNum(pc.comprimento)+' '+u+' × '+fmtNum(pc.largura)+' '+u+'</b></div>'+
+   (ac.length?'<div class="s" style="font-size:13px;margin-top:2px">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join(''):'';
+ const itens=orc?(orc.itens||[]).map(i=>'<div class="detail-row"><span class="dk">'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><span class="dv">'+fmtNum(num(i.qtd)||1)+'</span></div>').join(''):'';
+ const nf=orc?orcFotos(orc).length:0;
+ openModal('Obra Nº '+(p.numero||''),
+  '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+esc(clienteName(p.clienteId))+'</span></div>'+
+  (c&&soDigitos(c.telefone)?'<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="abrirWhatsAppCliente(\''+c.id+'\')">Falar no WhatsApp</button></div>':'')+
+  (orc&&orc.local&&orc.local.lat!=null?'<div style="margin-top:8px"><button class="btn sec sm" style="width:100%" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa (como chegar)</button></div>':'')+
+  '<div class="section-title">Etapa</div>'+flow+
+  '<div class="detail-row"><span class="dk">Entrega prevista</span><span class="dv">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</span></div>'+
+  (p.obs?'<div class="section-title">Observações</div><div style="white-space:pre-wrap;font-size:14px">'+esc(p.obs)+'</div>':'')+
+  (pecas?'<div class="section-title">Peças e medidas</div><div class="card">'+pecas+'</div>':'')+
+  (itens?'<div class="section-title">Produtos</div>'+itens:'')+
+  (nf?'<div class="section-title">Fotos do serviço e local ('+nf+')</div>'+fotosOrcHtml(orc,'ped',id,false):'')+
+  '<div class="hint" style="margin-top:14px">Só consulta. Mudanças são feitas pelo escritório.</div>');
+ $('modalBox').scrollTop=0;
+}
+function receberDadosM(){importBackupPrompt();}
+function aplicarPacoteMontador(obj){
+ if(!MONTADOR){toast('Este arquivo é para o app dos montadores.');return;}
+ const d=obj.data;
+ if(!d||!Array.isArray(d.pedidos)){toast('Arquivo não reconhecido.');return;}
+ data=d;data.recebidoEm=obj.exportedAt||now();normalize();
+ save();closeModal();go('pageHome');toast('Dados do escritório atualizados.');
+}
+function openSettingsM(){
+ const dark=document.body.classList.contains('dark');
+ openModal('Ajustes',
+  '<div class="card">'+
+   '<div class="list-item" onclick="receberDadosM()"><div class="body"><div class="t">Receber dados do escritório</div><div class="s">'+esc(mDadosInfo())+'</div></div></div>'+
+   '<div class="list-item" onclick="verificarAtualizacao()"><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir</div></div></div>'+
+   '<div class="list-item" onclick="toggleDark()"><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
+  '</div>'+
+  '<div class="hint" style="margin-top:12px">Como atualizar: o escritório manda o arquivo pelo WhatsApp → baixe no celular → toque em "Receber dados do escritório" e escolha o arquivo.</div>');
+}
+if(MONTADOR){
+ renderHome=renderHomeM;renderClientes=renderClientesM;viewCliente=viewClienteM;renderPedidos=renderPedidosM;viewPedido=viewPedidoM;
+ renderOrcamentos=function(){};renderFinanceiro=function(){};openSettings=openSettingsM;
+ const goAdmin=go;go=function(page){if(page==='pageOrcamentos'||page==='pageFinanceiro')page='pageHome';goAdmin(page);};
+}
+
+/* ============================================================
    Boot
    ============================================================ */
 (function init(){
  try{if(localStorage.getItem('marmoraria.theme')==='dark')document.body.classList.add('dark');}catch(e){}
  load();
  $('appSub').textContent='Orçamentos e obras';
+ if(MONTADOR)montadorInit();
  renderAll();
 })();
 </script>
