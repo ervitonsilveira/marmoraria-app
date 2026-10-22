@@ -417,7 +417,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.24.0';
+const APP_VERSION='1.25.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1399,9 +1399,9 @@ const PED_FLOW=['medicao','corte','acabamento','entrega','concluido'];
 const PED_LABEL={medicao:'Medição',corte:'Corte',acabamento:'Acabamento',entrega:'Entrega/Instalação',concluido:'Concluído'};
 let pedFilter='ativas';
 function setPedFilter(f){pedFilter=f;renderPedidos();}
-function renderPedFilters(){
- const defs=[['ativas','Em andamento'],['concluido','Concluídas'],['todas','Todas']];
- $('pedFilters').innerHTML=defs.map(([k,l])=>'<button class="chip'+(pedFilter===k?' active':'')+'" onclick="setPedFilter(\''+k+'\')">'+l+'</button>').join('');
+function renderPedFilters(){   // concluídas saem da lista e ficam no relatório "Obras concluídas"
+ const n=act(data.pedidos).filter(p=>p.status==='concluido').length;
+ $('pedFilters').innerHTML='<button class="chip" onclick="relatorioConcluidas()">📁 Obras concluídas'+(n?' ('+n+')':'')+'</button>';
 }
 function pedRecebido(id){return round2(act(data.lancamentos).filter(l=>l.tipo==='receita'&&l.pedidoId===id&&l.pago).reduce((s,l)=>s+(+l.valor||0),0));}
 // custos reais lançados nesta obra (despesas vinculadas)
@@ -1464,10 +1464,9 @@ function tempoHtml(p){
 function renderPedidos(){
  renderPedFilters();
  let list=act(data.pedidos).slice().sort((a,b)=>(retNovos(b.id)?1:0)-(retNovos(a.id)?1:0)||(b.numero||0)-(a.numero||0));
- if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
- else if(pedFilter==='concluido')list=list.filter(p=>p.status==='concluido');
+ list=list.filter(p=>p.status!=='concluido');
  const el=$('pedidosList');
- if(!list.length){el.innerHTML=emptyBox('Nenhuma obra','Aprove um orçamento para abrir uma obra.');return;}
+ if(!list.length){el.innerHTML=emptyBox('Nenhuma obra em andamento','Concluídas ficam em "Obras concluídas". Aprove um orçamento ou crie uma obra.');return;}
  el.innerHTML=list.map(p=>{
   const done=p.status==='concluido';
   const rec=pedRecebido(p.id),falta=round2(p.valorTotal-rec);
@@ -2218,6 +2217,7 @@ function openRelatorios(origem){
    item("relatorioContas(\'despesa\')",'<path d="M12 5v14M5 12l7 7 7-7"/>','Contas a pagar','Tudo que falta pagar, por vencimento')+
   '</div>'+
   '<div class="section-title">Obras</div><div class="card">'+
+   item("relatorioConcluidas()",'<path d="M20 6L9 17l-5-5"/>','Obras concluídas','Histórico com filtro por período e busca por cliente')+
    item("relatorioEntrega()",'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>','Obras por ordem de entrega','O que entregar primeiro, com o que falta receber')+
   '</div>'+
   '<div class="section-title">Planilhas</div><div class="card">'+
@@ -2291,6 +2291,35 @@ function shareFluxoAno(){
  ms.forEach(m=>{if(m.e||m.sa)txt+='• '+MESES_LONGOS[+m.key.slice(5)-1]+': entrou '+money(m.e)+' · saiu '+money(m.sa)+' · saldo '+money(m.saldo)+'\n';});
  txt+='\nSaldo do ano: '+money(round2(ms.reduce((t,m)=>t+m.saldo,0)));
  nativeShareOrPrint('Fluxo de caixa '+relAno,txt);
+}
+/* ---- Relatório: obras concluídas (com filtros) ---- */
+let rcBusca='',rcPeriodo='todos';
+function dataConclusao(p){const h=(p.historico||[]).filter(x=>x.etapa==='concluido');return h.length?h[h.length-1].inicio:(p.dataPrevista||(p.updatedAt||'').slice(0,10));}
+function relatorioConcluidas(){
+ const todas=act(data.pedidos).filter(p=>p.status==='concluido');
+ const meses=[...new Set(todas.map(p=>monthKey(dataConclusao(p))).filter(Boolean))].sort().reverse();
+ const anos=[...new Set(meses.map(m=>m.slice(0,4)))];
+ const q=normNome(rcBusca);
+ let list=todas.filter(p=>{
+  const d=dataConclusao(p)||'';
+  if(rcPeriodo!=='todos'&&!(rcPeriodo.length===4?d.startsWith(rcPeriodo):monthKey(d)===rcPeriodo))return false;
+  if(q&&!normNome(clienteName(p.clienteId)+' obra '+(p.numero||'')+' '+(p.obs||'')).includes(q))return false;
+  return true;
+ }).sort((a,b)=>(dataConclusao(b)||'').localeCompare(dataConclusao(a)||''));
+ const tot=round2(list.reduce((t,p)=>t+(+p.valorTotal||0),0)),rec=round2(list.reduce((t,p)=>t+pedRecebido(p.id),0));
+ const opt=(v,l)=>'<option value="'+v+'"'+(rcPeriodo===v?' selected':'')+'>'+l+'</option>';
+ openModal('Obras concluídas',
+  '<input id="rcBusca" type="search" placeholder="🔍 Buscar cliente, nº da obra…" value="'+esc(rcBusca)+'" oninput="rcBusca=this.value;clearTimeout(window._rcT);window._rcT=setTimeout(()=>{relatorioConcluidas();const b=$(\'rcBusca\');if(b){b.focus();b.setSelectionRange(b.value.length,b.value.length);}},350)">'+
+  '<select style="margin-top:8px" onchange="rcPeriodo=this.value;relatorioConcluidas()">'+opt('todos','Todo o período')+anos.map(a=>opt(a,'Ano '+a)).join('')+meses.map(m=>opt(m,mesLongo(m).replace(/^./,x=>x.toUpperCase()))).join('')+'</select>'+
+  '<div class="stat-grid" style="margin:12px 0 6px">'+
+   '<div class="stat"><div class="k">Obras</div><div class="v small">'+list.length+'</div></div>'+
+   '<div class="stat"><div class="k">Valor total</div><div class="v small">'+money(tot)+'</div></div></div>'+
+  (round2(tot-rec)>0.009?'<div class="detail-row"><span class="dk">Ainda a receber destas obras</span><span class="dv" style="color:var(--st-arec)">'+money(round2(tot-rec))+'</span></div>':'')+
+  (list.length?'<div class="card" style="margin-top:8px">'+list.map(p=>{const falta=round2(p.valorTotal-pedRecebido(p.id));
+   return '<div class="list-item" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+p.id+'\')"><div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+' · concluída em '+fmtDate(dataConclusao(p))+'</div></div>'+
+    '<div class="end"><div class="money">'+money(p.valorTotal)+'</div><div class="cap">'+(falta>0.009?'<span class="badge b-warn">falta '+money(falta)+'</span>':'<span class="badge b-ok">pago</span>')+'</div></div></div>';}).join('')+'</div>':
+   '<div class="empty">Nenhuma obra concluída'+(rcBusca||rcPeriodo!=='todos'?' com esses filtros':'')+'.</div>')+
+  '<div style="margin-top:14px" class="btn-row"><button class="btn sec" onclick="closeModal()">Fechar</button>'+(list.length?'<button class="btn sec" onclick="relatorioEntregaExcel()">Exportar Excel</button>':'')+'</div>');
 }
 /* ---- Relatório por ordem de entrega ---- */
 function relatorioEntrega(){
