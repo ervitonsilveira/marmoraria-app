@@ -423,7 +423,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.28.1';
+const APP_VERSION='1.28.2';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1510,7 +1510,6 @@ function viewPedido(id,detalhes){
   '<div class="detail-row"><span class="dk">Recebido</span><span class="dv" style="color:var(--ok)">'+money(rec)+'</span></div>'+
   '<div class="detail-row"><span class="dk">Falta receber</span><span class="dv" style="color:'+(falta>0.009?'var(--warn)':'var(--ok)')+'">'+money(falta)+'</span></div>'+
   '<div class="btn-row" style="margin-top:10px">'+
-   (falta>0.009?'<button class="btn ok sm" style="flex:1" onclick="registrarRecebimento(\''+id+'\')">Registrar recebimento</button>':'')+
    (orc&&orc.local&&orc.local.lat!=null?'<button class="btn sec sm" style="flex:1" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa</button>':'')+
   '</div>'+
   '<details class="mais"'+(detalhes?' open':'')+'><summary>Mais detalhes'+(nf?' · '+nf+' foto'+(nf>1?'s':''):'')+'</summary>'+
@@ -1534,7 +1533,7 @@ function finalizarPedido(id){   // com saldo: escolhe os pagamentos antes; sem s
  else concluirObra(p);
 }
 function concluirObra(p){
- setEtapa(p,'concluido');save();closeModal();go('pagePedidos');renderAll();
+ setEtapa(p,'concluido');save();closeModal();go('pageRecebimentos');renderAll();
  toast('Obra Nº '+(p.numero||'')+' finalizada.');
 }
 function novaObra(){
