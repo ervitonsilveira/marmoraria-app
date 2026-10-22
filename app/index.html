@@ -134,6 +134,7 @@ textarea{min-height:70px;resize:vertical}
 
 /* Chips */
 .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.titles #syncBadge{font-size:12px;opacity:.85}
 body.montador nav.tabbar button[data-tab="pageOrcamentos"],body.montador nav.tabbar button[data-tab="pageFinanceiro"],body.montador .admin-only{display:none!important}
 /* Caixa */
 .fin-month{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
@@ -379,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.14.0';
+const APP_VERSION='1.15.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -476,9 +477,10 @@ function load(){
  }catch(e){console.warn('load falhou',e);}
  data=seed();normalize();save();
 }
-function save(){
+function save(semSync){
  data.updatedAt=now();
  try{localStorage.setItem(STORE_KEY,JSON.stringify(data));}catch(e){toast('Não foi possível salvar.');}
+ if(!semSync)syncAgendar();   // sobe para a nuvem o que mudou (se a sincronização estiver ligada)
 }
 const act=arr=>arr.filter(x=>!x.deleted);
 const byId=(arr,id)=>arr.find(x=>x.id===id&&!x.deleted)||null;
@@ -1869,6 +1871,7 @@ function openSettings(){
   '</div>'+
   '<div class="section-title">Dados</div>'+
   '<div class="card">'+
+   '<div class="list-item" onclick="openSync()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12.5 3.5 3.5 0 0 0 6 19z"/></svg></div><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
    '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
    '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
    '<div class="list-item" onclick="exportMontador()"><div class="body"><div class="t">Arquivo para os montadores</div><div class="s">Obras, clientes, medidas e fotos, sem nenhum valor. Mande pelo WhatsApp.</div></div></div>'+
@@ -2377,7 +2380,8 @@ function renderHomeM(){
  const el=$('mHome');if(!el)return;
  const ativas=act(data.pedidos).filter(p=>p.status!=='concluido').sort(mOrdemEntrega);
  el.innerHTML='<div class="card fin-hero"><div class="k">Obras em andamento</div><div class="v">'+ativas.length+'</div><div class="s">'+esc(mDadosInfo())+'</div></div>'+
-  '<div style="margin-top:12px"><button class="btn" onclick="receberDadosM()">⤓ Receber dados do escritório</button></div>'+
+  (sync.user?'':'<div style="margin-top:12px"><button class="btn" onclick="openSync()">☁ Entrar para receber as obras automaticamente</button></div>')+
+  '<div style="margin-top:10px"><button class="btn sec" onclick="receberDadosM()">⤓ Receber arquivo do escritório</button></div>'+
   '<div class="section-title">Próximas entregas</div>'+
   (ativas.length?'<div class="card">'+ativas.map(mObraLinha).join('')+'</div>':emptyBox('Nenhuma obra','Peça ao escritório o arquivo atualizado.'));
 }
@@ -2445,7 +2449,8 @@ function openSettingsM(){
  const dark=document.body.classList.contains('dark');
  openModal('Ajustes',
   '<div class="card">'+
-   '<div class="list-item" onclick="receberDadosM()"><div class="body"><div class="t">Receber dados do escritório</div><div class="s">'+esc(mDadosInfo())+'</div></div></div>'+
+   '<div class="list-item" onclick="openSync()"><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
+   '<div class="list-item" onclick="receberDadosM()"><div class="body"><div class="t">Receber dados do escritório (arquivo)</div><div class="s">'+esc(mDadosInfo())+'</div></div></div>'+
    '<div class="list-item" onclick="verificarAtualizacao()"><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir</div></div></div>'+
    '<div class="list-item" onclick="toggleDark()"><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
   '</div>'+
@@ -2458,6 +2463,214 @@ if(MONTADOR){
 }
 
 /* ============================================================
+   SINCRONIZAÇÃO (Firebase Firestore) — 1.15.0
+   - Cada registro vira um documento em empresas/itapiruba/<coleção>/<id>; vence o updatedAt mais novo.
+   - Fotos vão em empresas/itapiruba/fotos/<idFoto> (o orçamento guarda só os ids) por causa do limite de 1 MB.
+   - O administrador também grava a cópia SEM VALORES em montador_* (as regras só deixam o montador ler isso).
+   - Sem internet o app segue normal no aparelho; ao voltar, envia o que mudou (compara por hash).
+   ============================================================ */
+const FB_CFG={apiKey:'AIzaSyAtAlU_bq24E_xeiiEfCweDS5AswibEVa4',authDomain:'marmoraria-itapiruba.firebaseapp.com',projectId:'marmoraria-itapiruba',
+ storageBucket:'marmoraria-itapiruba.firebasestorage.app',messagingSenderId:'1074595820408',appId:'1:1074595820408:web:074b19f6ecb76264724e8d'};
+const FB_VER='10.14.1';
+const SYNC_COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos'];
+const MONT_COLS=['clientes','pedidos','orcamentos','materiais','produtos','acabamentos'];
+const EMAIL_ADMIN='ervitonsilveira@gmail.com',EMAIL_MONTADOR='montadores@marmoraria-itapiruba.app';
+const sync={db:null,user:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
+function syncLS(k,v){
+ try{if(v===undefined)return JSON.parse(localStorage.getItem(STORE_KEY+'.sync.'+k)||'null');
+  if(v===null)localStorage.removeItem(STORE_KEY+'.sync.'+k);else localStorage.setItem(STORE_KEY+'.sync.'+k,JSON.stringify(v));}catch(e){return null;}
+}
+function hashStr(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+'.'+s.length.toString(36);}
+const fsCol=nome=>sync.db.collection('empresas').doc('itapiruba').collection(nome);
+function carregaScript(src){return new Promise((ok,err)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>err(new Error('offline'));document.head.appendChild(s);});}
+function fbIniciar(){
+ if(sync.iniciando)return sync.iniciando;
+ sync.iniciando=(async()=>{
+  try{
+   const b='https://www.gstatic.com/firebasejs/'+FB_VER+'/';
+   await carregaScript(b+'firebase-app-compat.js');
+   await carregaScript(b+'firebase-auth-compat.js');
+   await carregaScript(b+'firebase-firestore-compat.js');
+   firebase.initializeApp(FB_CFG);sync.db=firebase.firestore();
+   firebase.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();});
+   return true;
+  }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
+ })();
+ return sync.iniciando;
+}
+// forma enviada ao Firestore: orçamento sem o conteúdo das fotos (só os ids)
+function formaEnvio(k,r){
+ const f=JSON.parse(JSON.stringify(r));
+ if(k==='orcamentos'||k==='montador_orcamentos')f.fotos=(Array.isArray(r.fotos)?r.fotos:[]).map(x=>({id:x.id}));
+ return f;
+}
+function marcaEnviado(k,r){(sync.pushed[k]=sync.pushed[k]||{})[r.id]=hashStr(JSON.stringify(formaEnvio(k,r)));}
+function preencheFotos(r,loc){
+ r.fotos=(Array.isArray(r.fotos)?r.fotos:[]).map(f=>({id:f.id,data:sync.fotoCache[f.id]||(((loc&&Array.isArray(loc.fotos)?loc.fotos:[]).find(x=>x.id===f.id))||{}).data||''}));
+}
+// junta um registro vindo da nuvem; vence o mais novo (empate: o da nuvem)
+function mergeRemoto(k,colLocal,r){
+ const arr=data[colLocal],i=arr.findIndex(x=>x.id===r.id),loc=i>=0?arr[i]:null;
+ if(colLocal==='orcamentos')preencheFotos(r,loc);
+ const tr=r.updatedAt||r.createdAt||'',tl=loc?(loc.updatedAt||loc.createdAt||''):'';
+ if(loc&&tl>tr)return false;
+ if(loc&&JSON.stringify(loc)===JSON.stringify(r))return false;
+ if(i>=0)arr[i]=r;else arr.push(r);
+ marcaEnviado(k,r);
+ return true;
+}
+function aplicaFoto(f){
+ if(!f||!f.id||!f.data)return false;
+ sync.fotoCache[f.id]=f.data;let mud=false;
+ data.orcamentos.forEach(o=>(Array.isArray(o.fotos)?o.fotos:[]).forEach(x=>{if(x.id===f.id&&x.data!==f.data){x.data=f.data;mud=true;}}));
+ return mud;
+}
+let syncRenderT=null;
+function syncDepoisDeReceber(){
+ save(true);clearTimeout(syncRenderT);syncRenderT=setTimeout(()=>{try{renderAll();}catch(e){}},150);
+}
+function ouvir(nome,fn){
+ sync.unsubs.push(fsCol(nome).onSnapshot(qs=>{
+  let mud=false;qs.docChanges().forEach(ch=>{if(ch.type!=='removed'&&fn(ch.doc.data()))mud=true;});
+  if(mud)syncDepoisDeReceber();
+  sync.status='ok';sync.erro='';sync.ultimo=now();atualizaSyncUI();
+ },err=>{sync.status='erro';sync.erro=traduzErroFb(err);atualizaSyncUI();}));
+}
+async function syncLigar(){
+ syncDesligar(true);
+ sync.pushed=syncLS('pushed')||{};sync.status='conectando';atualizaSyncUI();
+ if(MONTADOR){
+  MONT_COLS.forEach(k=>ouvir('montador_'+k,r=>{const m=mergeRemoto('montador_'+k,k,r);if(m)data.recebidoEm=now();return m;}));
+  ouvir('montador_fotos',aplicaFoto);
+  return;
+ }
+ try{
+  if(!syncLS('inited')){
+   const [a,b]=await Promise.all([fsCol('pedidos').limit(1).get(),fsCol('clientes').limit(1).get()]);
+   if(!a.empty||!b.empty){
+    const localTem=['clientes','orcamentos','pedidos','lancamentos'].some(k=>act(data[k]).length);
+    if(!localTem||!confirm('A nuvem já tem dados da Marmoraria.\n\nOK = juntar com os dados deste aparelho\nCancelar = usar só os dados da nuvem')){
+     SYNC_COLS.forEach(k=>{data[k]=[];});sync.pushed={};save(true);
+    }
+   }
+   syncLS('inited',true);
+  }
+ }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);atualizaSyncUI();return;}
+ SYNC_COLS.forEach(k=>ouvir(k,r=>mergeRemoto(k,k,r)));
+ ouvir('fotos',aplicaFoto);
+ ouvir('meta',r=>{
+  if(r.id!=='config'||!r.config)return false;
+  const h=hashStr(JSON.stringify({config:r.config,seq:r.seq}));
+  if(sync.pushed.meta===h)return false;
+  data.config=Object.assign(data.config||{},r.config);
+  const s=r.seq||{};data.seq={orcamento:Math.max(+s.orcamento||0,+(data.seq||{}).orcamento||0),pedido:Math.max(+s.pedido||0,+(data.seq||{}).pedido||0)};
+  sync.pushed.meta=h;normalize();return true;
+ });
+ syncAgendar(800);
+}
+function syncDesligar(silencioso){
+ sync.unsubs.forEach(u=>{try{u();}catch(e){}});sync.unsubs=[];
+ if(!silencioso){sync.status='off';atualizaSyncUI();}
+}
+function syncAgendar(ms){
+ if(MONTADOR||!sync.user||!sync.db)return;
+ clearTimeout(sync.timer);sync.timer=setTimeout(syncEnviar,ms||1500);
+}
+// junta o que precisa subir: registros que mudaram (hash), fotos novas, ajustes e a cópia dos montadores
+function syncPendentes(){
+ const ops=[],P=sync.pushed;
+ const add=(nome,id,obj)=>{const h=hashStr(JSON.stringify(obj));if((P[nome]||{})[id]!==h)ops.push({nome,id,obj,h});};
+ SYNC_COLS.forEach(k=>data[k].forEach(r=>{if(r&&r.id)add(k,r.id,formaEnvio(k,r));}));
+ data.orcamentos.forEach(o=>(Array.isArray(o.fotos)?o.fotos:[]).forEach(f=>{if(f.id&&f.data&&!(P.fotos||{})[f.id])ops.push({nome:'fotos',id:f.id,obj:{id:f.id,orcId:o.id,data:f.data},h:'1'});}));
+ const meta={id:'config',config:data.config,seq:data.seq,updatedAt:now()},hm=hashStr(JSON.stringify({config:data.config,seq:data.seq}));
+ if(P.meta!==hm)ops.push({nome:'meta',id:'config',obj:meta,h:hm,meta:true});
+ // cópia sem valores para os montadores
+ const pk=pacoteMontador().data;
+ MONT_COLS.forEach(k=>{
+  const nome='montador_'+k,ids=new Set();
+  pk[k].forEach(r=>{ids.add(r.id);add(nome,r.id,formaEnvio(nome,r));});
+  Object.keys(P[nome]||{}).forEach(id=>{if(!ids.has(id)&&P[nome][id]!=='x')ops.push({nome,id,obj:{id,deleted:true,updatedAt:now()},h:'x'});});
+ });
+ pk.orcamentos.forEach(o=>(Array.isArray(o.fotos)?o.fotos:[]).forEach(f=>{if(f.id&&f.data&&!(P.montador_fotos||{})[f.id])ops.push({nome:'montador_fotos',id:f.id,obj:{id:f.id,data:f.data},h:'1'});}));
+ return ops;
+}
+async function syncEnviar(){
+ if(MONTADOR||!sync.user||!sync.db)return;
+ if(sync.enviando){syncAgendar(1500);return;}
+ sync.enviando=true;
+ try{
+  const ops=syncPendentes();
+  for(let i=0;i<ops.length;i+=200){
+   const parte=ops.slice(i,i+200),b=sync.db.batch();
+   parte.forEach(o=>b.set(fsCol(o.nome).doc(o.id),o.obj));
+   await b.commit();
+   parte.forEach(o=>{(sync.pushed[o.nome]=sync.pushed[o.nome]||{});if(o.meta)sync.pushed.meta=o.h;else sync.pushed[o.nome][o.id]=o.h;});
+   syncLS('pushed',sync.pushed);
+  }
+  sync.status='ok';sync.erro='';sync.ultimo=now();
+ }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);syncAgendar(30000);}
+ sync.enviando=false;atualizaSyncUI();
+}
+function traduzErroFb(e){
+ const c=(e&&e.code)||'',m=(e&&e.message)||String(e||'');
+ if(/network|offline|unavailable/i.test(c+m))return 'Sem internet. Os dados ficam no aparelho e sobem quando voltar.';
+ if(/permission/i.test(c+m))return 'Sem permissão para estes dados (confira o e-mail do login).';
+ if(/invalid-credential|wrong-password|user-not-found|invalid-login/i.test(c))return 'E-mail ou senha incorretos. Se é o primeiro acesso, toque em "Primeiro acesso".';
+ if(/email-already-in-use/.test(c))return 'Esse acesso já foi criado. Use "Entrar" com a senha.';
+ if(/weak-password/.test(c))return 'A senha precisa ter pelo menos 6 caracteres.';
+ if(/operation-not-allowed|configuration-not-found/i.test(c+m))return 'O login por e-mail ainda não foi ativado no Firebase.';
+ if(/too-many-requests/.test(c))return 'Muitas tentativas. Espere alguns minutos.';
+ if(/resource-exhausted|too large|maximum size/i.test(c+m))return 'Algum registro ficou grande demais (muitas fotos?).';
+ return 'Erro: '+m.slice(0,140);
+}
+function emailDoApp(){return MONTADOR?EMAIL_MONTADOR:EMAIL_ADMIN;}
+function syncResumo(){
+ if(sync.user){
+  if(sync.status==='erro')return '⚠ '+sync.erro;
+  if(sync.status==='conectando')return 'Conectando…';
+  return '☁ Sincronizado'+(sync.ultimo?' às '+new Date(sync.ultimo).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'');
+ }
+ if(sync.status==='offline')return sync.erro;
+ return MONTADOR?'Entre para receber as obras automaticamente.':'Desligada. Entre para juntar Android, iPhone e montadores.';
+}
+function atualizaSyncUI(){
+ const b=$('syncBadge');
+ if(b){b.textContent=sync.user?(sync.status==='erro'?' · ⚠ sem sincronizar':sync.status==='ok'?' · ☁':' · …'):'';}
+ const s=$('syncStatus');if(s)s.textContent=syncResumo();
+}
+async function openSync(){
+ openModal('Sincronização','<div class="empty">Carregando…</div>');
+ const ok=await fbIniciar();
+ const u=sync.user;
+ openModal('Sincronização',
+  '<div class="hint" id="syncStatus" style="margin:0 0 12px;font-weight:600;color:var(--brand)">'+esc(syncResumo())+'</div>'+
+  (!ok?'<div class="hint">Precisa de internet para entrar. Os dados continuam salvos no aparelho.</div><div style="margin-top:14px"><button class="btn" onclick="openSync()">Tentar de novo</button></div>':
+  u?('<div class="detail-row"><span class="dk">Conectado como</span><span class="dv">'+esc(u.email||'')+'</span></div>'+
+     (MONTADOR?'':'<div style="margin-top:14px"><button class="btn" onclick="syncEnviar();toast(\'Enviando…\')">Sincronizar agora</button></div>')+
+     '<div style="margin-top:10px"><button class="btn sec" onclick="syncSair()">Sair deste aparelho</button></div>'+
+     '<div class="hint" style="margin-top:12px">'+(MONTADOR?'As obras chegam sozinhas quando o escritório altera algo.':'Tudo que você muda vai para a nuvem e aparece no iPhone, no Android e (sem valores) para os montadores.')+'</div>'):
+  ('<label class="fld"><span>E-mail</span><input id="syEmail" value="'+esc(emailDoApp())+'" readonly></label>'+
+   '<label class="fld"><span>Senha</span><input id="sySenha" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></label>'+
+   '<div class="btn-row" style="margin-top:12px"><button class="btn" onclick="syncEntrar(false)">Entrar</button><button class="btn sec" onclick="syncEntrar(true)">Primeiro acesso</button></div>'+
+   '<div class="hint" style="margin-top:12px">Primeiro acesso: escolha a senha uma vez (no primeiro aparelho). Nos outros aparelhos use "Entrar" com a mesma senha.</div>'))+
+  '<div style="margin-top:14px"><button class="btn sec" onclick="'+(MONTADOR?'openSettingsM()':'openSettings()')+'">Voltar</button></div>');
+}
+async function syncEntrar(criar){
+ const email=emailDoApp(),senha=($('sySenha')||{}).value||'';
+ if(senha.length<6){toast('A senha precisa ter pelo menos 6 caracteres.');return;}
+ try{
+  if(criar)await firebase.auth().createUserWithEmailAndPassword(email,senha);
+  else await firebase.auth().signInWithEmailAndPassword(email,senha);
+  syncLS('ativo',true);toast('Conectado.');openSync();
+ }catch(e){toast(traduzErroFb(e));}
+}
+async function syncSair(){
+ if(!confirm('Sair da sincronização neste aparelho? Os dados continuam aqui.'))return;
+ try{await firebase.auth().signOut();}catch(e){}
+ syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();
+}
+
+/* ============================================================
    Boot
    ============================================================ */
 (function init(){
@@ -2465,7 +2678,9 @@ if(MONTADOR){
  load();
  $('appSub').textContent='Orçamentos e obras';
  if(MONTADOR)montadorInit();
+ {const sb=document.createElement('span');sb.id='syncBadge';$('appSub').after(sb);}
  renderAll();
+ if(syncLS('ativo'))fbIniciar();   // já entrou antes: conecta sozinho
 })();
 </script>
 </body>
