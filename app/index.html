@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.16.0';
+const APP_VERSION='1.17.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -458,7 +458,7 @@ function seed(){
  };
 }
 // garante que dados de versões antigas (e backups) tenham todos os campos novos
-const COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','log'];
+const COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','log','retornos'];
 function normalize(){
  COLS.forEach(k=>{if(!Array.isArray(data[k]))data[k]=[];});
  if(!data.seq)data.seq={orcamento:Math.max(0,...data.orcamentos.map(o=>o.numero||0)),pedido:Math.max(0,...data.pedidos.map(p=>p.numero||0))};
@@ -1437,7 +1437,7 @@ function renderPedidos(){
   return '<div class="list-item" onclick="viewPedido(\''+p.id+'\')">'+
    '<div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>'+
    '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div>'+
-    '<div class="s">Obra Nº '+(p.numero||'')+' · '+(done?'concluída em '+fmtDias(diasTotalObra(p)):PED_LABEL[p.status]+' há '+fmtDias(diasEtapaAtual(p)))+(p.dataPrevista?' · entrega '+fmtDate(p.dataPrevista):'')+'</div></div>'+
+    '<div class="s">'+(retNovos(p.id)?'<b style="color:var(--st-pagat)">📷 retorno novo</b> · ':'')+'Obra Nº '+(p.numero||'')+' · '+(done?'concluída em '+fmtDias(diasTotalObra(p)):PED_LABEL[p.status]+' há '+fmtDias(diasEtapaAtual(p)))+(p.dataPrevista?' · entrega '+fmtDate(p.dataPrevista):'')+'</div></div>'+
    '<div class="end"><div class="money">'+money(p.valorTotal)+'</div><div class="cap">'+
     (done?'<span class="badge b-ok">Concluída</span>':(falta>0.009?'<span class="badge b-warn">falta '+money(falta)+'</span>':'<span class="badge b-ok">pago</span>'))+'</div></div></div>';
  }).join('');
@@ -1452,6 +1452,7 @@ function viewPedido(id,detalhes){
  openModal('Obra Nº '+(p.numero||''),
   '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+(p.clienteId?'<a href="#" onclick="closeModal();viewCliente(\''+p.clienteId+'\');return false" style="color:var(--brand);font-weight:600;text-decoration:none">'+esc(clienteName(p.clienteId))+' ›</a>':esc(clienteName(p.clienteId)))+'</span></div>'+
   (p.obs?'<div style="white-space:pre-wrap;font-size:14px;margin:6px 0">'+esc(p.obs)+'</div>':'')+
+  retornoAdminHtml(id)+
   flow+
   '<div class="btn-row" style="margin-top:12px">'+
    (idx>0?'<button class="btn sec sm" style="flex:1" onclick="moveEtapa(\''+id+'\',-1)">← Voltar etapa</button>':'')+
@@ -1478,6 +1479,7 @@ function viewPedido(id,detalhes){
    (orc?'<button class="btn ghost" onclick="closeModal();viewOrcamento(\''+orc.id+'\')">Ver orçamento</button>':'')+
    '<button class="btn sec" onclick="delPedido(\''+id+'\')">Excluir obra</button></div>');
  if(!detalhes)$('modalBox').scrollTop=0;   // obra sempre abre do topo
+ if(retNovos(id)){marcaRetVistos(id);renderPedidos();}
 }
 function finalizarPedido(id){   // com saldo: escolhe os pagamentos antes; sem saldo: conclui direto
  const p=byId(data.pedidos,id);if(!p)return;
@@ -2429,15 +2431,16 @@ function viewPedidoM(id){
  const itens=orc?(orc.itens||[]).map(i=>'<div class="detail-row"><span class="dk">'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><span class="dv">'+fmtNum(num(i.qtd)||1)+'</span></div>').join(''):'';
  const nf=orc?orcFotos(orc).length:0;
  openModal('Obra Nº '+(p.numero||''),
+  '<div class="card fin-hero" style="padding:12px 14px;margin-bottom:10px"><div class="k">Data de entrega</div><div class="v" style="font-size:24px">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</div></div>'+
   '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+esc(clienteName(p.clienteId))+'</span></div>'+
   (c&&soDigitos(c.telefone)?'<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="whatsEntregaM(\''+c.id+'\')">Falar no WhatsApp (avisar entrega)</button></div>':'')+
   (orc&&orc.local&&orc.local.lat!=null?'<div style="margin-top:8px"><button class="btn sec sm" style="width:100%" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa (como chegar)</button></div>':'')+
-  '<div class="detail-row" style="margin-top:8px"><span class="dk">Entrega prevista</span><span class="dv">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</span></div>'+
   (p.obs?'<div class="section-title">Observações</div><div style="white-space:pre-wrap;font-size:14px">'+esc(p.obs)+'</div>':'')+
   (pecas?'<div class="section-title">Peças e medidas</div><div class="card">'+pecas+'</div>':'')+
   (itens?'<div class="section-title">Produtos</div>'+itens:'')+
   (nf?'<div class="section-title">Fotos do serviço e local ('+nf+')</div>'+fotosOrcHtml(orc,'ped',id,false):'')+
-  '<div class="hint" style="margin-top:14px">Só consulta. Mudanças são feitas pelo escritório.</div>');
+  retornoFormM(id)+
+  '<div class="hint" style="margin-top:14px">Os dados da obra são alterados só pelo escritório.</div>');
  $('modalBox').scrollTop=0;
 }
 // WhatsApp do montador já com o aviso de saída para entrega
@@ -2554,6 +2557,7 @@ async function syncLigar(){
  if(MONTADOR){
   MONT_COLS.forEach(k=>ouvir('montador_'+k,r=>{const m=mergeRemoto('montador_'+k,k,r);if(m)data.recebidoEm=now();return m;}));
   ouvir('montador_fotos',aplicaFoto);
+  ouvir('retornos',r=>mergeRemoto('retornos','retornos',r));
   return;
  }
  try{
@@ -2570,6 +2574,7 @@ async function syncLigar(){
  }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);atualizaSyncUI();return;}
  SYNC_COLS.forEach(k=>ouvir(k,r=>mergeRemoto(k,k,r)));
  ouvir('fotos',aplicaFoto);
+ ouvir('retornos',r=>mergeRemoto('retornos','retornos',r));
  ouvir('meta',r=>{
   if(r.id!=='config'||!r.config)return false;
   const h=hashStr(JSON.stringify({config:r.config,seq:r.seq}));
@@ -2680,6 +2685,68 @@ async function syncSair(){
  if(!confirm('Sair da sincronização neste aparelho? Os dados continuam aqui.'))return;
  try{await firebase.auth().signOut();}catch(e){}
  syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();
+}
+
+/* ============================================================
+   RETORNO DOS MONTADORES (1.17.0): fotos e observações tiradas na obra.
+   Cada foto/observação é um documento em empresas/itapiruba/retornos (o montador só pode CRIAR ali).
+   O administrador vê tudo na tela da obra; obra com retorno novo ganha um aviso na lista.
+   ============================================================ */
+const RET_SUGESTOES=['Faltou rodapé','Não encaixou no esquadro','Medida errada','Peça trincada/quebrada','Faltou material','Cliente pediu ajuste'];
+let mRetFotos=[];   // fotos tiradas e ainda não enviadas
+const retornosDa=pid=>act(data.retornos||[]).filter(r=>r.pedidoId===pid).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+function retornoHtml(r){
+ const quando=r.createdAt?new Date(r.createdAt).toLocaleDateString('pt-BR')+' '+new Date(r.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
+ return '<div class="list-item" style="cursor:default;display:block">'+
+  (r.foto?'<div class="foto-grid" style="margin-bottom:6px">'+fotoThumbHtml(r.foto,"verFotoRet('"+r.id+"')",'')+'</div>':'')+
+  (r.texto?'<div style="white-space:pre-wrap;font-size:14px">'+esc(r.texto)+'</div>':'')+
+  '<div class="s" style="font-size:12px;color:var(--muted);margin-top:4px">'+esc(quando)+'</div></div>';
+}
+function verFotoRet(id){const r=(data.retornos||[]).find(x=>x.id===id);if(r&&r.foto)verFotoFull(r.foto);}
+// ---- montador: formulário no fim da tela da obra ----
+function retornoFormM(pid){
+ const env=retornosDa(pid);
+ return '<div class="section-title">Retorno para o escritório</div>'+
+  '<div class="chip-row" style="margin-bottom:8px">'+RET_SUGESTOES.map(t=>'<button type="button" class="chip" onclick="retSugestaoM(\''+t+'\')">'+t+'</button>').join('')+'</div>'+
+  '<label class="fld"><span>Observações</span><textarea id="mRetTexto" style="min-height:80px" placeholder="Ex.: faltou rodapé, não encaixou no esquadro, medida errada…"></textarea></label>'+
+  '<div id="mRetFotosBox">'+retFotosPrevM(pid)+'</div>'+
+  '<input type="file" accept="image/*" id="mRetInput" class="hidden" onchange="addFotoRetM(event,\''+pid+'\')">'+
+  '<div class="btn-row" style="margin-top:10px"><button class="btn sec" onclick="$(\'mRetInput\').click()">📷 Tirar foto</button>'+
+  '<button class="btn" onclick="enviarRetornoM(\''+pid+'\')">Enviar ao escritório</button></div>'+
+  (env.length?'<div class="section-title">Já enviado ('+env.length+')</div><div class="card">'+env.map(retornoHtml).join('')+'</div>':'');
+}
+function retFotosPrevM(pid){
+ return mRetFotos.length?'<div class="foto-grid" style="margin-top:6px">'+mRetFotos.map((f,i)=>fotoThumbHtml(f,"verFotoFull(mRetFotos["+i+"])","mRetFotos.splice("+i+",1);$('mRetFotosBox').innerHTML=retFotosPrevM('"+pid+"')")).join('')+'</div>':'';
+}
+function retSugestaoM(t){const ta=$('mRetTexto');if(!ta)return;ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+t;ta.focus();}
+function addFotoRetM(ev,pid){
+ const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;
+ comprimirImagem(f,durl=>{mRetFotos.push(durl);const b=$('mRetFotosBox');if(b)b.innerHTML=retFotosPrevM(pid);toast('Foto pronta. Toque em "Enviar ao escritório".');});
+}
+async function enviarRetornoM(pid){
+ const texto=(($('mRetTexto')||{}).value||'').trim();
+ if(!texto&&!mRetFotos.length){toast('Escreva uma observação ou tire uma foto.');return;}
+ if(!sync.user||!sync.db){toast('Entre na sincronização (engrenagem) para enviar ao escritório.');return;}
+ const t=now(),base={pedidoId:pid,autor:(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
+ const itens=[];
+ if(texto)itens.push(Object.assign({id:uid(),texto},base));
+ mRetFotos.forEach(f=>itens.push(Object.assign({id:uid(),foto:f,texto:''},base)));
+ toast('Enviando…');
+ try{
+  for(const it of itens)await fsCol('retornos').doc(it.id).set(it);
+  data.retornos=(data.retornos||[]).concat(itens);mRetFotos=[];save(true);
+  toast('Enviado ao escritório.');viewPedido(pid);
+ }catch(e){toast(traduzErroFb(e));}
+}
+// ---- administrador: avisos de retorno novo ----
+let _retVistos=null;   // cópia em memória (vale mesmo se o armazenamento falhar)
+function retVistos(){if(!_retVistos){try{_retVistos=JSON.parse(localStorage.getItem(STORE_KEY+'.retVistos')||'{}');}catch(e){_retVistos={};}}return _retVistos;}
+function retNovos(pid){const v=retVistos();return retornosDa(pid).filter(r=>!v[r.id]).length;}
+function marcaRetVistos(pid){const v=retVistos();retornosDa(pid).forEach(r=>{v[r.id]=1;});try{localStorage.setItem(STORE_KEY+'.retVistos',JSON.stringify(v));}catch(e){}}
+function retornoAdminHtml(pid){
+ const rs=retornosDa(pid);if(!rs.length)return '';
+ const n=retNovos(pid);
+ return '<div class="section-title">Retorno dos montadores ('+rs.length+')'+(n?' · <b style="color:var(--st-pagat)">'+n+' novo'+(n>1?'s':'')+'</b>':'')+'</div><div class="card">'+rs.map(retornoHtml).join('')+'</div>';
 }
 
 /* ============================================================
