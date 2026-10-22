@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.19.0';
+const APP_VERSION='1.20.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1875,6 +1875,7 @@ function openSettings(){
   '<div class="card">'+
    '<div class="list-item" onclick="openSync()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12.5 3.5 3.5 0 0 0 6 19z"/></svg></div><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
    '<div class="list-item" onclick="openUsuarios()"><div class="body"><div class="t">Colaboradores</div><div class="s">Cadastrar montadores: nome + senha de 6 números</div></div></div>'+
+   (sync.user?'<div class="list-item" onclick="syncSair()"><div class="body"><div class="t" style="color:var(--st-pagat)">Sair da conta</div><div class="s">'+esc(sync.user.email||'')+'</div></div></div>':'')+
    '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
    '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
    '<div class="list-item" onclick="exportMontador()"><div class="body"><div class="t">Arquivo para os montadores</div><div class="s">Obras, clientes, medidas e fotos, sem nenhum valor. Mande pelo WhatsApp.</div></div></div>'+
@@ -2411,8 +2412,9 @@ function viewClienteM(id){
 }
 function renderPedidosM(){
  const topo=$('mTopo');
- if(topo)topo.innerHTML=(sync.user?'':'<div style="margin-bottom:10px"><button class="btn" onclick="openSync()">☁ Entrar para receber as obras automaticamente</button></div>')+
-  '<div class="hint" style="margin:0 2px 10px">'+esc(sync.user?syncResumo():mDadosInfo())+'</div>';
+ if(topo)topo.innerHTML=sync.user?
+  '<div style="display:flex;align-items:center;gap:10px;margin:0 2px 10px"><div class="hint" style="flex:1;margin:0">👤 '+esc(syncLS('nome')||'')+' · '+esc(syncResumo())+'</div><button class="btn sec sm" onclick="syncSair()">Sair</button></div>':
+  '<div style="margin-bottom:10px"><button class="btn" onclick="openSync()">☁ Entrar</button></div><div class="hint" style="margin:0 2px 10px">'+esc(mDadosInfo())+'</div>';
  renderPedFilters();
  let list=act(data.pedidos).slice().sort(mOrdemEntrega);
  if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
@@ -2466,6 +2468,7 @@ function openSettingsM(){
  openModal('Ajustes',
   '<div class="card">'+
    '<div class="list-item" onclick="openSync()"><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
+   (sync.user?'<div class="list-item" onclick="syncSair()"><div class="body"><div class="t" style="color:var(--st-pagat)">Sair</div><div class="s">'+esc(syncLS('nome')||'')+'</div></div></div>':'')+
    '<div class="list-item" onclick="receberDadosM()"><div class="body"><div class="t">Receber dados do escritório (arquivo)</div><div class="s">'+esc(mDadosInfo())+'</div></div></div>'+
    '<div class="list-item" onclick="verificarAtualizacao()"><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir</div></div></div>'+
    '<div class="list-item" onclick="toggleDark()"><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
@@ -2510,7 +2513,7 @@ function fbIniciar(){
    await carregaScript(b+'firebase-firestore-compat.js');
    // app com nome próprio no montador: no mesmo iPhone o login do admin e o do montador não se misturam
    sync.app=firebase.initializeApp(FB_CFG,MONTADOR?'montador':'[DEFAULT]');sync.db=sync.app.firestore();
-   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();});
+   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
    return true;
   }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
  })();
@@ -2764,9 +2767,11 @@ async function ativarColab(uid,ativo){
  catch(e){toast(traduzErroFb(e));}
 }
 async function syncSair(){
- if(!confirm('Sair da sincronização neste aparelho? Os dados continuam aqui.'))return;
+ if(!confirm(MONTADOR?'Sair? As obras somem deste celular até entrar de novo.':'Sair da conta neste aparelho? Os dados continuam salvos aqui.'))return;
  try{await sync.app.auth().signOut();}catch(e){}
- syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();renderAll();
+ syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};
+ if(MONTADOR){COLS.forEach(k=>{data[k]=[];});delete data.recebidoEm;save(true);}   // celular do montador não guarda obras sem login
+ closeModal();renderAll();toast('Você saiu.');
 }
 
 /* ============================================================
