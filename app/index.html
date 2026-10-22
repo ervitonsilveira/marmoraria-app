@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.18.0';
+const APP_VERSION='1.19.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1874,6 +1874,7 @@ function openSettings(){
   '<div class="section-title">Dados</div>'+
   '<div class="card">'+
    '<div class="list-item" onclick="openSync()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12.5 3.5 3.5 0 0 0 6 19z"/></svg></div><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
+   '<div class="list-item" onclick="openUsuarios()"><div class="body"><div class="t">Colaboradores</div><div class="s">Cadastrar montadores: nome + senha de 6 números</div></div></div>'+
    '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
    '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
    '<div class="list-item" onclick="exportMontador()"><div class="body"><div class="t">Arquivo para os montadores</div><div class="s">Obras, clientes, medidas e fotos, sem nenhum valor. Mande pelo WhatsApp.</div></div></div>'+
@@ -2490,7 +2491,7 @@ const FB_CFG={apiKey:'AIzaSyAtAlU_bq24E_xeiiEfCweDS5AswibEVa4',authDomain:'marmo
 const FB_VER='10.14.1';
 const SYNC_COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos'];
 const MONT_COLS=['clientes','pedidos','orcamentos','materiais','produtos','acabamentos'];
-const EMAIL_ADMIN='ervitonsilveira@gmail.com',EMAIL_MONTADOR='montadores@marmoraria-itapiruba.app';
+const EMAIL_ADMIN='ervitonsilveira@gmail.com';   // só ele cadastra; colaboradores são criados por ele (Colaboradores)
 const sync={db:null,user:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
 function syncLS(k,v){
  try{if(v===undefined)return JSON.parse(localStorage.getItem(STORE_KEY+'.sync.'+k)||'null');
@@ -2633,7 +2634,7 @@ async function syncEnviar(){
 function traduzErroFb(e){
  const c=(e&&e.code)||'',m=(e&&e.message)||String(e||'');
  if(/network|offline|unavailable/i.test(c+m))return 'Sem internet. Os dados ficam no aparelho e sobem quando voltar.';
- if(/permission/i.test(c+m))return 'Sem permissão para estes dados (confira o e-mail do login).';
+ if(/permission/i.test(c+m))return MONTADOR?'Acesso bloqueado ou não cadastrado. Fale com o administrador.':'Sem permissão para estes dados.';
  if(/invalid-credential|wrong-password|user-not-found|invalid-login/i.test(c))return 'E-mail ou senha incorretos. Se é o primeiro acesso, toque em "Primeiro acesso".';
  if(/email-already-in-use/.test(c))return 'Esse acesso já foi criado. Use "Entrar" com a senha.';
  if(/weak-password/.test(c))return 'A senha precisa ter pelo menos 6 caracteres.';
@@ -2642,7 +2643,6 @@ function traduzErroFb(e){
  if(/resource-exhausted|too large|maximum size/i.test(c+m))return 'Algum registro ficou grande demais (muitas fotos?).';
  return 'Erro: '+m.slice(0,140);
 }
-function emailDoApp(){return MONTADOR?EMAIL_MONTADOR:EMAIL_ADMIN;}
 function syncResumo(){
  if(sync.user){
   if(sync.status==='erro')return '⚠ '+sync.erro;
@@ -2657,36 +2657,116 @@ function atualizaSyncUI(){
  if(b){b.textContent=sync.user?(sync.status==='erro'?' · ⚠ sem sincronizar':sync.status==='ok'?' · ☁':' · …'):'';}
  const s=$('syncStatus');if(s)s.textContent=syncResumo();
 }
+// Login do colaborador: nome + senha de 6 números. O e-mail do Firebase sai do nome (o colaborador nem vê).
+function emailDoNome(nome){
+ const s=String(nome||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.+|\.+$/g,'');
+ return s?s+'@colaborador.itapiruba.app':'';
+}
+const senhaOk=p=>/^\d{6}$/.test(p||'');
 async function openSync(){
  openModal('Sincronização','<div class="empty">Carregando…</div>');
  const ok=await fbIniciar();
  const u=sync.user;
+ const voltar='<div style="margin-top:14px"><button class="btn sec" onclick="'+(MONTADOR?'openSettingsM()':'openSettings()')+'">Voltar</button></div>';
+ if(!ok){openModal('Sincronização','<div class="hint" id="syncStatus">'+esc(syncResumo())+'</div><div class="hint">Precisa de internet para entrar. Os dados continuam salvos no aparelho.</div><div style="margin-top:14px"><button class="btn" onclick="openSync()">Tentar de novo</button></div>'+voltar);return;}
+ if(u){
+  openModal('Sincronização',
+   '<div class="hint" id="syncStatus" style="margin:0 0 12px;font-weight:600;color:var(--brand)">'+esc(syncResumo())+'</div>'+
+   '<div class="detail-row"><span class="dk">Conectado como</span><span class="dv">'+esc(MONTADOR?(syncLS('nome')||u.email):u.email)+'</span></div>'+
+   (MONTADOR?'':'<div style="margin-top:14px"><button class="btn" onclick="syncEnviar();toast(\'Enviando…\')">Sincronizar agora</button></div>'+
+    '<div style="margin-top:10px"><button class="btn sec" onclick="openUsuarios()">👥 Colaboradores (logins e senhas)</button></div>')+
+   '<div style="margin-top:10px"><button class="btn sec" onclick="syncSair()">Sair deste aparelho</button></div>'+voltar);
+  return;
+ }
+ if(MONTADOR){
+  openModal('Entrar',
+   '<label class="fld"><span>Seu nome</span><input id="syNome" value="'+esc(syncLS('nome')||'')+'" placeholder="Como o escritório cadastrou" autocomplete="username"></label>'+
+   '<label class="fld"><span>Senha (6 números)</span><input id="sySenha" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" placeholder="••••••"></label>'+
+   '<div style="margin-top:12px"><button class="btn" onclick="syncEntrarColab()">Entrar</button></div>'+
+   '<div class="hint" style="margin-top:12px">O nome e a senha são criados pelo escritório. Se não tiver, peça ao administrador.</div>'+voltar);
+  return;
+ }
  openModal('Sincronização',
-  '<div class="hint" id="syncStatus" style="margin:0 0 12px;font-weight:600;color:var(--brand)">'+esc(syncResumo())+'</div>'+
-  (!ok?'<div class="hint">Precisa de internet para entrar. Os dados continuam salvos no aparelho.</div><div style="margin-top:14px"><button class="btn" onclick="openSync()">Tentar de novo</button></div>':
-  u?('<div class="detail-row"><span class="dk">Conectado como</span><span class="dv">'+esc(u.email||'')+'</span></div>'+
-     (MONTADOR?'':'<div style="margin-top:14px"><button class="btn" onclick="syncEnviar();toast(\'Enviando…\')">Sincronizar agora</button></div>')+
-     '<div style="margin-top:10px"><button class="btn sec" onclick="syncSair()">Sair deste aparelho</button></div>'+
-     '<div class="hint" style="margin-top:12px">'+(MONTADOR?'As obras chegam sozinhas quando o escritório altera algo.':'Tudo que você muda vai para a nuvem e aparece no iPhone, no Android e (sem valores) para os montadores.')+'</div>'):
-  ('<label class="fld"><span>E-mail</span><input id="syEmail" value="'+esc(emailDoApp())+'" readonly></label>'+
-   '<label class="fld"><span>Senha</span><input id="sySenha" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></label>'+
-   '<div class="btn-row" style="margin-top:12px"><button class="btn" onclick="syncEntrar(false)">Entrar</button><button class="btn sec" onclick="syncEntrar(true)">Primeiro acesso</button></div>'+
-   '<div class="hint" style="margin-top:12px">Primeiro acesso: escolha a senha uma vez (no primeiro aparelho). Nos outros aparelhos use "Entrar" com a mesma senha.</div>'))+
-  '<div style="margin-top:14px"><button class="btn sec" onclick="'+(MONTADOR?'openSettingsM()':'openSettings()')+'">Voltar</button></div>');
+  '<div class="hint" id="syncStatus" style="margin:0 0 12px">'+esc(syncResumo())+'</div>'+
+  '<label class="fld"><span>E-mail do administrador</span><input id="syEmail" value="'+esc(EMAIL_ADMIN)+'" readonly></label>'+
+  '<label class="fld"><span>Senha</span><input id="sySenha" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></label>'+
+  '<div class="btn-row" style="margin-top:12px"><button class="btn" onclick="syncEntrar(false)">Entrar</button><button class="btn sec" onclick="syncEntrar(true)">Primeiro acesso</button></div>'+
+  '<div class="hint" style="margin-top:12px">Só o administrador faz cadastro. "Primeiro acesso" cria a sua senha uma única vez; nos outros aparelhos use "Entrar".</div>'+voltar);
 }
 async function syncEntrar(criar){
- const email=emailDoApp(),senha=($('sySenha')||{}).value||'';
+ const senha=($('sySenha')||{}).value||'';
  if(senha.length<6){toast('A senha precisa ter pelo menos 6 caracteres.');return;}
  try{
-  if(criar)await sync.app.auth().createUserWithEmailAndPassword(email,senha);
-  else await sync.app.auth().signInWithEmailAndPassword(email,senha);
+  if(criar)await sync.app.auth().createUserWithEmailAndPassword(EMAIL_ADMIN,senha);
+  else await sync.app.auth().signInWithEmailAndPassword(EMAIL_ADMIN,senha);
   syncLS('ativo',true);toast('Conectado.');openSync();
  }catch(e){toast(traduzErroFb(e));}
+}
+async function syncEntrarColab(){
+ const nome=(($('syNome')||{}).value||'').trim(),senha=(($('sySenha')||{}).value||'').trim();
+ if(!nome){toast('Digite o seu nome.');return;}
+ if(!senhaOk(senha)){toast('A senha tem 6 números.');return;}
+ try{
+  await sync.app.auth().signInWithEmailAndPassword(emailDoNome(nome),senha);
+  syncLS('nome',nome);syncLS('ativo',true);toast('Conectado.');closeModal();renderAll();
+ }catch(e){toast(/invalid-credential|wrong-password|user-not-found|invalid-login/i.test((e&&e.code)||'')?'Nome ou senha incorretos.':traduzErroFb(e));}
+}
+// ---- administrador: cadastro dos colaboradores ----
+function appCadastro(){return firebase.apps.find(a=>a.name==='cadastro')||firebase.initializeApp(FB_CFG,'cadastro');}
+async function openUsuarios(){
+ if(!sync.user||MONTADOR){toast('Entre como administrador primeiro.');return;}
+ openModal('Colaboradores','<div class="empty">Carregando…</div>');
+ let lista=[];
+ try{const qs=await fsCol('usuarios').get();lista=qs.docs.map(d=>Object.assign({uid:d.id},d.data())).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));}
+ catch(e){openModal('Colaboradores','<div class="hint">'+esc(traduzErroFb(e))+'</div><div style="margin-top:14px"><button class="btn sec" onclick="openSync()">Voltar</button></div>');return;}
+ openModal('Colaboradores',
+  '<div class="hint" style="margin:0 0 10px">Montadores entram no app deles com o <b>nome</b> e a <b>senha de 6 números</b> que você cria aqui. Eles não veem valores.</div>'+
+  (lista.length?'<div class="card">'+lista.map(u=>'<div class="list-item" style="cursor:default"><div class="av">'+esc(initials(u.nome))+'</div>'+
+   '<div class="body"><div class="t">'+esc(u.nome)+'</div><div class="s">Senha: '+esc(u.pin||'')+' · '+(u.ativo?'<span style="color:var(--st-rec)">ativo</span>':'<span style="color:var(--st-pagat)">bloqueado</span>')+'</div></div>'+
+   '<div class="end" style="display:flex;flex-direction:column;gap:4px">'+
+    '<button class="btn sec sm" style="padding:5px 9px" onclick="trocarSenhaColab(\''+u.uid+'\')">Trocar senha</button>'+
+    '<button class="btn sec sm" style="padding:5px 9px" onclick="ativarColab(\''+u.uid+'\','+(!u.ativo)+')">'+(u.ativo?'Bloquear':'Liberar')+'</button></div></div>').join('')+'</div>':'<div class="empty" style="padding:18px">Nenhum colaborador ainda.</div>')+
+  '<div class="section-title">Novo colaborador</div>'+
+  '<label class="fld"><span>Nome do colaborador (é o login)</span><input id="ncNome" placeholder="Ex.: João Silva"></label>'+
+  '<label class="fld"><span>Senha (6 números)</span><input id="ncSenha" inputmode="numeric" maxlength="6" placeholder="Ex.: 482913"></label>'+
+  '<div class="btn-row" style="margin-top:10px"><button class="btn sec" onclick="$(\'ncSenha\').value=String(Math.floor(100000+Math.random()*900000))">Gerar senha</button><button class="btn" onclick="criarColab()">Cadastrar</button></div>'+
+  '<div style="margin-top:14px"><button class="btn sec" onclick="openSync()">Voltar</button></div>');
+}
+async function criarColab(){
+ const nome=(($('ncNome')||{}).value||'').trim(),pin=(($('ncSenha')||{}).value||'').trim(),email=emailDoNome(nome);
+ if(!email){toast('Digite o nome do colaborador.');return;}
+ if(!senhaOk(pin)){toast('A senha precisa ter exatamente 6 números.');return;}
+ const sec=appCadastro();
+ try{
+  toast('Cadastrando…');
+  const cred=await sec.auth().createUserWithEmailAndPassword(email,pin);
+  await fsCol('usuarios').doc(cred.user.uid).set({nome,email,pin,papel:'montador',ativo:true,criadoEm:now()});
+  await sec.auth().signOut();
+  toast(nome+' cadastrado. Senha: '+pin);openUsuarios();
+ }catch(e){try{await sec.auth().signOut();}catch(_){}toast(/email-already-in-use/.test((e&&e.code)||'')?'Já existe um colaborador com esse nome. Use outro (ex.: com sobrenome).':traduzErroFb(e));}
+}
+async function trocarSenhaColab(uid){
+ const nova=prompt('Nova senha (6 números):',String(Math.floor(100000+Math.random()*900000)));
+ if(nova===null)return;
+ if(!senhaOk(nova.trim())){toast('A senha precisa ter exatamente 6 números.');return;}
+ const sec=appCadastro();
+ try{
+  const d=(await fsCol('usuarios').doc(uid).get()).data();
+  const cred=await sec.auth().signInWithEmailAndPassword(d.email,d.pin);
+  await cred.user.updatePassword(nova.trim());
+  await fsCol('usuarios').doc(uid).update({pin:nova.trim()});
+  await sec.auth().signOut();
+  toast('Senha trocada: '+nova.trim());openUsuarios();
+ }catch(e){try{await sec.auth().signOut();}catch(_){}toast(traduzErroFb(e));}
+}
+async function ativarColab(uid,ativo){
+ try{await fsCol('usuarios').doc(uid).update({ativo});toast(ativo?'Acesso liberado.':'Acesso bloqueado.');openUsuarios();}
+ catch(e){toast(traduzErroFb(e));}
 }
 async function syncSair(){
  if(!confirm('Sair da sincronização neste aparelho? Os dados continuam aqui.'))return;
  try{await sync.app.auth().signOut();}catch(e){}
- syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();
+ syncLS('ativo',null);syncLS('inited',null);syncLS('pushed',null);sync.pushed={};openSync();renderAll();
 }
 
 /* ============================================================
@@ -2702,7 +2782,7 @@ function retornoHtml(r){
  return '<div class="list-item" style="cursor:default;display:block">'+
   (r.foto?'<div class="foto-grid" style="margin-bottom:6px">'+fotoThumbHtml(r.foto,"verFotoRet('"+r.id+"')",'')+'</div>':'')+
   (r.texto?'<div style="white-space:pre-wrap;font-size:14px">'+esc(r.texto)+'</div>':'')+
-  '<div class="s" style="font-size:12px;color:var(--muted);margin-top:4px">'+esc(quando)+'</div></div>';
+  '<div class="s" style="font-size:12px;color:var(--muted);margin-top:4px">'+esc(quando)+(r.autor&&!/@/.test(r.autor)?' · por '+esc(r.autor):'')+'</div></div>';
 }
 function verFotoRet(id){const r=(data.retornos||[]).find(x=>x.id===id);if(r&&r.foto)verFotoFull(r.foto);}
 // ---- montador: formulário no fim da tela da obra ----
@@ -2729,7 +2809,7 @@ async function enviarRetornoM(pid){
  const texto=(($('mRetTexto')||{}).value||'').trim();
  if(!texto&&!mRetFotos.length){toast('Escreva uma observação ou tire uma foto.');return;}
  if(!sync.user||!sync.db){toast('Entre na sincronização (engrenagem) para enviar ao escritório.');return;}
- const t=now(),base={pedidoId:pid,autor:(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
+ const t=now(),base={pedidoId:pid,autor:syncLS('nome')||(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
  const itens=[];
  if(texto)itens.push(Object.assign({id:uid(),texto},base));
  mRetFotos.forEach(f=>itens.push(Object.assign({id:uid(),foto:f,texto:''},base)));

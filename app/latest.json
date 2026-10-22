@@ -1,8 +1,8 @@
 {
- "version": "1.18.0",
- "interfaceVersion": 11800,
- "notes": "iPhone: admin e montador separados no mesmo aparelho",
- "publishedAt": "2026-10-22T18:59:38",
+ "version": "1.19.0",
+ "interfaceVersion": 11900,
+ "notes": "Colaboradores: admin cadastra nome + senha de 6 números",
+ "publishedAt": "2026-10-22T19:07:21",
  "apkVersionName": "1.14.0",
  "apkVersionCode": 25,
  "apkUrl": ""
