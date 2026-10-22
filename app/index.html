@@ -134,6 +134,43 @@ textarea{min-height:70px;resize:vertical}
 
 /* Chips */
 .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+/* Montador (1.23.0) */
+body.montador #pedFilters{display:none}
+body.montador #pedidosList{background:none;border:0;box-shadow:none;border-radius:0}
+.m-hello{display:flex;align-items:center;gap:10px;margin:2px 2px 14px}
+.m-hello>div{flex:1;min-width:0}.m-hello b{display:block;font-size:22px;letter-spacing:-.3px}
+.m-hello span{display:block;font-size:12px;color:var(--muted);margin-top:2px;text-transform:none}
+.m-login,.m-vazio{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.m-login b,.m-vazio b{font-size:17px}.m-login span,.m-vazio span{font-size:13px;color:var(--muted)}.m-login .btn{margin-top:8px}
+.m-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.m-stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;box-shadow:var(--shadow);border-top:3px solid var(--mc)}
+.m-stat b{display:block;font-size:26px;color:var(--mc);line-height:1.1}.m-stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.m-card{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--mc);border-radius:16px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer}
+.m-card:active{transform:scale(.99)}
+.m-date{width:56px;height:60px;flex:none;border-radius:12px;background:var(--mcs);color:var(--mc);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.m-date b{font-size:24px;font-weight:800}.m-date span{font-size:11px;font-weight:700;text-transform:uppercase;margin-top:3px}
+.m-body{flex:1;min-width:0}.m-body .t{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-body .s{font-size:12.5px;color:var(--muted);margin-top:1px}
+.m-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.m-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.m-tag.st{background:var(--mcs);color:var(--mc);border-color:transparent}
+.m-chev{color:var(--muted);font-size:22px;padding-left:2px}
+.m-hero{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;border-radius:18px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.m-hero:after{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--mc)}
+.m-hero .k{opacity:.8;font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.m-hero .d{font-size:24px;font-weight:800;margin:3px 0 8px;letter-spacing:-.3px}
+.m-hero .r{display:inline-block;background:rgba(255,255,255,.22);border-radius:999px;padding:3px 11px;font-size:12px;font-weight:700}
+.m-hero .c{margin-top:12px;font-size:16px;font-weight:700}
+.m-acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.m-act{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:12px;padding:11px 8px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}
+.m-sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.m-sec h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.m-peca{padding:10px 0;border-bottom:1px dashed var(--line)}.m-peca:first-of-type{padding-top:0}.m-peca:last-child{border-bottom:0;padding-bottom:0}
+.m-peca .n{font-weight:700;font-size:15px}.mat{font-size:12.5px;color:var(--muted);margin-top:2px}
+.m-peca .med{font-size:22px;font-weight:800;color:var(--brand);margin-top:4px;letter-spacing:-.3px}.m-peca .med small{font-size:13px;font-weight:600;color:var(--muted)}
+.m-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}.m-item:last-child{border-bottom:0}
+.m-ret textarea{width:100%}
+.m-enviados .list-item{padding:10px 0}
 .titles #syncBadge{font-size:12px;opacity:.85}
 body.montador nav.tabbar,body.montador .admin-only{display:none!important}
 /* Caixa */
@@ -380,7 +417,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.22.0';
+const APP_VERSION='1.24.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -2380,14 +2417,14 @@ function renderAll(){
 // ---- lado do administrador: gera o arquivo sem valores ----
 function pacoteMontador(){
  const so=(o,ks)=>{const r={};ks.forEach(k=>{if(o[k]!==undefined)r[k]=o[k];});return r;};
- const pedidos=act(data.pedidos).map(p=>so(p,['id','numero','orcamentoId','clienteId','status','dataPrevista','historico','obs','createdAt','updatedAt']));
+ const pedidos=act(data.pedidos).filter(p=>p.status!=='concluido').map(p=>so(p,['id','numero','orcamentoId','clienteId','status','dataPrevista','historico','obs','createdAt','updatedAt']));
  const usados=new Set(pedidos.map(p=>p.orcamentoId).filter(Boolean));
  const orcamentos=act(data.orcamentos).filter(o=>usados.has(o.id)).map(o=>Object.assign(so(o,['id','numero','clienteId','data','status','modo','fotos','local','createdAt','updatedAt']),{
   pecas:(o.pecas||[]).map(p=>Object.assign(so(p,['id','descricao','materialId','un','comprimento','largura','qtd']),{acabamentos:(p.acabamentos||[]).map(a=>so(a,['acabamentoId','qtd']))})),
   itens:(o.itens||[]).map(i=>so(i,['produtoId','qtd']))}));
  const nomes=(arr,ks)=>act(arr).map(x=>so(x,['id','nome'].concat(ks||[])));
  return {app:'marmoraria.itapiruba',tipo:'montador',version:APP_VERSION,exportedAt:now(),data:{
-  clientes:act(data.clientes).map(c=>so(c,['id','nome','telefone','createdAt','updatedAt'])),
+  clientes:act(data.clientes).filter(c=>pedidos.some(p=>p.clienteId===c.id)).map(c=>so(c,['id','nome','telefone','createdAt','updatedAt'])),
   orcamentos,pedidos,materiais:nomes(data.materiais,['tipo']),produtos:nomes(data.produtos,['unidade']),acabamentos:nomes(data.acabamentos,['unidade']),
   insumos:[],lancamentos:[],log:[],config:{empresa:{nome:data.config.empresa.nome||'Marmoraria Itapiruba'}}}};
 }
@@ -2400,7 +2437,7 @@ function exportMontador(){
 // ---- lado do montador ----
 function montadorInit(){
  document.body.classList.add('montador');
- $('appSub').textContent='Montador · só consulta';
+ $('appSub').textContent='Montador';
  document.title='Itapiruba Montador';{const m=document.querySelector('meta[name=apple-mobile-web-app-title]');if(m)m.content='Montador';}
  const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
  const home=$('pageHome');if(home)home.innerHTML='<div id="mHome"></div>';
@@ -2410,11 +2447,90 @@ function montadorInit(){
 function mDadosInfo(){
  return data.recebidoEm?'Dados do escritório de '+new Date(data.recebidoEm).toLocaleDateString('pt-BR')+' às '+new Date(data.recebidoEm).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Ainda sem dados do escritório.';
 }
+// ---- visual do montador (1.23.0): cartões com data em destaque e cor por urgência ----
+const MESES_CURTOS=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const DIAS_SEMANA=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+function mDiasAte(iso){if(!iso)return null;const a=new Date(iso+'T12:00:00'),h=new Date(isoToday()+'T12:00:00');return Math.round((a-h)/864e5);}
+function mUrgencia(p){
+ if(p.status==='concluido')return {cor:'var(--st-rec)',soft:'var(--st-rec-soft)',txt:'Concluída'};
+ const d=mDiasAte(p.dataPrevista);
+ if(d==null)return {cor:'var(--muted)',soft:'var(--surface)',txt:'Sem data'};
+ if(d<0)return {cor:'var(--st-pagat)',soft:'var(--st-pagat-soft)',txt:'Atrasada '+(-d)+(d===-1?' dia':' dias')};
+ if(d===0)return {cor:'var(--st-apag)',soft:'var(--st-apag-soft)',txt:'Hoje'};
+ if(d===1)return {cor:'var(--st-apag)',soft:'var(--st-apag-soft)',txt:'Amanhã'};
+ return {cor:'var(--brand)',soft:'var(--brand-soft)',txt:'Em '+d+' dias'};
+}
 function mObraLinha(p){
- const hoje=isoToday(),atr=p.status!=='concluido'&&p.dataPrevista&&p.dataPrevista<hoje;
- return '<div class="list-item" onclick="viewPedido(\''+p.id+'\')"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>'+
-  '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+'</div></div>'+
-  '<div class="end"><div class="cap">'+(p.status==='concluido'?'<span class="badge b-ok">Concluída</span>':p.dataPrevista?'<span class="badge '+(atr?'b-danger':'b-sent')+'">'+(atr?'atrasada · ':'entrega ')+fmtDate(p.dataPrevista).slice(0,5)+'</span>':'<span class="badge">sem data</span>')+'</div></div></div>';
+ const u=mUrgencia(p),orc=byId(data.orcamentos,p.orcamentoId),nf=orc?orcFotos(orc).length:0,np=orc?(orc.pecas||[]).length:0;
+ const dt=p.dataPrevista?new Date(p.dataPrevista+'T12:00:00'):null,nr=retornosDa(p.id).length;
+ return '<div class="m-card" style="--mc:'+u.cor+';--mcs:'+u.soft+'" onclick="viewPedido(\''+p.id+'\')">'+
+  '<div class="m-date">'+(dt?'<b>'+dt.getDate()+'</b><span>'+MESES_CURTOS[dt.getMonth()]+'</span>':'<b>—</b><span>data</span>')+'</div>'+
+  '<div class="m-body"><div class="t">'+esc(clienteName(p.clienteId))+'</div>'+
+   '<div class="s">Obra Nº '+(p.numero||'')+(dt?' · '+DIAS_SEMANA[dt.getDay()]:'')+'</div>'+
+   '<div class="m-tags"><span class="m-tag st">'+u.txt+'</span>'+(np?'<span class="m-tag">'+np+(np>1?' peças':' peça')+'</span>':'')+(nf?'<span class="m-tag">📷 '+nf+'</span>':'')+
+   (orc&&orc.local&&orc.local.lat!=null?'<span class="m-tag">📍 mapa</span>':'')+(nr?'<span class="m-tag">💬 '+nr+'</span>':'')+'</div></div>'+
+  '<div class="m-chev">›</div></div>';
+}
+function setPedFilterM(f){pedFilter=f;renderPedidos();}
+function renderPedidosM(){
+ const topo=$('mTopo'),el=$('pedidosList');
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido');
+ const atr=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d!=null&&d<0;}).length;
+ const logo=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d===0||d===1;}).length;
+ const hj=new Date(),nome=syncLS('nome')||'';
+ if(topo)topo.innerHTML=(sync.user?
+  '<div class="m-hello"><div><b>Olá'+(nome?', '+esc(primeiroNome(nome)):'')+' 👋</b><span>'+DIAS_SEMANA[hj.getDay()]+', '+hj.getDate()+' de '+MESES_LONGOS[hj.getMonth()]+' · '+esc(syncResumo())+'</span></div><button class="btn sec sm" onclick="syncSair()">Sair</button></div>':
+  '<div class="m-login"><div style="font-size:34px">🔐</div><b>Entre para ver as suas obras</b><span>Use o nome e a senha que o escritório passou.</span><button class="btn" onclick="openSync()">Entrar</button></div>')+
+  '<div class="m-stats">'+
+   '<div class="m-stat" style="--mc:var(--st-pagat)"><b>'+atr+'</b><span>Atrasadas</span></div>'+
+   '<div class="m-stat" style="--mc:var(--st-apag)"><b>'+logo+'</b><span>Hoje/amanhã</span></div>'+
+   '<div class="m-stat" style="--mc:var(--brand)"><b>'+ativas.length+'</b><span>A entregar</span></div></div>'+
+  '<div class="section-title" style="margin-top:4px">Obras para entregar</div>';
+ const list=ativas.slice().sort(mOrdemEntrega);   // concluída pelo escritório some daqui
+ el.innerHTML=list.length?list.map(mObraLinha).join(''):'<div class="m-vazio"><div style="font-size:40px">🧱</div><b>Nenhuma obra para entregar</b><span>'+(sync.user?'Quando o escritório lançar uma obra, ela aparece aqui sozinha.':'Entre para receber as obras.')+'</span></div>';
+}
+function viewPedidoM(id){
+ const p=byId(data.pedidos,id);if(!p)return;
+ const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId),u=mUrgencia(p);
+ const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
+ const dt=p.dataPrevista?new Date(p.dataPrevista+'T12:00:00'):null;
+ const pecas=orc?(orc.pecas||[]).map(pc=>{const un=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
+  const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
+  return '<div class="m-peca"><div class="n">'+esc(pc.descricao||'Peça')+(q>1?' <span class="m-tag">'+q+' un</span>':'')+'</div>'+
+   '<div class="mat">'+esc(nm(data.materiais,pc.materialId)||'material não informado')+'</div>'+
+   '<div class="med">'+fmtNum(pc.comprimento)+' × '+fmtNum(pc.largura)+' <small>'+un+'</small></div>'+
+   (ac.length?'<div class="mat">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join(''):'';
+ const itens=orc?(orc.itens||[]).map(i=>'<div class="m-item"><span>'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><b>'+fmtNum(num(i.qtd)||1)+'</b></div>').join(''):'';
+ const nf=orc?orcFotos(orc).length:0,temTel=c&&soDigitos(c.telefone),temMapa=orc&&orc.local&&orc.local.lat!=null;
+ openModal('Obra Nº '+(p.numero||''),
+  '<div class="m-hero" style="--mc:'+u.cor+'">'+
+   '<div class="k">Entrega</div>'+
+   '<div class="d">'+(dt?DIAS_SEMANA[dt.getDay()].replace(/^./,x=>x.toUpperCase())+', '+dt.getDate()+' de '+MESES_LONGOS[dt.getMonth()]:'Sem data marcada')+'</div>'+
+   '<span class="r">'+u.txt+'</span>'+
+   '<div class="c">👤 '+esc(clienteName(p.clienteId))+'</div>'+
+   ((temTel||temMapa)?'<div class="m-acts">'+
+    (temTel?'<button class="m-act" onclick="whatsEntregaM(\''+c.id+'\')">💬 Avisar entrega</button>':'')+
+    (temMapa?'<button class="m-act" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Como chegar</button>':'')+'</div>':'')+
+  '</div>'+
+  (p.obs?'<div class="m-sec"><h3>📝 Observações</h3><div style="white-space:pre-wrap;font-size:15px;line-height:1.45">'+esc(p.obs)+'</div></div>':'')+
+  (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
+  (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
+  (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+
+  retornoFormM(id)+
+  '<div class="hint" style="margin:6px 2px 4px;text-align:center">Os dados da obra são alterados só pelo escritório.</div>');
+ $('modalBox').scrollTop=0;
+}
+function retornoFormM(pid){
+ const env=retornosDa(pid);
+ return '<div class="m-sec m-ret"><h3>📤 Retorno para o escritório</h3>'+
+  '<div class="chip-row" style="margin-bottom:10px">'+RET_SUGESTOES.map(t=>'<button type="button" class="chip" onclick="retSugestaoM(\''+t+'\')">'+t+'</button>').join('')+'</div>'+
+  '<textarea id="mRetTexto" style="min-height:84px" placeholder="Escreva aqui: faltou rodapé, não encaixou no esquadro, medida errada…"></textarea>'+
+  '<div id="mRetFotosBox">'+retFotosPrevM(pid)+'</div>'+
+  '<input type="file" accept="image/*" id="mRetInput" class="hidden" onchange="addFotoRetM(event,\''+pid+'\')">'+
+  '<div class="btn-row" style="margin-top:10px"><button class="btn sec" onclick="$(\'mRetInput\').click()">📷 Foto</button>'+
+  '<button class="btn" onclick="enviarRetornoM(\''+pid+'\')">Enviar</button></div>'+
+  (env.length?'<div class="m-enviados"><div class="mat" style="margin:12px 0 6px;font-weight:700">Já enviado ('+env.length+')</div>'+env.map(retornoHtml).join('')+'</div>':'')+
+  '</div>';
 }
 function mOrdemEntrega(a,b){return (a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999')||(a.numero||0)-(b.numero||0);}
 function renderHomeM(){
@@ -2443,43 +2559,6 @@ function viewClienteM(id){
   (soDigitos(c.telefone)?'<div style="margin-top:12px"><button class="btn ok" onclick="abrirWhatsAppCliente(\''+id+'\')">Falar no WhatsApp</button></div>':'')+
   '<div class="section-title">Obras'+(obras.length?' ('+obras.length+')':'')+'</div>'+
   (obras.length?'<div class="card">'+obras.map(p=>mObraLinha(p).replace('viewPedido(','closeModal();viewPedido(')).join('')+'</div>':'<div class="empty" style="padding:18px">Nenhuma obra.</div>'));
-}
-function renderPedidosM(){
- const topo=$('mTopo');
- if(topo)topo.innerHTML=sync.user?
-  '<div style="display:flex;align-items:center;gap:10px;margin:0 2px 10px"><div class="hint" style="flex:1;margin:0">👤 '+esc(syncLS('nome')||'')+' · '+esc(syncResumo())+'</div><button class="btn sec sm" onclick="syncSair()">Sair</button></div>':
-  '<div style="margin-bottom:10px"><button class="btn" onclick="openSync()">☁ Entrar</button></div><div class="hint" style="margin:0 2px 10px">'+esc(mDadosInfo())+'</div>';
- renderPedFilters();
- let list=act(data.pedidos).slice().sort(mOrdemEntrega);
- if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
- else if(pedFilter==='concluido')list=list.filter(p=>p.status==='concluido');
- const el=$('pedidosList');
- el.innerHTML=list.length?list.map(mObraLinha).join(''):emptyBox('Nenhuma obra','Peça ao escritório o arquivo atualizado.');
-}
-function viewPedidoM(id){
- const p=byId(data.pedidos,id);if(!p)return;
- const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId);
- const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
- const pecas=orc?(orc.pecas||[]).map(pc=>{const u=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
-  const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
-  return '<div class="list-item" style="cursor:default;display:block"><div class="t" style="font-weight:600">'+esc(pc.descricao||'Peça')+(q>1?' · '+q+' un':'')+'</div>'+
-   '<div class="s" style="color:var(--muted);font-size:13px;margin-top:2px">'+esc(nm(data.materiais,pc.materialId)||'material não informado')+'</div>'+
-   '<div style="font-size:15px;margin-top:4px"><b>'+fmtNum(pc.comprimento)+' '+u+' × '+fmtNum(pc.largura)+' '+u+'</b></div>'+
-   (ac.length?'<div class="s" style="font-size:13px;margin-top:2px">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join(''):'';
- const itens=orc?(orc.itens||[]).map(i=>'<div class="detail-row"><span class="dk">'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><span class="dv">'+fmtNum(num(i.qtd)||1)+'</span></div>').join(''):'';
- const nf=orc?orcFotos(orc).length:0;
- openModal('Obra Nº '+(p.numero||''),
-  '<div class="card fin-hero" style="padding:12px 14px;margin-bottom:10px"><div class="k">Data de entrega</div><div class="v" style="font-size:24px">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</div></div>'+
-  '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+esc(clienteName(p.clienteId))+'</span></div>'+
-  (c&&soDigitos(c.telefone)?'<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="whatsEntregaM(\''+c.id+'\')">Falar no WhatsApp (avisar entrega)</button></div>':'')+
-  (orc&&orc.local&&orc.local.lat!=null?'<div style="margin-top:8px"><button class="btn sec sm" style="width:100%" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa (como chegar)</button></div>':'')+
-  (p.obs?'<div class="section-title">Observações</div><div style="white-space:pre-wrap;font-size:14px">'+esc(p.obs)+'</div>':'')+
-  (pecas?'<div class="section-title">Peças e medidas</div><div class="card">'+pecas+'</div>':'')+
-  (itens?'<div class="section-title">Produtos</div>'+itens:'')+
-  (nf?'<div class="section-title">Fotos do serviço e local ('+nf+')</div>'+fotosOrcHtml(orc,'ped',id,false):'')+
-  retornoFormM(id)+
-  '<div class="hint" style="margin-top:14px">Os dados da obra são alterados só pelo escritório.</div>');
- $('modalBox').scrollTop=0;
 }
 // WhatsApp do montador já com o aviso de saída para entrega
 function whatsEntregaM(clienteId){
@@ -2836,17 +2915,6 @@ function retornoHtml(r){
 }
 function verFotoRet(id){const r=(data.retornos||[]).find(x=>x.id===id);if(r&&r.foto)verFotoFull(r.foto);}
 // ---- montador: formulário no fim da tela da obra ----
-function retornoFormM(pid){
- const env=retornosDa(pid);
- return '<div class="section-title">Retorno para o escritório</div>'+
-  '<div class="chip-row" style="margin-bottom:8px">'+RET_SUGESTOES.map(t=>'<button type="button" class="chip" onclick="retSugestaoM(\''+t+'\')">'+t+'</button>').join('')+'</div>'+
-  '<label class="fld"><span>Observações</span><textarea id="mRetTexto" style="min-height:80px" placeholder="Ex.: faltou rodapé, não encaixou no esquadro, medida errada…"></textarea></label>'+
-  '<div id="mRetFotosBox">'+retFotosPrevM(pid)+'</div>'+
-  '<input type="file" accept="image/*" id="mRetInput" class="hidden" onchange="addFotoRetM(event,\''+pid+'\')">'+
-  '<div class="btn-row" style="margin-top:10px"><button class="btn sec" onclick="$(\'mRetInput\').click()">📷 Tirar foto</button>'+
-  '<button class="btn" onclick="enviarRetornoM(\''+pid+'\')">Enviar ao escritório</button></div>'+
-  (env.length?'<div class="section-title">Já enviado ('+env.length+')</div><div class="card">'+env.map(retornoHtml).join('')+'</div>':'');
-}
 function retFotosPrevM(pid){
  return mRetFotos.length?'<div class="foto-grid" style="margin-top:6px">'+mRetFotos.map((f,i)=>fotoThumbHtml(f,"verFotoFull(mRetFotos["+i+"])","mRetFotos.splice("+i+",1);$('mRetFotosBox').innerHTML=retFotosPrevM('"+pid+"')")).join('')+'</div>':'';
 }
