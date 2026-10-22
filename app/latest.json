@@ -1,9 +1,12 @@
 {
- "version": "1.21.0",
- "interfaceVersion": 12100,
- "notes": "Notificação de retorno, aviso no Início, sem duplicar envio do montador",
- "publishedAt": "2026-10-22T19:28:27",
+ "version": "1.22.0",
+ "interfaceVersion": 12200,
+ "notes": "Aviso de atualização no topo da tela inicial",
+ "publishedAt": "2026-10-22T19:31:39",
  "apkVersionName": "1.21.0",
  "apkVersionCode": 26,
- "apkUrl": ""
+ "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.21.0/MarmorariaItapiruba-1.21.0.apk",
+ "apkMontadorVersionName": "",
+ "apkMontadorVersionCode": 0,
+ "apkMontadorUrl": ""
 }

@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.21.0';
+const APP_VERSION='1.22.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1995,6 +1995,7 @@ window.nativeEvent=function(event,encoded){
 };
 /* ---- Atualização automática (OTA): o nativo baixa a interface assinada; aqui só avisamos e recarregamos ---- */
 function avisoAtualizacao(ver){
+ upd.tela={versao:ver||''};renderUpd();
  if($('otaAviso'))return;
  const d=document.createElement('div');d.id='otaAviso';
  d.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;background:var(--brand);color:#fff;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.3);font-size:14px';
@@ -2002,6 +2003,39 @@ function avisoAtualizacao(ver){
   '<button class="btn sm" style="background:#fff;color:var(--brand)" onclick="aplicarAtualizacao()">Atualizar</button>'+
   '<button class="btn sm" style="background:transparent;color:#fff;padding:9px 6px" onclick="this.parentNode.remove()" aria-label="Depois">✕</button>';
  document.body.appendChild(d);
+}
+/* ---- Aviso de atualização no topo da tela inicial (1.22.0) ----
+   Android: a tela nova chega pelo nativo (evento interfaceUpdate); APK novo vem do latest.json (publish_apk.py).
+   iPhone/navegador: compara o latest.json com a versão aberta e recarrega sem cache. */
+const FEED_URL='https://ervitonsilveira.github.io/marmoraria-app/app/latest.json';
+const ifaceDe=v=>{const m=String(v||'').match(/(\d+)\.(\d+)\.(\d+)/);return m?(+m[1])*10000+(+m[2])*100+(+m[3]):0;};
+const upd={tela:null,apk:null};
+const temNativo=()=>typeof Android!=='undefined'&&!!Android.appInfo;
+async function checarAtualizacoes(){
+ try{
+  const f=await (await fetch(FEED_URL+'?t='+Date.now(),{cache:'no-store'})).json();
+  if(!temNativo()){if(ifaceDe(f.version)>ifaceDe(APP_VERSION))upd.tela={versao:f.version,web:true};}
+  else{
+   const inst=+(JSON.parse(Android.appInfo()||'{}').versionCode)||0;
+   const code=+(MONTADOR?f.apkMontadorVersionCode:f.apkVersionCode)||0,url=MONTADOR?f.apkMontadorUrl:f.apkUrl;
+   if(url&&code>inst)upd.apk={versao:MONTADOR?f.apkMontadorVersionName:f.apkVersionName,url};
+  }
+ }catch(e){}
+ renderUpd();
+}
+function renderUpd(){
+ const alvo=MONTADOR?$('pagePedidos'):$('pageHome');if(!alvo)return;
+ let el=$('updCard');
+ if(!el){el=document.createElement('div');el.id='updCard';alvo.insertBefore(el,alvo.firstChild);}
+ let h='';
+ if(upd.apk)h+='<div class="card" style="padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center;border-color:var(--brand)"><span style="font-size:22px">📲</span><div style="flex:1"><b>Nova versão do aplicativo'+(upd.apk.versao?' '+esc(upd.apk.versao):'')+'</b><div class="hint" style="margin:2px 0 0">Baixe e instale por cima. Seus dados continuam salvos.</div></div><button class="btn sm" onclick="abrirLink(upd.apk.url)">Instalar</button></div>';
+ if(upd.tela)h+='<div class="card" style="padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center;border-color:var(--brand)"><span style="font-size:22px">🔄</span><div style="flex:1"><b>Nova versão '+esc(upd.tela.versao||'')+' pronta</b><div class="hint" style="margin:2px 0 0">Toque em Atualizar. Seus dados continuam salvos.</div></div><button class="btn sm" onclick="atualizarAgora()">Atualizar</button></div>';
+ el.innerHTML=h;
+}
+function atualizarAgora(){
+ try{save(true);}catch(e){}
+ if(upd.tela&&upd.tela.web){location.replace(location.pathname+'?v='+encodeURIComponent(upd.tela.versao||Date.now())+(MONTADOR?'&montador':''));return;}
+ aplicarAtualizacao();
 }
 function aplicarAtualizacao(){
  try{save();}catch(e){}
@@ -2882,6 +2916,7 @@ function retornoAdminHtml(pid){
  {const sb=document.createElement('span');sb.id='syncBadge';$('appSub').after(sb);}
  renderAll();
  if(syncLS('ativo'))fbIniciar();   // já entrou antes: conecta sozinho
+ setTimeout(checarAtualizacoes,2500);   // aviso de versão nova no topo da tela inicial
 })();
 </script>
 </body>
