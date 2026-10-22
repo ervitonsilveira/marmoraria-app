@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.32.3';
+const APP_VERSION='1.32.4';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1267,13 +1267,30 @@ function setOrcStatus(id,st){
  const o=byId(data.orcamentos,id);if(!o)return;
  o.status=st;o.updatedAt=now();save();viewOrcamento(id);renderAll();
 }
+// 1.32.4: tudo o que foi preenchido no orçamento (peças, medidas, produtos, mão de obra, fotos, local)
+function orcPreenchidoHtml(o){
+ const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
+ const pecas=(o.pecas||[]).map(pc=>{const un=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
+  const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
+  return '<div class="m-peca"><div class="n">'+esc(pc.descricao||'Peça')+(q>1?' <span class="m-tag">'+q+' un</span>':'')+'</div>'+
+   '<div class="mat">'+esc(nm(data.materiais,pc.materialId)||'material não informado')+'</div>'+
+   '<div class="med">'+fmtNum(pc.comprimento)+' × '+fmtNum(pc.largura)+' <small>'+un+'</small></div>'+
+   (ac.length?'<div class="mat">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join('');
+ const itens=(o.itens||[]).map(i=>'<div class="m-item"><span>'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><b>'+fmtNum(num(i.qtd)||1)+'</b></div>').join('');
+ const mao=maoDescricao(o),nf=orcFotos(o).length,temMapa=o.local&&o.local.lat!=null;
+ return (pecas?'<div class="m-sec" style="margin-top:12px"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
+  (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
+  (mao?'<div class="m-sec"><h3>👷 Mão de obra</h3><div>'+esc(mao)+'</div></div>':'')+
+  (nf?'<div class="m-sec"><h3>🖼️ Fotos ('+nf+')</h3>'+fotosOrcHtml(o,'orc',o.id,false)+'</div>':'')+
+  (temMapa?'<div class="m-sec"><h3>📍 Local do serviço</h3><button class="btn sec sm" style="width:100%" onclick="abrirMapa(byId(data.orcamentos,\''+o.id+'\').local)">Abrir no mapa</button></div>':'');
+}
 function viewOrcamento(id){
  const o=byId(data.orcamentos,id);if(!o)return;
  const st=ORC_STATUS[o.status]||ORC_STATUS.rascunho;
  const pedido=act(data.pedidos).find(p=>p.orcamentoId===id);
  let corpo='';
  if(isNovo(o)){
-  corpo='<div class="section-title" style="margin-top:14px">Valores da proposta</div><div class="peca"><div class="calc2" style="margin-top:0;border:0;padding-top:0">'+
+  corpo=orcPreenchidoHtml(o)+'<div class="section-title" style="margin-top:14px">Valores da proposta</div><div class="peca"><div class="calc2" style="margin-top:0;border:0;padding-top:0">'+
    linhasCliente(o).map(x=>'<div class="cl"><span>'+esc(x.texto)+'</span><span><b>'+money(x.valor)+'</b></span></div>').join('')+'</div></div>';
  }else{
   const linhas=(o.pecas||[]).map(p=>{
