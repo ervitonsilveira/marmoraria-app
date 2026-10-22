@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#35606e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Marmoraria">
+<meta name="application-name" content="Marmoraria">
+<link rel="apple-touch-icon" href="data:image/png;base64,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XG/iM24A+FlBGgIAATCS0l46WFIA1Dz4BQACAAFQgZJeOlhCAEQY/AIAAYAAEAICoLC79wkABAAIgOJCIMcAiDj4BQACAAEgBMIGQOk38REACAAQAJeGgAAw+AUAAgABEFQOdxWcMwAMfgGAAEAACIFAAVDrTXwEAAIABEAxIZAyAAx+AYAAQAAY+JmEQKoAMPgFAAIAASAAMgqBqQMg0k18BAACAARAMS8dnCoADH4BgAAAAZBxCIwdAEM38TH4BQACAARAZiEwVgBEvnufAEAAgAAoLgRODYDuZL/BLwAQACAACguBYwPATXwEAAIABEDBrxg4NAAMfgGAAAABUEEI7BsA227iY2gLAAQACIACQ+CyAHD3PgGAAAABUGEIbAsAg18AECUAnm0/gAQEQF4hMBQAbuKTQQD4WUEiAgABEET/FQObAWDwCwAEAAiAIC8d7L+G3+AXAAgAEACV++73f+AmPgIAAeBJQABE8cLyewa/AAABgACI4rWf/qz5zFPPDi77G74CAAEAAiDA4O9WAbp/JwAEAALAE4EACDT41wSAAEAAeCIQABUP/u6fu9/v/7cCQAAgADwRCIBAg18ACAAQAAiAChw6+AWAAAABgACo6CV9+w5+ASAAQAAgAAIOfgEgAEAAIAAKv4nPMYNfAAgAEAAIgEIHf/8lfQJAAIAAQABUdLJ/isEvAAQACAAEQKE38REAAgAEAALA4BcAAgAEAAKglpv4TP3/KwAEAALAE4EAKOTufQJAAIAAQAAY/AJAAIAAQABEuomPABAAMEIAfLOBFCIHQE6DXwDkHgB+VpCGAEAABBv8AkAAgABAABR29z4BIABAACAADH4BIABAACAAIt3ERwAIABAACACDXwAIABAACACDXwAIABAACIAqb+IjAAQACAAEgMEvAAQACAAEwNhqG/wCQADA/QD4WPsLpFBaAOR8Ex8BUG8A+FlBKgIAARBs8AsAAQACAAFwyU18ahz8AkAAgABAABR29z4BIABAACAARjjZH3HwCwABAAKAkAFQw018BIAAAAGAADD4BYAAAAGAANj3Jj5RB78AEAAgAKg6AGq8e58AEAAgABAABr8AEAAgABAAkW7iIwAEAAgABIDBLwAEAAgAYgWAwS8ABAAIAAIFQNS79wkAAQACgJABYPALAAEAYwXAc+0HkMApAeAmPgIgTAD4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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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XG/iM24A+FlBGgIAATCS0l46WFIA1Dz4BQACAAFQgZJeOlhCAEQY/AIAAYAAEAICoLC79wkABAAIgOJCIMcAiDj4BQACAAEgBMIGQOk38REACAAQAJeGgAAw+AUAAgABEFQOdxWcMwAMfgGAAEAACIFAAVDrTXwEAAIABEAxIZAyAAx+AYAAQAAY+JmEQKoAMPgFAAIAASAAMgqBqQMg0k18BAACAARAMS8dnCoADH4BgAAAAZBxCIwdAEM38TH4BQACAARAZiEwVgBEvnufAEAAgAAoLgRODYDuZL/BLwAQACAACguBYwPATXwEAAIABEDBrxg4NAAMfgGAAAABUEEI7BsA227iY2gLAAQACIACQ+CyAHD3PgGAAAABUGEIbAsAg18AECUAnm0/gAQEQF4hMBQAbuKTQQD4WUEiAgABEET/FQObAWDwCwAEAAiAIC8d7L+G3+AXAAgAEACV++73f+AmPgIAAeBJQABE8cLyewa/AAABgACI4rWf/qz5zFPPDi77G74CAAEAAiDA4O9WAbp/JwAEAALAE4EACDT41wSAAEAAeCIQABUP/u6fu9/v/7cCQAAgADwRCIBAg18ACAAQAAiAChw6+AWAAAABgACo6CV9+w5+ASAAQAAgAAIOfgEgAEAAIAAKv4nPMYNfAAgAEAAIgEIHf/8lfQJAAIAAQABUdLJ/isEvAAQACAAEQKE38REAAgAEAALA4BcAAgAEAAKglpv4TP3/KwAEAALAE4EAKOTufQJAAIAAQAAY/AJAAIAAQABEuomPABAAMEIAfLOBFCIHQE6DXwDkHgB+VpCGAEAABBv8AkAAgABAABR29z4BIABAACAADH4BIABAACAAIt3ERwAIABAACACDXwAIABAACACDXwAIABAACIAqb+IjAAQACAAEgMEvAAQACAAEwNhqG/wCQADA/QD4WPsLpFBaAOR8Ex8BUG8A+FlBKgIAARBs8AsAAQACAAFwyU18ahz8AkAAgABAABR29z4BIABAACAARjjZH3HwCwABAAKAkAFQw018BIAAAAGAADD4BYAAAAGAANj3Jj5RB78AEAAgAKg6AGq8e58AEAAgABAABr8AEAAgABAAkW7iIwAEAAgABIDBLwAEAAgAYgWAwS8ABAAIAAIFQNS79wkAAQACgJABYPALAAEAYwXAc+0HkMApAeAmPgIgTAD4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">
+<title>Marmoraria Itapiruba</title>
+<style>
+:root{
+ /* Tema "azul sereno": paleta harmônica, receita e despesa em tons da mesma família */
+ --bg:#eef1f2; --card:#ffffff; --surface:#f3f6f7; --text:#28343a; --muted:#6f7d84;
+ --line:#dde3e5; --brand:#3d6b7a; --brand-dark:#35606e; --brand-soft:#e3edf0;
+ --ok:#4e8a74; --ok-soft:#e3efea; --warn:#b58a4a; --warn-soft:#f4ecdc;
+ --danger:#b0705f; --danger-soft:#f3e7e3; --info:#3d6b7a;
+ /* situação dos lançamentos no Caixa */
+ --st-rec:#2e8b57; --st-rec-soft:#dff1e6; --st-arec:#c9a000; --st-arec-soft:#faf3cf;
+ --st-recat:#8e44ad; --st-recat-soft:#f1e3f7; --st-pago:#7a868c; --st-pago-soft:#eceff0;
+ --st-apag:#e07b1f; --st-apag-soft:#fcebdb; --st-pagat:#d32f2f; --st-pagat-soft:#fbe1e1;
+ --radius:14px; --shadow:0 1px 3px rgba(30,50,60,.09),0 6px 18px rgba(30,50,60,.06);
+}
+body.dark{
+ --bg:#121a1e; --card:#1b262b; --surface:#162024; --text:#e5edf0; --muted:#93a3aa;
+ --line:#2a363b; --brand:#4e8294; --brand-dark:#3d6b7a; --brand-soft:#19303a;
+ --ok:#5aa088; --ok-soft:#153028; --warn:#d6a74e; --warn-soft:#342c14;
+ --danger:#c58571; --danger-soft:#3a251f; --info:#4e8294;
+ --st-rec:#4cc47f; --st-rec-soft:#14301f; --st-arec:#f2cf3a; --st-arec-soft:#352e0e;
+ --st-recat:#c48ee6; --st-recat-soft:#2e1d3a; --st-pago:#98a5ab; --st-pago-soft:#242e33;
+ --st-apag:#f59a45; --st-apag-soft:#3a2614; --st-pagat:#f26b6b; --st-pagat-soft:#3c1d1d;
+ --shadow:0 1px 3px rgba(0,0,0,.45),0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;background:var(--bg);color:var(--text);
+ font-size:16px;line-height:1.45;padding-bottom:84px;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:700;line-height:1.2}
+a{color:var(--brand)}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+.hidden{display:none !important}
+
+/* Top bar */
+header.appbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,var(--brand-dark),var(--brand));
+ color:#fff;padding:14px 16px calc(14px + env(safe-area-inset-top,0)) 16px;padding-top:max(14px,env(safe-area-inset-top,0));
+ display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(20,40,60,.18)}
+.appbar .logo{width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.appbar .logo svg{width:24px;height:24px}
+.appbar .titles{flex:1;min-width:0}
+.appbar .titles b{display:block;font-size:17px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .titles span{display:block;font-size:12px;opacity:.82}
+.appbar .iconbtn{background:rgba(255,255,255,.14);border:0;color:#fff;width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.appbar .iconbtn svg{width:20px;height:20px}
+
+/* Layout */
+main{max-width:720px;margin:0 auto;padding:16px}
+.page{display:none}
+.page.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.section-title{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:22px 2px 10px}
+.section-title:first-child{margin-top:4px}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card.pad{padding:16px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.stat .k{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.stat .v{font-size:22px;font-weight:700;margin-top:4px}
+.stat .v.small{font-size:16px}
+.stat.tap{cursor:pointer;transition:transform .1s}
+.stat.tap:active{transform:scale(.98)}
+.stat .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Dashboard money tile */
+.hero{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.hero .lbl{font-size:12px;opacity:.85}
+.hero .big{font-size:30px;font-weight:800;margin-top:2px}
+.hero .row{display:flex;gap:18px;margin-top:14px}
+.hero .row div{flex:1}
+.hero .row .mini{font-size:11px;opacity:.82}
+.hero .row .num{font-size:16px;font-weight:700}
+
+/* Lists */
+.list-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.list-item:last-child{border-bottom:0}
+.list-item:active{background:var(--surface)}
+.list-item .av{width:40px;height:40px;border-radius:10px;background:var(--brand-soft);color:var(--brand);
+ display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto}
+.list-item .av svg{width:20px;height:20px}
+.list-item .body{flex:1;min-width:0}
+.list-item .body .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .body .s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .end{text-align:right;flex:0 0 auto}
+.list-item .end .money{font-weight:700}
+.list-item .end .cap{font-size:12px;color:var(--muted)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.b-draft{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.b-sent{background:var(--brand-soft);color:var(--brand)}
+.b-ok{background:var(--ok-soft);color:var(--ok)}
+.b-warn{background:var(--warn-soft);color:var(--warn)}
+.b-danger{background:var(--danger-soft);color:var(--danger)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;
+ padding:12px 16px;font-weight:600;background:var(--brand);color:#fff;width:100%}
+.btn svg{width:18px;height:18px}
+.btn:active{filter:brightness(.95)}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--line)}
+.btn.danger{background:var(--danger)}
+.btn.sm{padding:9px 12px;font-size:14px;width:auto}
+.btn.ok{background:var(--ok)}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1}
+.fab-note{color:var(--muted);font-size:13px;text-align:center;padding:30px 10px}
+
+/* Forms */
+label.fld{display:block;margin:12px 0 0}
+label.fld>span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+ background:var(--surface);color:var(--text);font-size:16px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+textarea{min-height:70px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.hint{font-size:12px;color:var(--muted);margin:6px 2px 0}
+
+/* Chips */
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+/* Caixa */
+.fin-month{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.fin-month .chip{padding:8px 16px;font-size:18px;line-height:1}
+.fin-month-t{font-size:18px;font-weight:700}
+.fin-month-s{font-size:12px;color:var(--muted)}
+.fin-hero{padding:16px}
+.fin-hero .k{font-size:13px;color:var(--muted);font-weight:600}
+.fin-hero .v{font-size:30px;font-weight:800;margin:4px 0 2px;letter-spacing:-.5px}
+.fin-hero .s{font-size:13px;color:var(--muted)}
+.stat .n{font-size:11px;color:var(--muted);margin-top:2px}
+.stat.on{outline:2px solid var(--brand);outline-offset:-1px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);color:var(--text);font:inherit;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow);text-align:center;line-height:1.2}
+.tool .ic{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand)}
+.tool .ic svg{width:20px;height:20px}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600;padding:9px 4px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+.fin-info{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:12px;color:var(--muted);margin:0 2px 8px}
+.fin-info a{color:var(--brand);font-weight:600;text-decoration:none}
+.day-h{display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;font-weight:600;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line);text-transform:capitalize}
+.fin-alert{display:flex;gap:10px;align-items:center;margin-top:12px;padding:12px 14px;border-radius:var(--radius);background:var(--st-pagat-soft);color:var(--text);font-size:13px;cursor:pointer;border:1px solid var(--line)}
+.fin-alert b{color:var(--st-pagat)}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;
+ padding:7px 13px;font-size:14px;font-weight:600}
+.chip.active{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,30,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+details.mais{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.mais>summary{cursor:pointer;font-weight:600;color:var(--brand);padding:6px 0;list-style:none}
+details.mais>summary::-webkit-details-marker{display:none}
+details.mais>summary::before{content:'▸ '}
+details.mais[open]>summary::before{content:'▾ '}
+.modal{background:var(--card);width:100%;max-width:720px;max-height:92vh;border-radius:18px 18px 0 0;
+ overflow-y:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0));animation:slideup .22s ease}
+@media(min-width:720px){.modal{border-radius:18px;margin-bottom:5vh}.modal-bg{align-items:center}}
+@keyframes slideup{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.modal .mhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.modal .mhead h2{font-size:19px;flex:1}
+.modal .mhead .x{background:var(--surface);border:1px solid var(--line);border-radius:9px;width:34px;height:34px;color:var(--muted);font-size:20px;line-height:1}
+
+/* Peça sub-card in orçamento */
+.peca{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:var(--surface)}
+.peca .ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.peca .ph .pt{font-weight:700;font-size:14px}
+.peca .calc{font-size:13px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between}
+.peca .calc b{color:var(--text)}
+.acb-line{display:flex;gap:8px;align-items:center;margin-top:8px}
+.acb-line select{flex:2}
+.acb-line input{flex:1}
+.acb-line .rm{background:var(--danger-soft);color:var(--danger);border:0;border-radius:8px;width:36px;height:40px;flex:0 0 auto;font-size:18px}
+.linkbtn{background:none;border:0;color:var(--brand);font-weight:600;font-size:14px;padding:8px 0}
+
+/* Bottom nav */
+nav.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--card);border-top:1px solid var(--line);
+ display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0));max-width:720px;margin:0 auto}
+nav.tabbar button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:11px;font-weight:600}
+nav.tabbar button svg{width:22px;height:22px}
+nav.tabbar button.active{color:var(--brand)}
+
+/* Toast */
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--card);
+ padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:80;opacity:0;pointer-events:none;
+ transition:opacity .2s, transform .2s;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.detail-row:last-child{border-bottom:0}
+.detail-row .dk{color:var(--muted)}
+.detail-row .dv{font-weight:600;text-align:right}
+.total-line{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 4px;margin-top:6px;border-top:2px solid var(--line)}
+.total-line .tv{font-size:24px;font-weight:800;color:var(--brand)}
+.empty{text-align:center;color:var(--muted);padding:34px 16px}
+.empty svg{width:46px;height:46px;opacity:.4;margin-bottom:8px}
+.search{margin-bottom:12px}
+.flow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.flow .step{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.flow .step.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.flow .step.cur{background:var(--brand);color:#fff;border-color:transparent}
+.calc2{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;font-size:13px}
+.calc2 .cl{display:flex;justify-content:space-between;gap:10px;padding:3px 0;color:var(--muted)}
+.calc2 .cl span:last-child{text-align:right;color:var(--text)}
+.calc2 .cl.tot{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;font-size:15px;font-weight:700;color:var(--text)}
+.calc2 .cl.tot b{color:var(--brand)}
+.calc2 .warn{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:7px 9px;margin-top:6px}
+.money-echo{min-height:16px;color:var(--brand);font-weight:600}
+.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin:8px 0}
+.foto-thumb{position:relative;padding-top:100%;border-radius:10px;background-size:cover;background-position:center;border:1px solid var(--line);cursor:pointer}
+.foto-thumb .del{position:absolute;top:4px;right:4px;background:rgba(10,20,30,.6);color:#fff;border:0;border-radius:50%;width:26px;height:26px;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:90;display:none;align-items:center;justify-content:center;padding:12px}
+#lightbox.open{display:flex}
+#lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+.cli-row{flex-wrap:wrap}
+.cli-actions{display:flex;gap:8px;flex:1 0 100%;padding-left:52px;margin-top:-2px}
+.cli-actions .btn{flex:1;padding:8px 6px}
+.calc2 .okmsg{background:var(--ok-soft);color:var(--ok);border-radius:8px;padding:7px 9px;margin-top:6px;font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+ <div class="logo" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M3 9v6l9 5 9-5V9"/><path d="M12 14v6"/></svg>
+ </div>
+ <div class="titles"><b>Marmoraria Itapiruba</b><span id="appSub">Orçamentos e obras</span></div>
+ <button class="iconbtn" onclick="openSettings()" aria-label="Ajustes">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+ </button>
+</header>
+
+<main>
+ <!-- ================= INÍCIO ================= -->
+ <section id="pageHome" class="page active">
+  <div class="hero">
+   <div class="lbl">Resultado do mês <span id="homeMonthLbl"></span></div>
+   <div class="big" id="homeResultado">R$ 0,00</div>
+   <div class="row">
+    <div><div class="mini">Entradas</div><div class="num" id="homeEntradas">R$ 0,00</div></div>
+    <div><div class="mini">Saídas</div><div class="num" id="homeSaidas">R$ 0,00</div></div>
+    <div><div class="mini">A receber</div><div class="num" id="homeAReceber">R$ 0,00</div></div>
+   </div>
+  </div>
+
+  <div class="section-title">Visão rápida</div>
+  <div class="stat-grid">
+   <div class="stat tap" onclick="go('pageOrcamentos')">
+    <div class="k">Orçamentos em aberto</div><div class="v" id="homeOrcAbertos">0</div>
+    <div class="sub" id="homeOrcValor">R$ 0,00 em propostas</div>
+   </div>
+   <div class="stat tap" onclick="go('pagePedidos')">
+    <div class="k">Obras em andamento</div><div class="v" id="homePedidosAtivos">0</div>
+    <div class="sub" id="homePedidosEntrega">—</div>
+   </div>
+   <div class="stat tap" onclick="go('pageClientes')">
+    <div class="k">Clientes</div><div class="v" id="homeClientes">0</div>
+   </div>
+   <div class="stat tap" onclick="go('pageFinanceiro');setFinFilter('apagar')">
+    <div class="k">A pagar no mês</div><div class="v small" id="homeAPagar" style="color:var(--danger)">R$ 0,00</div>
+    <div class="sub" id="homeAPagarSub">—</div>
+   </div>
+  </div>
+
+  <div class="section-title">Atalhos</div>
+  <div class="stat-grid" style="gap:10px">
+   <button class="btn" onclick="newOrcamento()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo orçamento</button>
+   <button class="btn sec" onclick="newCliente()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Novo cliente</button>
+   <button class="btn ok" onclick="newLancamento('receita')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Nova receita</button>
+   <button class="btn danger" onclick="newLancamento('despesa')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Nova despesa</button>
+  </div>
+
+  <div class="section-title">Últimos orçamentos</div>
+  <div class="card" id="homeRecentOrc"></div>
+ </section>
+
+ <!-- ================= CLIENTES ================= -->
+ <section id="pageClientes" class="page">
+  <div class="search"><input id="clienteSearch" placeholder="Buscar cliente…" oninput="renderClientes()"></div>
+  <div class="card" id="clientesList"></div>
+  <div style="margin-top:14px"><button class="btn" onclick="newCliente()">
+   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo cliente</button></div>
+ </section>
+
+ <!-- ================= ORÇAMENTOS ================= -->
+ <section id="pageOrcamentos" class="page">
+  <div class="card" id="orcamentosList"></div>
+  <div style="margin-top:14px"><button class="btn" onclick="newOrcamento()">
+   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo orçamento</button></div>
+ </section>
+
+ <!-- ================= PEDIDOS / OBRAS ================= -->
+ <section id="pagePedidos" class="page">
+  <div class="chip-row" id="pedFilters" style="margin-bottom:12px"></div>
+  <div class="card" id="pedidosList"></div>
+  <div style="margin-top:14px"><button class="btn" onclick="novaObra()">
+   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nova obra</button></div>
+ </section>
+
+ <!-- ================= FINANCEIRO ================= -->
+ <section id="pageFinanceiro" class="page">
+  <div class="fin-month">
+   <button class="chip" onclick="changeMonth(-1)" aria-label="Mês anterior">‹</button>
+   <div style="text-align:center"><div class="fin-month-t" id="finMesNome"></div><div class="fin-month-s" id="finMesHoje"></div></div>
+   <button class="chip" onclick="changeMonth(1)" aria-label="Próximo mês">›</button>
+  </div>
+  <div class="card fin-hero">
+   <div class="k">Resultado do mês <span style="font-weight:400">(recebido − pago)</span></div>
+   <div class="v" id="finSaldo">R$ 0,00</div>
+   <div class="s" id="finPrevisto"></div>
+  </div>
+  <div class="stat-grid" style="margin-top:12px">
+   <div class="stat tap" id="tileRec" onclick="setFinFilter('recebido')"><div class="k"><i class="dot" style="background:var(--st-rec)"></i>Recebido</div><div class="v small" id="finRecebido" style="color:var(--st-rec)">R$ 0,00</div><div class="n" id="finRecebidoN"></div></div>
+   <div class="stat tap" id="tileARec" onclick="setFinFilter('areceber')"><div class="k"><i class="dot" style="background:var(--st-arec)"></i>A receber</div><div class="v small" id="finAReceber" style="color:var(--st-arec)">R$ 0,00</div><div class="n" id="finAReceberN"></div></div>
+   <div class="stat tap" id="tilePago" onclick="setFinFilter('pago')"><div class="k"><i class="dot" style="background:var(--st-pago)"></i>Pago</div><div class="v small" id="finPago" style="color:var(--st-pago)">R$ 0,00</div><div class="n" id="finPagoN"></div></div>
+   <div class="stat tap" id="tileAPag" onclick="setFinFilter('apagar')"><div class="k"><i class="dot" style="background:var(--st-apag)"></i>A pagar</div><div class="v small" id="finAPagarFin" style="color:var(--st-apag)">R$ 0,00</div><div class="n" id="finAPagarN"></div></div>
+  </div>
+  <div id="finAlerta"></div>
+  <div class="section-title">Ferramentas</div>
+  <div class="tools">
+   <button class="tool" onclick="newLancamento('receita')"><span class="ic" style="background:var(--st-rec-soft);color:var(--st-rec)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Nova receita</button>
+   <button class="tool" onclick="newLancamento('despesa')"><span class="ic" style="background:var(--st-apag-soft);color:var(--st-apag)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></span>Nova despesa</button>
+   <button class="tool" onclick="openRelatorios('caixa')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Relatórios</button>
+   <button class="tool" onclick="relatorioFinanceiroExcel()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></span>Exportar Excel</button>
+  </div>
+  <div class="section-title">Lançamentos</div>
+  <input id="finBusca" type="search" placeholder="🔍  Buscar por descrição, cliente, categoria, obra…" oninput="finBusca=this.value;renderFinanceiro()" autocomplete="off">
+  <div class="seg" id="finSegTipo" style="margin-top:10px"></div>
+  <div class="chip-row" id="finFilters" style="margin:10px 0 8px"></div>
+  <div class="fin-info" id="finInfo"></div>
+  <div class="card" id="financeiroList"></div>
+ </section>
+</main>
+
+<nav class="tabbar">
+ <button data-tab="pageHome" class="active" onclick="go('pageHome')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v10h14V10"/></svg>Início</button>
+ <button data-tab="pageClientes" onclick="go('pageClientes')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</button>
+ <button data-tab="pageOrcamentos" onclick="go('pageOrcamentos')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Orçamentos</button>
+ <button data-tab="pagePedidos" onclick="go('pagePedidos')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12l8.73-5.04M12 22V12"/></svg>Obras</button>
+ <button data-tab="pageFinanceiro" onclick="go('pageFinanceiro')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Caixa</button>
+</nav>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div id="lightbox" onclick="fecharFoto()"><img id="lightboxImg" alt="foto"></div>
+<input type="file" accept="image/*" id="fotoInputView" class="hidden" onchange="addFotoView(event)">
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   Marmoraria Itapiruba — app de arquivo único
+   Reaproveita os padrões do ContaLar: estado em localStorage,
+   soft-delete (deleted:true), updatedAt para sincronizar depois,
+   ponte nativa Android.* protegida (funciona no navegador agora).
+   ============================================================ */
+const APP_VERSION='1.13.0';
+const STORE_KEY='marmoraria.itapiruba.v1';
+const $=id=>document.getElementById(id);
+const now=()=>new Date().toISOString();
+const uid=()=>'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const isoToday=()=>new Date().toLocaleDateString('sv');  // YYYY-MM-DD local
+const monthKey=d=>(d||'').slice(0,7);
+const thisMonth=()=>isoToday().slice(0,7);
+
+let viewMonth=thisMonth();
+let data=null;
+
+/* ---------- dinheiro ---------- */
+function money(v){const n=Math.round((+v||0)*100)/100;
+ return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function parseMoney(s){if(typeof s==='number')return s;
+ s=String(s||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
+ const n=parseFloat(s);return isNaN(n)?0:n;}
+function num(s){const n=parseFloat(String(s==null?'':s).replace(',','.'));return isNaN(n)?0:n;}
+function round2(v){return Math.round((+v||0)*100)/100;}
+// número com vírgula, sem separador de milhar (para preencher campos e mostrar medidas)
+function fmtNum(v,casas){const n=num(v);if(casas==null)return String(Math.round(n*1000)/1000).replace('.',',');
+ return n.toLocaleString('pt-BR',{minimumFractionDigits:casas,maximumFractionDigits:casas});}
+const fmtM2=v=>fmtNum(v,2)+' m²';
+// campo de dinheiro: mostra abaixo como o app entendeu o valor digitado
+function echoInit(v){return '<div class="hint money-echo">'+(v?'Entendido como '+money(parseMoney(v)):'')+'</div>';}
+function echoMoney(el){const n=el.nextElementSibling;
+ if(n&&n.classList.contains('money-echo'))n.textContent=String(el.value).trim()?'Entendido como '+money(parseMoney(el.value)):'';}
+
+/* ---------- datas ---------- */
+function fmtDate(iso){if(!iso)return'—';const[a,m,d]=iso.slice(0,10).split('-');return d+'/'+m+'/'+a;}
+function monthName(key){if(!key)return'';const[a,m]=key.split('-');
+ const nm=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+ return nm[(+m||1)-1]+'/'+a;}
+
+/* ============================================================
+   Estado / persistência
+   ============================================================ */
+function seed(){
+ const t=now();
+ const mk=(nome,tipo,precoM2)=>({id:uid(),nome,tipo,precoM2,createdAt:t,updatedAt:t,deleted:false});
+ const ac=(nome,preco,unidade)=>({id:uid(),nome,preco,unidade,createdAt:t,updatedAt:t,deleted:false});
+ return {
+  version:1,
+  clientes:[],
+  materiais:[
+   mk('Granito Preto São Gabriel','Granito',380),
+   mk('Granito Branco Siena','Granito',450),
+   mk('Mármore Branco Paraná','Mármore',620),
+   mk('Quartzo Branco','Quartzo',980),
+  ],
+  acabamentos:[
+   ac('Saia / rodapé',60,'m'),
+   ac('Acabamento meia-cana',45,'m'),
+   ac('Furo para cuba',80,'un'),
+   ac('Rebaixo para cooktop',120,'un'),
+   ac('Fundo de pia moldado',90,'un'),
+  ],
+  produtos:[],
+  orcamentos:[],
+  pedidos:[],
+  lancamentos:[],
+  seq:{orcamento:0,pedido:0},
+  insumos:[],
+  log:[],
+  config:{pct:60,margemMin:0,lucroMeta:0,diaria:0,funcionarios:1,empresa:{nome:'Marmoraria Itapiruba',cnpj:'',pixChave:''}},
+  createdAt:t,updatedAt:t
+ };
+}
+// garante que dados de versões antigas (e backups) tenham todos os campos novos
+const COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','log'];
+function normalize(){
+ COLS.forEach(k=>{if(!Array.isArray(data[k]))data[k]=[];});
+ if(!data.seq)data.seq={orcamento:Math.max(0,...data.orcamentos.map(o=>o.numero||0)),pedido:Math.max(0,...data.pedidos.map(p=>p.numero||0))};
+ if(!data.config)data.config={};
+ const c=data.config;
+ ['margemMin','lucroMeta','diaria'].forEach(k=>{if(typeof c[k]!=='number')c[k]=0;});
+ if(!(c.funcionarios>=1))c.funcionarios=1;   // funcionários por obra (padrão de Ajustes)
+ if(typeof c.pct!=='number')c.pct=60;   // percentual de lucro padrão sobre o custo
+ if(!c.empresa||typeof c.empresa!=='object')c.empresa={};
+ ['nome','cnpj','pixChave'].forEach(k=>{if(typeof c.empresa[k]!=='string')c.empresa[k]='';});
+ if(!c.empresa.nome)c.empresa.nome='Marmoraria Itapiruba';
+}
+function load(){
+ try{const raw=localStorage.getItem(STORE_KEY);
+  if(raw){data=JSON.parse(raw);normalize();return;}
+ }catch(e){console.warn('load falhou',e);}
+ data=seed();normalize();save();
+}
+function save(){
+ data.updatedAt=now();
+ try{localStorage.setItem(STORE_KEY,JSON.stringify(data));}catch(e){toast('Não foi possível salvar.');}
+}
+const act=arr=>arr.filter(x=>!x.deleted);
+const byId=(arr,id)=>arr.find(x=>x.id===id&&!x.deleted)||null;
+function softDelete(arr,id){const r=byId(arr,id);if(r){r.deleted=true;r.updatedAt=now();}}
+
+/* ============================================================
+   Navegação
+   ============================================================ */
+function go(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
+ document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===page));
+ window.scrollTo(0,0);
+ renderAll();
+}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');
+ clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ============================================================
+   Modal helpers
+   ============================================================ */
+function openModal(title,bodyHtml,extraHeadBtn){
+ $('modalBox').innerHTML=
+  '<div class="mhead"><h2>'+esc(title)+'</h2>'+(extraHeadBtn||'')+
+  '<button class="x" onclick="closeModal()" aria-label="Fechar">&times;</button></div>'+bodyHtml;
+ $('modalBg').classList.add('open');
+ $('modalBg').onclick=e=>{if(e.target===$('modalBg'))closeModal();};
+}
+function closeModal(){$('modalBg').classList.remove('open');$('modalBox').innerHTML='';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ============================================================
+   CLIENTES
+   ============================================================ */
+function newCliente(){editCliente(null);}
+const normNome=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function findClienteByNome(nome){const k=normNome(nome);return act(data.clientes).find(c=>normNome(c.nome)===k)||null;}
+// Comprime uma imagem (foto) para um dataURL jpeg leve; cb recebe o dataURL
+function comprimirImagem(file,cb){
+ const r=new FileReader();
+ r.onload=()=>{const img=new Image();
+  img.onload=()=>{const max=1024;let w=img.width,h=img.height;
+   if(w>h&&w>max){h=Math.round(h*max/w);w=max;}else if(h>=w&&h>max){w=Math.round(w*max/h);h=max;}
+   const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+   let out;try{out=cv.toDataURL('image/jpeg',0.6);}catch(e){out=r.result;}cb(out);};
+  img.onerror=()=>toast('Não consegui ler a imagem.');img.src=r.result;};
+ r.onerror=()=>toast('Não consegui ler a imagem.');r.readAsDataURL(file);
+}
+// Visualizador de foto em tela cheia (não interfere no modal aberto)
+function verFotoFull(url){const lb=$('lightbox'),im=$('lightboxImg');if(lb&&im){im.src=url;lb.classList.add('open');}}
+function fecharFoto(){const lb=$('lightbox');if(lb)lb.classList.remove('open');}
+/* ---------- Localização (GPS) do serviço ---------- */
+let draftLoc=null;   // {lat,lng,acc,quando} em edição no orçamento
+function abrirMapa(loc){if(loc&&loc.lat!=null)abrirLink('https://www.google.com/maps/search/?api=1&query='+loc.lat+','+loc.lng);}
+function renderLocalDraft(){
+ const el=$('localWrap');if(!el)return;
+ if(draftLoc&&draftLoc.lat!=null){
+  el.innerHTML='<div class="detail-row"><span class="dk">📍 Registrada</span><span class="dv">precisão ±'+(draftLoc.acc||0)+' m · '+fmtDate(draftLoc.quando)+'</span></div>'+
+   '<div class="btn-row"><button type="button" class="btn sec sm" onclick="abrirMapa(draftLoc)">Ver no mapa</button>'+
+   '<button type="button" class="btn sec sm" style="color:var(--danger)" onclick="draftLoc=null;renderLocalDraft()">Remover</button></div>';
+ }else{
+  el.innerHTML='<button type="button" class="btn sec sm" onclick="pegarLocalizacao()">📍 Registrar localização agora</button>';
+ }
+}
+function pegarLocalizacao(){
+ if(!navigator.geolocation){toast('Este aparelho não tem GPS disponível.');return;}
+ toast('Obtendo localização…');
+ const el=$('localWrap');if(el)el.innerHTML='<div class="hint">Buscando GPS… permita o acesso à localização, se pedir.</div>';
+ navigator.geolocation.getCurrentPosition(function(pos){
+  draftLoc={lat:+pos.coords.latitude.toFixed(6),lng:+pos.coords.longitude.toFixed(6),acc:Math.round(pos.coords.accuracy||0),quando:now()};
+  renderLocalDraft();toast('Localização registrada.');
+ },function(err){
+  renderLocalDraft();
+  toast(err&&err.code===1?'Permissão de localização negada.':'Não consegui a localização. Tente a céu aberto.');
+ },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+/* ---------- Fotos do serviço/local (ficam no orçamento; aparecem na obra) ---------- */
+let draftFotos=[];   // fotos em edição dentro do orçamento
+function fotoThumbHtml(dataUrl,viewCall,delCall){
+ return '<div class="foto-thumb" style="background-image:url('+dataUrl+')" onclick="'+viewCall+'">'+
+  (delCall?'<button class="del" onclick="event.stopPropagation();'+delCall+'">&times;</button>':'')+'</div>';
+}
+function orcFotos(o){if(!o)return[];if(!Array.isArray(o.fotos))o.fotos=[];return o.fotos;}
+// editor (draftFotos)
+function renderFotosDraft(){
+ const el=$('fotosWrap');if(!el)return;
+ el.innerHTML=draftFotos.length?('<div class="foto-grid">'+draftFotos.map(f=>fotoThumbHtml(f.data,"verFotoDraft('"+f.id+"')","removeFotoDraft('"+f.id+"')")).join('')+'</div>'):'<div class="hint" style="margin:6px 0">Nenhuma foto ainda.</div>';
+}
+function verFotoDraft(id){const f=draftFotos.find(x=>x.id===id);if(f)verFotoFull(f.data);}
+function addFotoDraft(ev){const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;
+ comprimirImagem(f,durl=>{draftFotos.push({id:uid(),data:durl});renderFotosDraft();});}
+function removeFotoDraft(id){draftFotos=draftFotos.filter(x=>x.id!==id);renderFotosDraft();}
+// orçamento salvo / obra (edita direto o.fotos)
+let _fotoOrc=null,_reabreTipo=null,_reabreId=null;
+function reabreFotos(tipo,id){if(tipo==='ped')viewPedido(id,true);else viewOrcamento(id);}
+function pedirFotoView(orcId,tipo,id){_fotoOrc=orcId;_reabreTipo=tipo;_reabreId=id;$('fotoInputView').click();}
+function addFotoView(ev){const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f||!_fotoOrc)return;
+ const o=byId(data.orcamentos,_fotoOrc);if(!o){toast('Orçamento não encontrado.');return;}
+ comprimirImagem(f,durl=>{orcFotos(o).push({id:uid(),data:durl});o.updatedAt=now();save();reabreFotos(_reabreTipo,_reabreId);toast('Foto adicionada.');});}
+function verFotoOrc(orcId,fotoId){const o=byId(data.orcamentos,orcId),f=o&&orcFotos(o).find(x=>x.id===fotoId);if(f)verFotoFull(f.data);}
+function removeFotoOrc(orcId,fotoId,tipo,id){const o=byId(data.orcamentos,orcId);if(!o)return;if(!confirm('Remover esta foto?'))return;
+ o.fotos=orcFotos(o).filter(x=>x.id!==fotoId);o.updatedAt=now();save();reabreFotos(tipo,id);}
+function fotosOrcHtml(o,tipo,id,gerenciavel){
+ const fotos=orcFotos(o),oid=o.id;
+ let h=fotos.length?('<div class="foto-grid">'+fotos.map(f=>fotoThumbHtml(f.data,"verFotoOrc('"+oid+"','"+f.id+"')",gerenciavel?("removeFotoOrc('"+oid+"','"+f.id+"','"+tipo+"','"+id+"')"):'')).join('')+'</div>'):'<div class="hint" style="margin:6px 0">Nenhuma foto ainda.</div>';
+ if(gerenciavel)h+='<button type="button" class="btn sec sm" onclick="pedirFotoView(\''+oid+'\',\''+tipo+'\',\''+id+'\')">📷 Tirar foto</button>';
+ return h;
+}
+function editCliente(id){
+ const c=id?byId(data.clientes,id):{nome:'',telefone:''};
+ if(!c){toast('Cliente não encontrado.');return;}
+ openModal(id?'Editar cliente':'Novo cliente',
+  '<label class="fld"><span>Nome *</span><input id="cNome" value="'+esc(c.nome)+'" placeholder="Nome do cliente"></label>'+
+  '<label class="fld"><span>Telefone / WhatsApp</span><input id="cTel" value="'+esc(c.telefone||'')+'" inputmode="tel" placeholder="(00) 00000-0000"></label>'+
+  '<div style="margin-top:16px"><button class="btn" onclick="saveCliente(\''+(id||'')+'\',true)">Salvar e criar orçamento</button></div>'+
+  '<div style="margin-top:10px" class="btn-row">'+
+   (id?'<button class="btn sec" onclick="delCliente(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn sec" onclick="saveCliente(\''+(id||'')+'\')">Só salvar</button></div>');
+}
+function saveCliente(id,depoisOrc){
+ const nome=$('cNome').value.trim(),tel=$('cTel').value.trim();
+ if(!nome){toast('Informe o nome.');return;}
+ const t=now();let cid=id;
+ if(id){Object.assign(byId(data.clientes,id),{nome,telefone:tel,updatedAt:t});}
+ else{
+  const igual=findClienteByNome(nome);   // não duplica quem já existe
+  if(igual){cid=igual.id;if(tel&&!igual.telefone){igual.telefone=tel;igual.updatedAt=t;}}
+  else{cid=uid();data.clientes.push({id:cid,nome,telefone:tel,createdAt:t,updatedAt:t,deleted:false});}
+ }
+ save();closeModal();renderAll();
+ if(depoisOrc)editOrcamento(null,cid);else toast('Cliente salvo.');
+}
+function delCliente(id){
+ const c=byId(data.clientes,id);if(!c)return;
+ const n=act(data.orcamentos).filter(o=>o.clienteId===id).length;
+ if(!confirm('Excluir o cliente "'+c.nome+'"?'+(n?'\n\nEle tem '+n+' orçamento(s). Os orçamentos continuam, mas ficam sem cliente.':'')))return;
+ logExclusao('Cliente',c.nome+(c.telefone?' · '+c.telefone:'')+(n?' · tinha '+n+' orçamento(s)':''));
+ softDelete(data.clientes,id);save();closeModal();renderAll();toast('Cliente excluído.');
+}
+function clienteName(id){const c=byId(data.clientes,id);return c?c.nome:'(sem cliente)';}
+function renderClientes(){
+ const q=($('clienteSearch')?.value||'').toLowerCase();
+ let list=act(data.clientes).sort((a,b)=>a.nome.localeCompare(b.nome));
+ if(q)list=list.filter(c=>(c.nome+' '+(c.telefone||'')).toLowerCase().includes(q));
+ const el=$('clientesList');
+ if(!list.length){el.innerHTML=emptyBox('Nenhum cliente ainda','Cadastre seus clientes para montar orçamentos.');return;}
+ el.innerHTML=list.map(c=>{
+  const nOrc=act(data.orcamentos).filter(o=>o.clienteId===c.id).length;
+  const nObra=act(data.pedidos).filter(p=>p.clienteId===c.id).length;
+  return '<div class="list-item cli-row" onclick="viewCliente(\''+c.id+'\')">'+
+   '<div class="av">'+esc(initials(c.nome))+'</div>'+
+   '<div class="body"><div class="t">'+esc(c.nome)+'</div><div class="s">'+esc(c.telefone||'sem telefone')+(nOrc?' · '+nOrc+(nOrc===1?' orçamento':' orçamentos'):'')+(nObra?' · '+nObra+(nObra===1?' obra':' obras'):'')+'</div></div>'+
+   '<div class="cli-actions" onclick="event.stopPropagation()">'+
+    '<button class="btn sec sm" onclick="newOrcamento(\''+c.id+'\')">+ Orçamento</button>'+
+    '<button class="btn sec sm" onclick="editCliente(\''+c.id+'\')">Editar</button>'+
+    '<button class="btn sec sm" style="color:var(--danger)" onclick="delCliente(\''+c.id+'\')">Excluir</button>'+
+   '</div></div>';
+ }).join('');
+}
+function initials(n){return (n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+// Ficha do cliente: junta orçamentos, obras e resumo financeiro, tudo clicável
+function viewCliente(id){
+ const c=byId(data.clientes,id);if(!c){toast('Cliente não encontrado.');return;}
+ const orcs=act(data.orcamentos).filter(o=>o.clienteId===id).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+ const obras=act(data.pedidos).filter(p=>p.clienteId===id).sort((a,b)=>(b.numero||0)-(a.numero||0));
+ const totObras=round2(obras.reduce((s,p)=>s+(+p.valorTotal||0),0));
+ const recebido=round2(obras.reduce((s,p)=>s+pedRecebido(p.id),0));
+ const aReceber=round2(totObras-recebido);
+ const temTel=!!soDigitos(c.telefone);
+ const orcHtml=orcs.length?orcs.map(o=>{const st=ORC_STATUS[o.status]||ORC_STATUS.rascunho;
+   return '<div class="list-item" onclick="closeModal();go(\'pageOrcamentos\');viewOrcamento(\''+o.id+'\')"><div class="body"><div class="t">'+orcLabel(o)+'</div><div class="s">'+fmtDate(o.data)+'</div></div><div class="end"><div class="money">'+money(orcTotal(o))+'</div><div class="cap"><span class="badge '+st.c+'">'+st.l+'</span></div></div></div>';
+  }).join(''):'<div class="empty" style="padding:18px">Nenhum orçamento.</div>';
+ const obraHtml=obras.length?obras.map(p=>{const done=p.status==='concluido',falta=round2(p.valorTotal-pedRecebido(p.id));
+   return '<div class="list-item" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+p.id+'\')"><div class="body"><div class="t">Obra Nº '+(p.numero||'')+'</div><div class="s">'+PED_LABEL[p.status]+(p.dataPrevista?' · entrega '+fmtDate(p.dataPrevista):'')+'</div></div><div class="end"><div class="money">'+money(p.valorTotal)+'</div><div class="cap">'+(done?'<span class="badge b-ok">Concluída</span>':(falta>0.009?'<span class="badge b-warn">falta '+money(falta)+'</span>':'<span class="badge b-ok">pago</span>'))+'</div></div></div>';
+  }).join(''):'<div class="empty" style="padding:18px">Nenhuma obra ainda.</div>';
+ openModal(c.nome,
+  '<div class="detail-row"><span class="dk">Telefone</span><span class="dv">'+(c.telefone?esc(c.telefone):'—')+'</span></div>'+
+  '<div class="btn-row" style="margin-top:12px">'+
+   '<button class="btn" onclick="closeModal();newOrcamento(\''+id+'\')">+ Orçamento</button>'+
+   '<button class="btn sec" onclick="editCliente(\''+id+'\')">Editar</button></div>'+
+  (temTel?'<div style="margin-top:10px"><button class="btn ok" onclick="abrirWhatsAppCliente(\''+id+'\')">Falar no WhatsApp</button></div>':'')+
+  '<div class="section-title">Orçamentos'+(orcs.length?' ('+orcs.length+')':'')+'</div><div class="card">'+orcHtml+'</div>'+
+  '<div class="section-title">Obras'+(obras.length?' ('+obras.length+')':'')+'</div><div class="card">'+obraHtml+'</div>'+
+  '<div class="section-title">Resumo financeiro</div>'+
+  '<div class="detail-row"><span class="dk">Total em obras</span><span class="dv">'+money(totObras)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Recebido</span><span class="dv" style="color:var(--ok)">'+money(recebido)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">A receber</span><span class="dv" style="color:'+(aReceber>0.009?'var(--warn)':'var(--ok)')+'">'+money(aReceber)+'</span></div>'+
+  '<div style="margin-top:16px"><button class="btn sec" style="color:var(--danger)" onclick="delCliente(\''+id+'\')">Excluir cliente</button></div>');
+}
+
+/* ---------- Registro de exclusões ---------- */
+function logExclusao(tipo,descricao){
+ data.log.unshift({id:uid(),quando:now(),tipo,descricao});
+ if(data.log.length>1000)data.log.length=1000;
+}
+function openLog(){
+ const rows=data.log.map(l=>{
+  const d=new Date(l.quando);
+  return '<div class="list-item" style="cursor:default"><div class="body"><div class="t" style="white-space:normal">'+esc(l.descricao)+'</div>'+
+   '<div class="s">'+d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</div></div>'+
+   '<div class="end"><span class="badge b-danger">'+esc(l.tipo)+'</span></div></div>';
+ }).join('');
+ openModal('Registro de exclusões',
+  '<div class="hint" style="margin:0 0 10px">Tudo o que você exclui no app fica anotado aqui, com data e hora.</div>'+
+  '<div class="card">'+(rows||'<div class="empty">Nada foi excluído até agora.</div>')+'</div>'+
+  '<div style="margin-top:14px"><button class="btn sec" onclick="openSettings()">Voltar</button></div>');
+}
+
+/* ============================================================
+   CADASTROS: materiais, produtos e insumos
+   Preço de venda = custo + percentual de lucro (padrão em Ajustes, 60%;
+   cada material/produto pode ter o seu próprio percentual).
+   ============================================================ */
+const fmtPct=v=>v==null?'—':fmtNum(v,1)+'%';
+const PROD_UN={un:'unidade',m:'metro',m2:'m²'};
+const UN_CURTA={un:'un',m:'m',m2:'m²'};
+let catSec='materiais';
+const pctDe=x=>(x&&typeof x.pct==='number'&&x.pct>=0)?x.pct:data.config.pct;
+const precoComPct=(custo,pct)=>round2((+custo||0)*(1+pct/100));
+const pctTexto=x=>(x&&typeof x.pct==='number'&&x.pct>=0)?fmtNum(x.pct)+'%':'padrão '+fmtNum(data.config.pct)+'%';
+function catPreview(cId,pId,dId,suf){
+ const c=parseMoney($(cId).value),ptxt=String($(pId).value).trim(),pct=ptxt===''?data.config.pct:num(ptxt),el=$(dId);
+ el.textContent=c>0?'Preço de venda: '+money(precoComPct(c,pct))+suf+' (custo + '+fmtNum(pct)+'% de lucro)':'Informe o custo para ver o preço de venda.';
+}
+function openCatalogos(sec){
+ if(sec)catSec=sec;
+ const T={materiais:'Materiais',produtos:'Produtos',insumos:'Insumos'};
+ let hint='',rows='',novo='';
+ if(catSec==='materiais'){
+  hint='Informe o <b>custo de 1 m²</b> de cada material. O preço de venda é o custo + o percentual de lucro.';
+  rows=act(data.materiais).sort((a,b)=>a.nome.localeCompare(b.nome)).map(m=>
+   '<div class="list-item" onclick="editMaterial(\''+m.id+'\')"><div class="body"><div class="t">'+esc(m.nome)+'</div><div class="s">'+esc(m.tipo)+' · custo '+(m.custoM2>0?money(m.custoM2):'—')+' · lucro '+pctTexto(m)+'</div></div>'+
+   '<div class="end">'+(m.custoM2>0?'<div class="money">'+money(precoComPct(m.custoM2,pctDe(m)))+'</div><div class="cap">por m²</div>':'<span class="badge b-warn">sem custo</span>')+'</div></div>').join('')
+   ||'<div class="empty">Nenhum material cadastrado.</div>';
+  novo='<button class="btn sec sm" onclick="editMaterial(null)">+ Novo material</button>';
+ }else if(catSec==='produtos'){
+  hint='Os produtos cadastrados aparecem na hora de montar o orçamento (cuba, torneira, pia pronta, soleira…).';
+  rows=act(data.produtos).sort((a,b)=>a.nome.localeCompare(b.nome)).map(p=>
+   '<div class="list-item" onclick="editProduto(\''+p.id+'\')"><div class="body"><div class="t">'+esc(p.nome)+'</div><div class="s">por '+PROD_UN[p.unidade||'un']+' · custo '+(p.custo>0?money(p.custo):'—')+' · lucro '+pctTexto(p)+'</div></div>'+
+   '<div class="end">'+(p.custo>0?'<div class="money">'+money(precoComPct(p.custo,pctDe(p)))+'</div><div class="cap">preço de venda</div>':'<span class="badge b-warn">sem custo</span>')+'</div></div>').join('')
+   ||'<div class="empty">Nenhum produto cadastrado.<br>Cadastre aqui para poder escolher no orçamento.</div>';
+  novo='<button class="btn sec sm" onclick="editProduto(null)">+ Novo produto</button>';
+ }else{
+  hint='Insumos são o que se gasta no serviço (disco de corte, cola, resina, lixa…). Informe quanto cada um custa <b>por m² de serviço</b>: o app aplica todos automaticamente, conforme a metragem do orçamento.';
+  const tot=insumosRate();
+  rows=act(data.insumos).sort((a,b)=>a.nome.localeCompare(b.nome)).map(x=>
+   '<div class="list-item" onclick="editInsumo(\''+x.id+'\')"><div class="body"><div class="t">'+esc(x.nome)+'</div></div><div class="end"><div class="money">'+money(x.custoM2)+'</div><div class="cap">por m²</div></div></div>').join('')
+   ||'<div class="empty">Nenhum insumo cadastrado.</div>';
+  if(tot>0)rows+='<div class="list-item" style="cursor:default;background:var(--surface)"><div class="body"><div class="t">Total de insumos</div></div><div class="end"><div class="money">'+money(tot)+'</div><div class="cap">por m²</div></div></div>';
+  novo='<button class="btn sec sm" onclick="editInsumo(null)">+ Novo insumo</button>';
+ }
+ openModal(T[catSec],
+  '<div class="hint" style="margin:0 0 10px">'+hint+'</div><div class="card">'+rows+'</div>'+
+  '<div style="margin-top:10px">'+novo+'</div>'+
+  '<div style="margin-top:14px"><button class="btn sec" onclick="openSettings()">Voltar</button></div>');
+}
+/* ---- Materiais ---- */
+function editMaterial(id){
+ const m=id?byId(data.materiais,id):{nome:'',tipo:'Granito',custoM2:'',pct:null};
+ openModal(id?'Editar material':'Novo material',
+  '<label class="fld"><span>Nome *</span><input id="mNome" value="'+esc(m.nome)+'" placeholder="Ex.: Granito Preto São Gabriel"></label>'+
+  '<label class="fld"><span>Tipo</span><select id="mTipo">'+['Granito','Mármore','Quartzo','Outro'].map(t=>'<option'+(t===m.tipo?' selected':'')+'>'+t+'</option>').join('')+'</select></label>'+
+  '<label class="fld"><span>CUSTO de 1 m² (quanto você paga) (R$) *</span><input id="mCusto" inputmode="decimal" value="'+(m.custoM2?fmtNum(m.custoM2):'')+'" placeholder="Ex.: 220,00" oninput="echoMoney(this);catPreview(\'mCusto\',\'mPct\',\'mPrev\',\' por m²\')">'+echoInit(m.custoM2)+'</label>'+
+  '<label class="fld"><span>Percentual de lucro deste material (%)</span><input id="mPct" inputmode="decimal" value="'+(typeof m.pct==='number'?fmtNum(m.pct):'')+'" placeholder="Vazio = padrão ('+fmtNum(data.config.pct)+'%)" oninput="catPreview(\'mCusto\',\'mPct\',\'mPrev\',\' por m²\')"></label>'+
+  '<div class="hint" id="mPrev" style="color:var(--brand);font-weight:600"></div>'+
+  '<div style="margin-top:16px" class="btn-row">'+(id?'<button class="btn sec" onclick="delMaterial(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn" onclick="saveMaterial(\''+(id||'')+'\')">Salvar</button></div>');
+ catPreview('mCusto','mPct','mPrev',' por m²');
+}
+function lerPct(id){const t=String($(id).value).trim();return t===''?null:num(t);}
+function saveMaterial(id){
+ const nome=$('mNome').value.trim(),custo=parseMoney($('mCusto').value),pct=lerPct('mPct');
+ if(!nome){toast('Informe o nome.');return;}
+ if(!(custo>0)){toast('Informe o custo de 1 m².');return;}
+ if(pct!=null&&pct<0){toast('O percentual não pode ser negativo.');return;}
+ const t=now(),f={nome,tipo:$('mTipo').value,custoM2:custo,pct,updatedAt:t};
+ if(id)Object.assign(byId(data.materiais,id),f);
+ else data.materiais.push(Object.assign({id:uid(),createdAt:t,deleted:false},f));
+ save();openCatalogos('materiais');toast('Material salvo.');
+}
+function delMaterial(id){
+ const m=byId(data.materiais,id);if(!m)return;
+ if(!confirm('Excluir o material "'+m.nome+'"?'))return;
+ logExclusao('Material',m.nome);softDelete(data.materiais,id);save();openCatalogos('materiais');
+}
+/* ---- Produtos ---- */
+function editProduto(id){
+ const p=id?byId(data.produtos,id):{nome:'',unidade:'un',custo:'',pct:null};
+ openModal(id?'Editar produto':'Novo produto',
+  '<label class="fld"><span>Nome *</span><input id="pNome" value="'+esc(p.nome)+'" placeholder="Ex.: Cuba de inox 50 cm"></label>'+
+  '<label class="fld"><span>Vendido por</span><select id="pUn">'+Object.keys(PROD_UN).map(k=>'<option value="'+k+'"'+(k===(p.unidade||'un')?' selected':'')+'>'+PROD_UN[k]+'</option>').join('')+'</select></label>'+
+  '<label class="fld"><span>CUSTO (quanto você paga) (R$) *</span><input id="pCusto" inputmode="decimal" value="'+(p.custo?fmtNum(p.custo):'')+'" placeholder="Ex.: 280,00" oninput="echoMoney(this);catPreview(\'pCusto\',\'pPct\',\'pPrev\',\'\')">'+echoInit(p.custo)+'</label>'+
+  '<label class="fld"><span>Percentual de lucro deste produto (%)</span><input id="pPct" inputmode="decimal" value="'+(typeof p.pct==='number'?fmtNum(p.pct):'')+'" placeholder="Vazio = padrão ('+fmtNum(data.config.pct)+'%)" oninput="catPreview(\'pCusto\',\'pPct\',\'pPrev\',\'\')"></label>'+
+  '<div class="hint" id="pPrev" style="color:var(--brand);font-weight:600"></div>'+
+  '<div style="margin-top:16px" class="btn-row">'+(id?'<button class="btn sec" onclick="delProduto(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn" onclick="saveProduto(\''+(id||'')+'\')">Salvar</button></div>');
+ catPreview('pCusto','pPct','pPrev','');
+}
+function saveProduto(id){
+ const nome=$('pNome').value.trim(),custo=parseMoney($('pCusto').value),pct=lerPct('pPct');
+ if(!nome){toast('Informe o nome.');return;}
+ if(!(custo>0)){toast('Informe o custo do produto.');return;}
+ if(pct!=null&&pct<0){toast('O percentual não pode ser negativo.');return;}
+ const t=now(),f={nome,unidade:$('pUn').value,custo,pct,updatedAt:t};
+ if(id)Object.assign(byId(data.produtos,id),f);
+ else data.produtos.push(Object.assign({id:uid(),createdAt:t,deleted:false},f));
+ save();openCatalogos('produtos');toast('Produto salvo.');
+}
+function delProduto(id){
+ const p=byId(data.produtos,id);if(!p)return;
+ if(!confirm('Excluir o produto "'+p.nome+'"?'))return;
+ logExclusao('Produto',p.nome);softDelete(data.produtos,id);save();openCatalogos('produtos');
+}
+/* ---- Insumos (custo por m² de serviço) ---- */
+function insumosRate(){return round2(act(data.insumos).reduce((s,x)=>s+(+x.custoM2||0),0));}
+function editInsumo(id){
+ const x=id?byId(data.insumos,id):{nome:'',custoM2:''};
+ openModal(id?'Editar insumo':'Novo insumo',
+  '<label class="fld"><span>Nome *</span><input id="iNome" value="'+esc(x.nome)+'" placeholder="Ex.: Disco de corte, cola, resina, lixa"></label>'+
+  '<label class="fld"><span>Custo por m² de serviço (R$) *</span><input id="iCusto" inputmode="decimal" value="'+(x.custoM2?fmtNum(x.custoM2):'')+'" placeholder="Ex.: 12,00" oninput="echoMoney(this)">'+echoInit(x.custoM2)+'</label>'+
+  '<div class="hint">Quanto esse insumo custa, em média, para cada 1 m² de serviço executado.</div>'+
+  '<div style="margin-top:16px" class="btn-row">'+(id?'<button class="btn sec" onclick="delInsumo(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn" onclick="saveInsumo(\''+(id||'')+'\')">Salvar</button></div>');
+}
+function saveInsumo(id){
+ const nome=$('iNome').value.trim(),custo=parseMoney($('iCusto').value);
+ if(!nome){toast('Informe o nome.');return;}
+ if(!(custo>0)){toast('Informe o custo por m².');return;}
+ const t=now(),f={nome,custoM2:custo,updatedAt:t};
+ if(id)Object.assign(byId(data.insumos,id),f);
+ else data.insumos.push(Object.assign({id:uid(),createdAt:t,deleted:false},f));
+ save();openCatalogos('insumos');toast('Insumo salvo.');
+}
+function delInsumo(id){
+ const x=byId(data.insumos,id);if(!x)return;
+ if(!confirm('Excluir o insumo "'+x.nome+'"?'))return;
+ logExclusao('Insumo',x.nome);softDelete(data.insumos,id);save();openCatalogos('insumos');
+}
+
+/* ============================================================
+   ORÇAMENTOS
+   ============================================================ */
+const ORC_STATUS={rascunho:{l:'Rascunho',c:'b-draft'},enviado:{l:'Enviado',c:'b-sent'},
+ aprovado:{l:'Aprovado',c:'b-ok'},recusado:{l:'Recusado',c:'b-danger'}};
+let orcFilter='todos';
+let draftPecas=[];           // serviços em edição
+let draftItens=[];           // produtos em edição
+let draftMeta={lucroMeta:0,margemMin:0};
+let draftMao={funcionarios:1,diaria:0,pct:null};   // vem de Ajustes (novo) ou do próprio orçamento (edição)
+function setOrcFilter(f){orcFilter=f;renderOrcamentos();}
+function newOrcamento(clienteId){editOrcamento(null,clienteId||'');}
+
+/* ---------- Medidas: sempre em metros nos orçamentos novos ---------- */
+function peca(){return {id:uid(),descricao:'',materialId:(act(data.materiais)[0]?.id||''),un:'m',modo:'custo',comprimento:'',largura:'',qtd:1,acabamentos:[]};}
+function pecaFator(p){return p.un==='m'?1:0.01;}      // orçamentos antigos (sem p.un) eram em cm
+function pecaAreaUnit(p){const f=pecaFator(p);return round2((num(p.comprimento)*f)*(num(p.largura)*f));}
+function pecaQtd(p){return Math.max(1,Math.floor(num(p.qtd))||1);}
+function pecaArea(p){return round2(pecaAreaUnit(p)*pecaQtd(p));}
+function areaTotal(o){return round2((o.pecas||[]).reduce((s,p)=>s+pecaArea(p),0));}
+
+/* ---------- Cálculo antigo (preço por m²) — só para orçamentos já salvos assim ---------- */
+function acbSubtotal(a){const def=byId(data.acabamentos,a.acabamentoId);if(!def)return 0;return round2(def.preco*(num(a.qtd)||0));}
+function acbCusto(a){const d=byId(data.acabamentos,a.acabamentoId);return d?round2((+d.custo||0)*num(a.qtd)):0;}
+function pecaValor(p){
+ const mat=byId(data.materiais,p.materialId);
+ return round2(round2(pecaArea(p)*(mat?(+mat.precoM2||0):0))+p.acabamentos.reduce((s,a)=>s+acbSubtotal(a),0));
+}
+function itemProd(i){return byId(data.produtos,i.produtoId);}
+function itemVenda(i){const p=itemProd(i);return p?round2((+p.preco||0)*num(i.qtd)):0;}   // antigo
+function itemCusto(i){const p=itemProd(i);return p?round2((+p.custo||0)*num(i.qtd)):0;}
+
+/* ---------- Cálculo novo: custo real + percentual de lucro ---------- */
+const isNovo=o=>!!o&&o.modo==='custo';
+const pctPadrao=o=>(o&&typeof o.pct==='number'&&o.pct>=0)?o.pct:data.config.pct;
+const pctDoItem=(x,o)=>(x&&typeof x.pct==='number'&&x.pct>=0)?x.pct:pctPadrao(o);
+function pecaCustoMat(p){const m=byId(data.materiais,p.materialId);return round2(pecaArea(p)*(m?(+m.custoM2||0):0));}
+function orcCustoParts(o){
+ if(o.snap)return o.snap.parts;
+ const material=round2((o.pecas||[]).reduce((s,p)=>s+pecaCustoMat(p),0));
+ const acab=round2((o.pecas||[]).reduce((s,p)=>s+(p.acabamentos||[]).reduce((t,a)=>t+acbCusto(a),0),0));
+ const prod=round2((o.itens||[]).reduce((s,i)=>s+itemCusto(i),0));
+ const mao=round2(+o.maoDeObra||0),insumos=round2(+o.custoInsumos||0),outros=round2(+o.outrosCustos||0);
+ return{material,acab,prod,mao,insumos,outros,total:round2(material+acab+prod+mao+insumos+outros)};
+}
+const orcCusto=o=>orcCustoParts(o).total;
+// lucro bruto = custo de cada item × seu percentual (material/produto: o do cadastro; o resto: o do orçamento)
+function orcLucroBruto(o){
+ if(o.snap)return o.snap.lucroBruto;
+ let l=0;
+ (o.pecas||[]).forEach(p=>{l+=pecaCustoMat(p)*pctDoItem(byId(data.materiais,p.materialId),o)/100;});
+ (o.itens||[]).forEach(i=>{l+=itemCusto(i)*pctDoItem(itemProd(i),o)/100;});
+ const c=orcCustoParts(o);
+ l+=(c.acab+c.mao+c.insumos+c.outros)*pctPadrao(o)/100;
+ return round2(l);
+}
+function orcSubtotal(o){
+ if(o.snap)return o.snap.subtotal;
+ if(isNovo(o))return round2(orcCusto(o)+orcLucroBruto(o));
+ return round2((o.pecas||[]).reduce((s,p)=>s+pecaValor(p),0)+(o.itens||[]).reduce((s,i)=>s+itemVenda(i),0));
+}
+function orcTotal(o){return Math.max(0,round2(orcSubtotal(o)-(+o.desconto||0)+(+o.acrescimo||0)));}
+function orcLucro(o){return round2(orcTotal(o)-orcCusto(o));}
+function orcMargem(o){const v=orcTotal(o);return v>0?orcLucro(o)/v*100:null;}
+// itens usados que estão sem custo no cadastro (o preço ficaria subestimado)
+function custosFaltando(o){
+ const f=new Set();
+ (o.pecas||[]).forEach(p=>{
+  if(pecaArea(p)>0){const m=byId(data.materiais,p.materialId);if(m&&!(m.custoM2>0))f.add(m.nome);}
+ });
+ (o.itens||[]).forEach(i=>{const p=itemProd(i);if(p&&num(i.qtd)>0&&!(p.custo>0))f.add(p.nome);});
+ return[...f];
+}
+// o que o cliente vê: uma linha por serviço/produto + "mão de obra e insumos"; a soma fecha com o subtotal
+function linhasCliente(o){
+ if(o.snap&&o.snap.linhas)return o.snap.linhas;
+ const L=[];
+ (o.pecas||[]).forEach(p=>{
+  const m=byId(data.materiais,p.materialId);
+  L.push({texto:(p.descricao||'Serviço')+' — '+(m?m.nome:'material')+' — '+fmtM2(pecaArea(p)),valor:round2(pecaCustoMat(p)*(1+pctDoItem(m,o)/100))});
+ });
+ (o.itens||[]).forEach(i=>{
+  const p=itemProd(i);if(!p)return;
+  L.push({texto:p.nome+' ('+fmtNum(i.qtd)+' '+UN_CURTA[p.unidade||'un']+')',valor:round2(itemCusto(i)*(1+pctDoItem(p,o)/100))});
+ });
+ const c=orcCustoParts(o),resto=round2((c.acab+c.mao+c.insumos+c.outros)*(1+pctPadrao(o)/100));
+ const soma=round2(L.reduce((s,x)=>s+x.valor,0)+resto),dif=round2(orcSubtotal(o)-soma);
+ const ult=round2(resto+dif);   // o que falta para a soma das linhas fechar com o subtotal
+ if(!L.length||Math.abs(ult)>=0.05)L.push({texto:'Mão de obra e insumos',valor:ult});
+ else if(ult!==0)L[L.length-1].valor=round2(L[L.length-1].valor+ult);   // centavos de arredondamento
+ return L;
+}
+
+/* ---------- Dias de trabalho: aceita 1,5 · 1.5 · "1 dia e meio" · "meio dia" · "2 e meia" ---------- */
+function parseDias(s){
+ s=String(s==null?'':s).toLowerCase().trim();if(!s)return 0;
+ const meio=/meio|meia|½/.test(s),m=s.match(/\d+(?:[.,]\d+)?/);
+ return round2((m?parseFloat(m[0].replace(',','.')):0)+(meio?0.5:0));
+}
+function diasTexto(n){
+ if(!(n>0))return '';
+ const inteiro=Math.floor(n+1e-9),resto=round2(n-inteiro);
+ if(resto===0)return inteiro+(inteiro===1?' dia':' dias');
+ if(resto===0.5)return inteiro===0?'meio dia':inteiro+(inteiro===1?' dia':' dias')+' e meio';
+ return fmtNum(n)+' dias';
+}
+function stepDias(delta){
+ const el=$('oDias');if(!el)return;
+ const n=Math.max(0,round2(parseDias(el.value)+delta));
+ el.value=n>0?fmtNum(n):'';recalcOrc();
+}
+function maoDescricao(o){
+ const p=[],f=Math.max(1,Math.floor(+o.funcionarios||1));
+ if(o.dias>0&&o.diaria>0)p.push((f>1?f+' func. × ':'')+diasTexto(o.dias)+' × '+money(o.diaria));
+ if(o.maoFixa>0)p.push('fechada '+money(o.maoFixa));
+ return p.join(' + ');
+}
+
+/* ============================================================
+   Editor do orçamento
+   ============================================================ */
+function editOrcamento(id,clientePre){
+ let o;
+ if(id){
+  o=byId(data.orcamentos,id);if(!o){toast('Orçamento não encontrado.');return;}
+  if(!isNovo(o)&&!confirm('Este orçamento foi feito no cálculo antigo (preço por m²).\nAo editar, ele será recalculado como custo + percentual e o valor pode mudar. Continuar?'))return;
+  draftPecas=JSON.parse(JSON.stringify(o.pecas||[]));
+  draftPecas.forEach(p=>{   // sempre em metros
+   if(p.un!=='m'){['comprimento','largura'].forEach(k=>{if(num(p[k])>0)p[k]=fmtNum(num(p[k])/100);});p.un='m';}
+   p.modo='custo';
+  });
+  if(!draftPecas.length)draftPecas=[peca()];
+  draftItens=JSON.parse(JSON.stringify(o.itens||[]));draftItens.forEach(i=>{i.modo='custo';});
+  if(o.maoFixa==null&&o.dias==null)o.maoFixa=o.maoDeObra||0;   // mão de obra de orçamentos antigos vira "fechada"
+ }else{
+  o={clienteId:clientePre||'',data:isoToday(),status:'rascunho',desconto:0,acrescimo:0,obs:'',funcionarios:data.config.funcionarios,diaria:data.config.diaria,pct:null};
+  draftPecas=[peca()];draftItens=[];
+ }
+ draftFotos=o.fotos?JSON.parse(JSON.stringify(o.fotos)):[];
+ draftLoc=o.local?JSON.parse(JSON.stringify(o.local)):null;
+ draftMao={funcionarios:o.funcionarios>=1?Math.floor(o.funcionarios):data.config.funcionarios,diaria:o.diaria>0?o.diaria:data.config.diaria,pct:typeof o.pct==='number'?o.pct:null};
+ draftMeta={lucroMeta:typeof o.lucroMeta==='number'?o.lucroMeta:data.config.lucroMeta,margemMin:typeof o.margemMin==='number'?o.margemMin:data.config.margemMin};
+ const cli=byId(data.clientes,o.clienteId);
+ const g=(v)=>v?fmtNum(v):'';
+ openModal(id?'Editar orçamento':'Novo orçamento',
+  '<label class="fld"><span>Cliente *</span><input id="oClienteNome" value="'+esc(cli?cli.nome:'')+'" placeholder="Digite o nome ou escolha abaixo" autocomplete="off" oninput="cliSug()"></label>'+
+  '<div id="oSug"></div>'+
+  '<label class="fld"><span>Data</span><input type="date" id="oData" value="'+(o.data||isoToday())+'"></label>'+
+  '<div class="section-title">Serviço <span style="text-transform:none;letter-spacing:0">(medidas em metros)</span></div>'+
+  '<div id="pecasWrap"></div>'+
+  '<button class="linkbtn" onclick="addPeca()">+ Outro serviço</button>'+
+  '<div class="section-title">Produtos</div><div id="itensWrap"></div>'+
+  '<div class="section-title">Fotos do serviço e do local</div>'+
+  '<div class="hint" style="margin:0 0 4px">Tire aqui no orçamento (móveis, onde vai ser instalado, fachada da casa). Elas aparecem na obra.</div>'+
+  '<div id="fotosWrap"></div>'+
+  '<button type="button" class="btn sec sm" onclick="$(\'fotoInputDraft\').click()">📷 Tirar foto</button>'+
+  '<input type="file" accept="image/*" capture="environment" id="fotoInputDraft" class="hidden" onchange="addFotoDraft(event)">'+
+  '<div class="section-title">Localização do serviço</div>'+
+  '<div class="hint" style="margin:0 0 4px">Registre o GPS de onde você está agora (o local da obra). Aparece na obra para o entregador.</div>'+
+  '<div id="localWrap"></div>'+
+  '<div class="section-title">Acréscimo de transporte</div>'+
+  '<label class="fld"><span>Acréscimo de transporte (R$)</span><input id="oAcres" inputmode="decimal" value="'+g(o.acrescimo)+'" placeholder="0,00" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.acrescimo)+'<div class="hint">Frete/entrega cobrado do cliente.</div></label>'+
+  '<div class="section-title">Mão de obra</div>'+
+  '<label class="fld"><span>Dias de trabalho</span>'+
+   '<div style="display:flex;gap:8px;align-items:center">'+
+    '<button type="button" class="chip" onclick="stepDias(-0.5)" style="padding:11px 14px;white-space:nowrap">− ½</button>'+
+    '<input id="oDias" value="'+g(o.dias)+'" placeholder="Ex.: 1,5 ou 1 dia e meio" oninput="recalcOrc()" style="text-align:center">'+
+    '<button type="button" class="chip" onclick="stepDias(0.5)" style="padding:11px 14px;white-space:nowrap">+ ½</button></div>'+
+   '<div class="hint money-echo" id="oDiasEcho"></div></label>'+
+  (o.maoFixa>0?'<label class="fld"><span>Mão de obra fechada (R$) — orçamento antigo</span><input id="oMao" inputmode="decimal" value="'+g(o.maoFixa)+'" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.maoFixa)+'</label>':'')+
+  (o.outrosCustos>0?'<label class="fld"><span>Outros custos (R$) — orçamento antigo</span><input id="oOutros" inputmode="decimal" value="'+g(o.outrosCustos)+'" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.outrosCustos)+'</label>':'')+
+  '<div class="section-title">Desconto</div>'+
+  '<label class="fld"><span>Desconto final (R$)</span><input id="oDesc" inputmode="decimal" value="'+g(o.desconto)+'" placeholder="0,00" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.desconto)+'</label>'+
+  '<div class="section-title">Resumo <span style="text-transform:none;letter-spacing:0">(só você vê)</span></div><div id="oResumo"></div>'+
+  '<label class="fld"><span>Observações e negociação</span><textarea id="oObs" style="min-height:90px" placeholder="Como foi a negociação: forma de pagamento, sinal, prazo, desconto combinado, pedidos do cliente…">'+esc(o.obs||'')+'</textarea></label>'+
+  '<div style="margin-top:16px" class="btn-row">'+
+   (id?'<button class="btn sec" onclick="delOrcamento(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn" onclick="saveOrcamento(\''+(id||'')+'\')">Salvar</button></div>'+
+  (id?'<div style="margin-top:10px"><button class="btn ghost" onclick="shareOrcamento(\''+id+'\')">Compartilhar proposta</button></div>':''));
+ renderItens();
+ renderFotosDraft();
+ renderLocalDraft();
+ renderPecas();
+ cliSug();
+}
+/* ---- escolha do cliente: digita um nome (cliente novo é cadastrado ao salvar) ou toca num existente ---- */
+function cliSug(){
+ const el=$('oSug');if(!el)return;
+ const txt=normNome($('oClienteNome').value),todos=act(data.clientes);
+ const lista=todos.filter(c=>!txt||normNome(c.nome).includes(txt)).sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||'')).slice(0,8);
+ const exato=txt&&findClienteByNome($('oClienteNome').value);
+ let h='';
+ if(lista.length&&!exato)h+='<div class="chip-row" style="margin:-4px 0 4px">'+lista.map(c=>'<button type="button" class="chip" onclick="pickCliente(\''+c.id+'\')">'+esc(c.nome)+'</button>').join('')+'</div>';
+ if(txt&&!exato)h+='<div class="hint" style="margin:0 0 4px;color:var(--brand);font-weight:600">Cliente novo: será cadastrado automaticamente ao salvar.</div>';
+ else if(exato)h+='<div class="hint" style="margin:0 0 4px;color:var(--ok);font-weight:600">Cliente já cadastrado.</div>';
+ el.innerHTML=h;
+}
+function pickCliente(id){$('oClienteNome').value=clienteName(id);cliSug();}
+
+function addPeca(){readPecasFromDom();draftPecas.push(peca());renderPecas();}
+function removePeca(pid){readPecasFromDom();draftPecas=draftPecas.filter(p=>p.id!==pid);renderPecas();}
+function readPecasFromDom(){
+ draftPecas.forEach(p=>{
+  const g=s=>$(s+p.id);
+  if(g('pd'))p.descricao=g('pd').value;
+  if(g('pm'))p.materialId=g('pm').value;
+  if(g('pc'))p.comprimento=g('pc').value;
+  if(g('pl'))p.largura=g('pl').value;
+ });
+}
+// detalhe da conta de UM serviço
+function pecaCalcHtml(p){
+ const u=p.un==='m'?'m':'cm',areaU=pecaAreaUnit(p),qtd=pecaQtd(p),areaT=pecaArea(p);
+ const mat=byId(data.materiais,p.materialId),novo=p.modo==='custo';
+ const L=(k,v,cls)=>'<div class="cl'+(cls||'')+'"><span>'+k+'</span><span>'+v+'</span></div>';
+ let h='<div class="calc2">';
+ if(areaU<=0)h+='<div class="cl"><span>Digite o comprimento e a largura para ver a conta.</span></div>';
+ else{
+  h+=L('Área',fmtNum(p.comprimento)+' '+u+' × '+fmtNum(p.largura)+' '+u+' = <b>'+fmtM2(areaU)+'</b>');
+  if(qtd>1)h+=L('Quantidade',fmtM2(areaU)+' × '+qtd+' = <b>'+fmtM2(areaT)+'</b>');
+  if(novo){
+   const cm=mat?(+mat.custoM2||0):0;
+   h+=L('Custo do material',fmtM2(areaT)+' × '+money(cm)+'/m² = <b>'+money(round2(areaT*cm))+'</b>');
+   if(mat&&!(cm>0))h+='<div class="warn">Este material está sem custo. Cadastre em Ajustes → Materiais.</div>';
+  }else{
+   h+=L('Material',fmtM2(areaT)+' × '+money(mat?mat.precoM2:0)+'/m² = <b>'+money(round2(areaT*(mat?(+mat.precoM2||0):0)))+'</b>');
+  }
+ }
+ if(!novo){
+  (p.acabamentos||[]).forEach(a=>{
+   const d=byId(data.acabamentos,a.acabamentoId);if(!d)return;
+   h+=L(esc(d.nome),fmtNum(a.qtd)+(d.unidade==='m'?' m':' un')+' × '+money(d.preco)+' = <b>'+money(acbSubtotal(a))+'</b>');
+  });
+  h+=L('Valor da peça','<b>'+money(pecaValor(p))+'</b>',' tot');
+ }
+ if(areaU>0&&u==='m'&&(num(p.comprimento)>20||num(p.largura)>20))
+  h+='<div class="warn">Medida grande para metros. Confira se você não digitou em centímetros (use 2,50 e não 250).</div>';
+ return h+'</div>';
+}
+function renderPecas(){
+ const mats=act(data.materiais).sort((a,b)=>a.nome.localeCompare(b.nome));
+ if(!mats.length){$('pecasWrap').innerHTML='<div class="hint">Nenhum material cadastrado. Cadastre em Ajustes → Materiais.</div>';recalcOrc();return;}
+ const matOpt=p=>mats.map(m=>'<option value="'+m.id+'"'+(m.id===p.materialId?' selected':'')+'>'+esc(m.nome)+'</option>').join('');
+ $('pecasWrap').innerHTML=draftPecas.map((p,i)=>
+  '<div class="peca">'+
+   '<div class="ph"><span class="pt">'+(draftPecas.length>1?'Serviço '+(i+1):'Dados do serviço')+'</span>'+
+    (draftPecas.length>1?'<button class="rm" onclick="removePeca(\''+p.id+'\')" style="width:32px;height:32px;font-size:16px;border:0;border-radius:8px;background:var(--danger-soft);color:var(--danger)">&times;</button>':'')+'</div>'+
+   '<label class="fld"><span>Descrição do serviço</span><input id="pd'+p.id+'" value="'+esc(p.descricao)+'" placeholder="Ex.: Bancada da cozinha" oninput="syncPeca()"></label>'+
+   '<label class="fld"><span>Material</span><select id="pm'+p.id+'" onchange="syncPeca()">'+matOpt(p)+'</select></label>'+
+   '<div class="grid2">'+
+    '<label class="fld"><span>Comprimento (m)</span><input id="pc'+p.id+'" inputmode="decimal" value="'+esc(p.comprimento)+'" placeholder="Ex.: 2,50" oninput="syncPeca()"></label>'+
+    '<label class="fld"><span>Largura (m)</span><input id="pl'+p.id+'" inputmode="decimal" value="'+esc(p.largura)+'" placeholder="Ex.: 0,60" oninput="syncPeca()"></label>'+
+   '</div>'+
+   '<div id="pcalc'+p.id+'">'+pecaCalcHtml(p)+'</div>'+
+  '</div>').join('');
+ recalcOrc();
+}
+function syncPeca(){readPecasFromDom();draftPecas.forEach(p=>{const el=$('pcalc'+p.id);if(el)el.innerHTML=pecaCalcHtml(p);});recalcOrc();}
+
+/* ---------- Produtos dentro do orçamento ---------- */
+function itemLinhaHtml(i){
+ const p=itemProd(i);if(!p)return '<div class="cl"><span>Produto removido do cadastro</span></div>';
+ const un=UN_CURTA[p.unidade||'un'];
+ if(i.modo==='custo')return '<div class="cl"><span>'+esc(p.nome)+'</span><span>'+fmtNum(i.qtd)+' '+un+' × '+money(p.custo)+' (custo) = <b>'+money(itemCusto(i))+'</b></span></div>'+(p.custo>0?'':'<div class="warn">Este produto está sem custo. Cadastre em Ajustes → Produtos.</div>');
+ return '<div class="cl"><span>'+esc(p.nome)+'</span><span>'+fmtNum(i.qtd)+' '+un+' × '+money(p.preco)+' = <b>'+money(itemVenda(i))+'</b></span></div>';
+}
+function addItem(){readItensFromDom();const p=act(data.produtos)[0];if(!p)return;
+ draftItens.push({id:uid(),produtoId:p.id,qtd:1,modo:'custo'});renderItens();}
+function removeItem(iid){readItensFromDom();draftItens=draftItens.filter(i=>i.id!==iid);renderItens();}
+function readItensFromDom(){draftItens.forEach(i=>{
+ if($('ip'+i.id))i.produtoId=$('ip'+i.id).value;
+ if($('iq'+i.id))i.qtd=$('iq'+i.id).value;});}
+function renderItens(){
+ const el=$('itensWrap');if(!el)return;
+ const prods=act(data.produtos).sort((a,b)=>a.nome.localeCompare(b.nome));
+ if(!prods.length){el.innerHTML='<div class="hint">Nenhum produto cadastrado. Cadastre em Ajustes → Produtos para poder escolher aqui.</div>';return;}
+ const opt=i=>prods.map(p=>'<option value="'+p.id+'"'+(p.id===i.produtoId?' selected':'')+'>'+esc(p.nome)+'</option>').join('');
+ el.innerHTML=draftItens.map(i=>
+  '<div class="acb-line"><select id="ip'+i.id+'" onchange="syncOrc()">'+opt(i)+'</select>'+
+  '<input id="iq'+i.id+'" inputmode="decimal" value="'+esc(i.qtd)+'" placeholder="qtd" oninput="syncOrc()">'+
+  '<button class="rm" onclick="removeItem(\''+i.id+'\')">&times;</button></div>'+
+  '<div class="calc2" id="il'+i.id+'" style="margin-top:2px;border:0;padding-top:0">'+itemLinhaHtml(i)+'</div>').join('')+
+  '<button class="linkbtn" onclick="addItem()">+ Adicionar produto</button>';
+}
+function syncOrc(){readItensFromDom();draftItens.forEach(i=>{const e=$('il'+i.id);if(e)e.innerHTML=itemLinhaHtml(i);});recalcOrc();}
+
+/* ---------- Resumo (custo → lucro bruto → total) ---------- */
+function resumoHtml(o){
+ const c=orcCustoParts(o),novo=isNovo(o),venda=orcTotal(o),custo=c.total,lucro=round2(venda-custo),marg=venda>0?lucro/venda*100:null;
+ const sub=orcSubtotal(o),lb=orcLucroBruto(o),area=areaTotal(o),meta=+o.lucroMeta||0,mm=+o.margemMin||0;
+ const L=(k,v,cls)=>'<div class="cl'+(cls||'')+'"><span>'+k+'</span><span>'+v+'</span></div>';
+ const peq=t=>t?'<span style="font-size:11px"> ('+t+')</span>':'';
+ let h='<div class="calc2" style="margin-top:0;border-top:0;padding-top:0">';
+ h+=L('Material (chapas)',money(c.material));
+ if(c.acab>0)h+=L('Acabamentos',money(c.acab));
+ if(c.prod>0)h+=L('Produtos',money(c.prod));
+ h+=L('Mão de obra'+peq(maoDescricao(o)),money(c.mao));
+ if(c.insumos>0)h+=L('Insumos'+peq(fmtM2(area)+' × '+money(o.insumosM2||0)+'/m²'),money(c.insumos));
+ if(c.outros>0)h+=L('Outros custos',money(c.outros));
+ h+=L('Custo real total','<b>'+money(custo)+'</b>',' tot');
+ if(novo){
+  h+=L('Percentual de lucro',fmtNum(pctPadrao(o))+'%');
+  h+=L('Subtotal: lucro bruto','<b>'+money(lb)+'</b>');
+  h+=L('Custo + lucro bruto',money(sub));
+ }else h+=L('Soma de peças e produtos',money(sub));
+ if(o.desconto>0)h+=L('Desconto','− '+money(o.desconto));
+ if(o.acrescimo>0)h+=L('Acréscimo de transporte','+ '+money(o.acrescimo));
+ h+=L('Total do orçamento','<b>'+money(venda)+'</b>',' tot');
+ const cor=lucro<0?'var(--danger)':'var(--ok)';
+ h+=L('Lucro final','<b style="color:'+cor+'">'+money(lucro)+'</b>');
+ h+=L('Margem sobre a venda','<b style="color:'+cor+'">'+fmtPct(marg)+'</b>');
+ const falhas=[];
+ if(venda>0){
+  if(lucro<0)falhas.push('Este orçamento dá <b>prejuízo</b> de '+money(-lucro)+'.');
+  if(meta>0&&lucro<meta-0.005)falhas.push('Lucro abaixo da sua meta de '+money(meta)+' (faltam '+money(meta-lucro)+').');
+  if(mm>0&&(marg==null||marg<mm-0.0005))falhas.push('Margem de '+fmtPct(marg)+' abaixo do mínimo de '+fmtNum(mm)+'%.');
+ }
+ if(falhas.length)h+='<div class="warn">'+falhas.join('<br>')+'</div>';
+ const falt=custosFaltando(o);
+ if(falt.length)h+='<div class="warn">Sem custo cadastrado: '+falt.map(esc).join(', ')+'. O preço está <b>menor que o correto</b>. Preencha em Ajustes.</div>';
+ if(novo&&!(o.insumosM2>0)&&area>0)h+='<div class="cl"><span style="font-size:12px">Nenhum insumo cadastrado: o custo de insumos está em R$ 0,00 (Ajustes → Insumos).</span><span></span></div>';
+ if(novo&&!(o.diaria>0)&&o.dias>0)h+='<div class="warn">Defina o valor da diária em Ajustes → Percentual de lucro e mão de obra.</div>';
+ return h+'</div>';
+}
+function draftOrc(){
+ readPecasFromDom();readItensFromDom();
+ const g=id=>parseMoney($(id)?.value||0);
+ const dias=parseDias($('oDias')?.value),func=draftMao.funcionarios,diaria=draftMao.diaria,maoFixa=g('oMao');
+ const area=areaTotal({pecas:draftPecas}),taxa=insumosRate();
+ return{modo:'custo',pecas:draftPecas,itens:draftItens,desconto:g('oDesc'),acrescimo:g('oAcres'),
+  dias,funcionarios:func,diaria,maoFixa,maoDeObra:round2(dias*func*diaria+maoFixa),
+  insumosM2:taxa,custoInsumos:round2(area*taxa),outrosCustos:g('oOutros'),
+  pct:draftMao.pct,lucroMeta:draftMeta.lucroMeta,margemMin:draftMeta.margemMin};
+}
+function recalcOrc(){
+ const o=draftOrc();
+ if($('oResumo'))$('oResumo').innerHTML=resumoHtml(o);
+ const e=$('oDiasEcho');
+ if(e){
+  const txt=String(($('oDias')||{}).value||'').trim();
+  e.textContent=!txt?'':(o.dias>0?'Entendido como '+diasTexto(o.dias)+(o.diaria>0?' × '+(o.funcionarios>1?o.funcionarios+' funcionários × ':'')+money(o.diaria)+' = '+money(o.dias*o.funcionarios*o.diaria):''):'Não entendi. Use 1,5 ou "1 dia e meio".');
+ }
+}
+function saveOrcamento(id){
+ const d=draftOrc();
+ const nome=$('oClienteNome').value.trim();
+ if(!nome){toast('Informe o cliente.');return;}
+ const pecas=draftPecas.filter(p=>num(p.comprimento)>0&&num(p.largura)>0||p.descricao.trim());
+ const itens=draftItens.filter(i=>i.produtoId&&num(i.qtd)>0);
+ if(!pecas.length&&!itens.length){toast('Informe o serviço (medidas) ou adicione um produto.');return;}
+ const t=now();
+ // o cliente é salvo automaticamente, se ainda não existir
+ let cli=findClienteByNome(nome),novoCli=false;
+ if(!cli){cli={id:uid(),nome,telefone:'',createdAt:t,updatedAt:t,deleted:false};data.clientes.push(cli);novoCli=true;}
+ const base=Object.assign({},d,{pecas,itens});
+ // guarda os valores da época: mudar o cadastro depois não altera orçamentos já feitos
+ const snap={parts:orcCustoParts(base),lucroBruto:orcLucroBruto(base),subtotal:orcSubtotal(base)};
+ snap.linhas=linhasCliente(Object.assign({},base,{snap:{parts:snap.parts,lucroBruto:snap.lucroBruto,subtotal:snap.subtotal}}));
+ const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
+ if(id){Object.assign(byId(data.orcamentos,id),fields);}
+ else{
+  data.seq.orcamento=(data.seq.orcamento||0)+1;
+  data.orcamentos.push(Object.assign({id:uid(),numero:data.seq.orcamento,status:'rascunho',createdAt:t,deleted:false},fields));
+ }
+ save();closeModal();
+ if(id){renderAll();toast('Orçamento salvo.');}
+ else{orcFilter='todos';go('pageOrcamentos');toast('Orçamento criado'+(novoCli?' e cliente cadastrado':'')+'.');}
+}
+function delOrcamento(id){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ if(!confirm('Excluir este orçamento?'))return;
+ logExclusao('Orçamento','Nº '+(o.numero||'—')+' · '+clienteName(o.clienteId)+' · '+money(orcTotal(o)));
+ softDelete(data.orcamentos,id);save();closeModal();renderAll();toast('Orçamento excluído.');
+}
+function orcLabel(o){return 'Orçamento Nº '+(o.numero||'—');}
+function renderOrcamentos(){
+ // toda proposta criada aparece aqui, a mais recente primeiro
+ let list=act(data.orcamentos).slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')||(b.numero||0)-(a.numero||0));
+ if(orcFilter==='aprovavel')list=list.filter(o=>o.status==='rascunho'||o.status==='enviado');
+ else if(orcFilter!=='todos')list=list.filter(o=>o.status===orcFilter);
+ const el=$('orcamentosList');
+ if(!list.length){el.innerHTML=emptyBox('Nenhum orçamento','Toque em "Novo orçamento" para começar.');return;}
+ el.innerHTML=list.map(o=>{
+  const st=ORC_STATUS[o.status]||ORC_STATUS.rascunho;
+  const virou=act(data.pedidos).some(p=>p.orcamentoId===o.id);
+  return '<div class="list-item" onclick="viewOrcamento(\''+o.id+'\')">'+
+   '<div class="av">'+esc(initials(clienteName(o.clienteId)))+'</div>'+
+   '<div class="body"><div class="t">'+esc(clienteName(o.clienteId))+'</div>'+
+    '<div class="s">'+orcLabel(o)+' · '+fmtDate(o.data)+(virou?' · virou obra':'')+'</div></div>'+
+   '<div class="end"><div class="money">'+money(orcTotal(o))+'</div><div class="cap"><span class="badge '+st.c+'">'+st.l+'</span></div></div></div>';
+ }).join('');
+}
+function setOrcStatus(id,st){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ o.status=st;o.updatedAt=now();save();viewOrcamento(id);renderAll();
+}
+function viewOrcamento(id){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ const st=ORC_STATUS[o.status]||ORC_STATUS.rascunho;
+ const pedido=act(data.pedidos).find(p=>p.orcamentoId===id);
+ let corpo='';
+ if(isNovo(o)){
+  corpo='<div class="section-title" style="margin-top:14px">Valores da proposta</div><div class="peca"><div class="calc2" style="margin-top:0;border:0;padding-top:0">'+
+   linhasCliente(o).map(x=>'<div class="cl"><span>'+esc(x.texto)+'</span><span><b>'+money(x.valor)+'</b></span></div>').join('')+'</div></div>';
+ }else{
+  const linhas=(o.pecas||[]).map(p=>{
+   const mat=byId(data.materiais,p.materialId);
+   return '<div class="peca"><div class="pt">'+esc(p.descricao||'Peça')+' <span style="font-weight:400;color:var(--muted)">· '+esc(mat?mat.nome:'—')+'</span></div>'+pecaCalcHtml(p)+'</div>';
+  }).join('');
+  corpo=(linhas?'<div class="section-title" style="margin-top:14px">Peças</div>'+linhas:'')+
+   ((o.itens||[]).length?'<div class="section-title">Produtos</div><div class="peca"><div class="calc2" style="margin-top:0;border:0;padding-top:0">'+o.itens.map(i=>itemLinhaHtml(i)).join('')+'</div></div>':'');
+ }
+ openModal(orcLabel(o),
+  '<div style="margin-bottom:8px"><span class="badge '+st.c+'">'+st.l+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+(o.clienteId?'<a href="#" onclick="closeModal();viewCliente(\''+o.clienteId+'\');return false" style="color:var(--brand);font-weight:600;text-decoration:none">'+esc(clienteName(o.clienteId))+' ›</a>':esc(clienteName(o.clienteId)))+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Data</span><span class="dv">'+fmtDate(o.data)+'</span></div>'+
+  corpo+
+  '<div class="detail-row" style="margin-top:8px"><span class="dk">Subtotal</span><span class="dv">'+money(orcSubtotal(o))+'</span></div>'+
+  (o.desconto>0?'<div class="detail-row"><span class="dk">Desconto</span><span class="dv">− '+money(o.desconto)+'</span></div>':'')+
+  (o.acrescimo>0?'<div class="detail-row"><span class="dk">Acréscimo de transporte</span><span class="dv">+ '+money(o.acrescimo)+'</span></div>':'')+
+  '<div class="total-line"><span>Total</span><span class="tv">'+money(orcTotal(o))+'</span></div>'+
+  (o.obs?'<div class="section-title">Observações e negociação</div><div style="white-space:pre-wrap;font-size:14px">'+esc(o.obs)+'</div>':'')+
+  '<div class="section-title">Custo real e lucro <span style="text-transform:none;letter-spacing:0">(só você vê)</span></div><div class="peca" style="margin-top:0">'+resumoHtml(o)+'</div>'+
+  (pedido||o.status==='aprovado'?'':
+   '<div class="section-title">Situação</div><div class="chip-row">'+['rascunho','enviado','recusado'].map(k=>'<button class="chip'+(o.status===k?' active':'')+'" onclick="setOrcStatus(\''+id+'\',\''+k+'\')">'+ORC_STATUS[k].l+'</button>').join('')+'</div>')+
+  (o.obs?'<label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px"><input type="checkbox" id="shObs" style="width:auto"><span>Incluir as observações na proposta enviada</span></label>':'')+
+  '<div style="margin-top:14px"><button class="btn ok" onclick="enviarWhatsApp(\''+id+'\')">Enviar ao cliente no WhatsApp</button></div>'+
+  '<div style="margin-top:10px" class="btn-row">'+
+   '<button class="btn sec" onclick="editOrcamento(\''+id+'\')">Editar</button>'+
+   '<button class="btn sec" onclick="shareOrcamento(\''+id+'\')">Compartilhar</button></div>'+
+  (pedido
+    ?'<div style="margin-top:10px"><button class="btn ghost" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+pedido.id+'\')">Ver obra gerada</button></div>'
+    :(o.status!=='recusado'?'<div style="margin-top:10px"><button class="btn ok" onclick="aprovarEgerar(\''+id+'\')">Aprovar e gerar obra</button></div>':''))+
+  '<div style="margin-top:10px"><button class="btn sec" style="color:var(--danger)" onclick="delOrcamento(\''+id+'\')">Excluir orçamento</button></div>');
+}
+function aprovarEgerar(id){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ o.status='aprovado';o.updatedAt=now();
+ data.seq.pedido=(data.seq.pedido||0)+1;
+ const t=now();
+ const ped={id:uid(),numero:data.seq.pedido,orcamentoId:id,clienteId:o.clienteId,
+  status:'medicao',dataPrevista:'',valorTotal:orcTotal(o),custoPrevisto:orcCusto(o),
+  historico:[{etapa:'medicao',inicio:isoToday()}],obs:'',createdAt:t,updatedAt:t,deleted:false};
+ data.pedidos.push(ped);
+ save();closeModal();go('pagePedidos');
+ toast('Obra criada. Nº '+ped.numero);
+ setTimeout(()=>viewPedido(ped.id),250);
+}
+// monta o texto da proposta (usado em Compartilhar e no envio por WhatsApp)
+function propostaTexto(o,incluirObs){
+ const c=byId(data.clientes,o.clienteId);
+ let txt='*MARMORARIA ITAPIRUBA*\nProposta de orçamento Nº '+(o.numero||'')+'\n';
+ txt+='Data: '+fmtDate(o.data)+'\n';
+ if(c){txt+='Cliente: '+c.nome+'\n';if(c.obra)txt+='Obra: '+c.obra+'\n';}
+ txt+='\n';
+ if(isNovo(o)){
+  linhasCliente(o).forEach(x=>{txt+='• '+x.texto+': '+money(x.valor)+'\n';});
+ }else{
+  (o.pecas||[]).forEach(p=>{const mat=byId(data.materiais,p.materialId),u=p.un==='m'?'m':'cm',q=pecaQtd(p);
+   txt+='• '+(p.descricao||'Peça')+'\n  '+(mat?mat.nome:'')+'\n  '+fmtNum(p.comprimento)+' '+u+' x '+fmtNum(p.largura)+' '+u+' = '+fmtM2(pecaAreaUnit(p))+(q>1?' x '+q+' = '+fmtM2(pecaArea(p)):'')+
+    '\n  '+fmtM2(pecaArea(p))+' x '+money(mat?mat.precoM2:0)+'/m² = '+money(round2(pecaArea(p)*(mat?mat.precoM2:0)))+'\n';
+   (p.acabamentos||[]).forEach(a=>{const d=byId(data.acabamentos,a.acabamentoId);if(d)txt+='  + '+d.nome+': '+fmtNum(a.qtd)+(d.unidade==='m'?' m':' un')+' x '+money(d.preco)+' = '+money(acbSubtotal(a))+'\n';});
+   txt+='  Valor da peça: '+money(pecaValor(p))+'\n';
+  });
+  (o.itens||[]).forEach(i=>{const p=itemProd(i);if(p)txt+='• '+p.nome+': '+fmtNum(i.qtd)+' '+UN_CURTA[p.unidade||'un']+' x '+money(p.preco)+' = '+money(itemVenda(i))+'\n';});
+ }
+ txt+='\nSubtotal: '+money(orcSubtotal(o))+'\n';
+ if(o.desconto>0)txt+='Desconto: - '+money(o.desconto)+'\n';
+ if(o.acrescimo>0)txt+='Transporte: + '+money(o.acrescimo)+'\n';
+ txt+='\n*TOTAL: '+money(orcTotal(o))+'*\n';
+ if(incluirObs&&o.obs)txt+='\n'+o.obs+'\n';
+ return txt;
+}
+function marcarEnviado(o){if(o.status==='rascunho'){o.status='enviado';o.updatedAt=now();save();renderAll();}}
+// Mensagem amigável para o cliente (saudação, apresentação, o que será feito e só o total)
+function saudacao(){const h=new Date().getHours();return h<12?'Bom dia':(h<18?'Boa tarde':'Boa noite');}
+function primeiroNome(nome){return String(nome||'').trim().split(/\s+/)[0]||'';}
+function itensDescricao(o){
+ const nomes=[];
+ (o.pecas||[]).forEach(p=>{
+  const m=byId(data.materiais,p.materialId);let d=p.descricao||'Serviço';
+  if(m)d+=' em '+m.nome;
+  const area=pecaArea(p);if(area>0)d+=' ('+fmtM2(area)+')';
+  nomes.push(d);
+ });
+ (o.itens||[]).forEach(i=>{const p=itemProd(i);if(p)nomes.push(p.nome+(num(i.qtd)>1?' ('+fmtNum(i.qtd)+' un)':''));});
+ return nomes;
+}
+function mensagemCliente(o,incluirObs){
+ const c=byId(data.clientes,o.clienteId),pn=primeiroNome(c&&c.nome);
+ let t=saudacao()+(pn?', '+pn:'')+'!\n\n';
+ t+='Aqui é da *Marmoraria Itapiruba*. Segue o seu orçamento:\n\n';
+ const itens=itensDescricao(o);
+ if(itens.length)itens.forEach(n=>{t+='• '+n+'\n';});
+ else t+='• Serviço de marmoraria\n';
+ t+='\n*Valor total: '+money(orcTotal(o))+'*\n';
+ if(incluirObs&&o.obs)t+='\n'+o.obs+'\n';
+ t+='\nQualquer dúvida, estou à disposição!';
+ return t;
+}
+function shareOrcamento(id){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ const txt=mensagemCliente(o,!!$('shObs')?.checked);
+ marcarEnviado(o);
+ nativeShareOrPrint('Orçamento '+(o.numero||''),txt);
+}
+/* ---------- Envio direto ao WhatsApp do cliente ---------- */
+function soDigitos(s){return String(s==null?'':s).replace(/\D/g,'');}
+function waNumero(tel){let d=soDigitos(tel);if(!d)return '';if(d.length<=11)d='55'+d;return d;}  // completa com DDI do Brasil
+function abrirLink(url){
+ try{if(typeof Android!=='undefined'&&Android.openExternal){Android.openExternal(url);return true;}}catch(e){}
+ try{const w=window.open(url,'_blank');if(w)return true;}catch(e){}
+ try{window.location.href=url;return true;}catch(e){}
+ return false;
+}
+function enviarWhatsApp(id){
+ const o=byId(data.orcamentos,id);if(!o)return;
+ const c=byId(data.clientes,o.clienteId),num=waNumero(c&&c.telefone);
+ const txt=mensagemCliente(o,!!$('shObs')?.checked);
+ marcarEnviado(o);
+ if(!num){
+  toast('Cliente sem telefone. Toque em Editar cliente e informe o número com DDD.');
+  if(c)editCliente(c.id);
+  return;
+ }
+ if(!abrirLink('https://wa.me/'+num+'?text='+encodeURIComponent(txt))){
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).catch(()=>{});
+  previewText(txt);toast('Não consegui abrir o WhatsApp. Texto copiado.');
+ }
+}
+function abrirWhatsAppCliente(id){
+ const c=byId(data.clientes,id),num=waNumero(c&&c.telefone);
+ if(!num){toast('Cliente sem telefone.');return;}
+ if(!abrirLink('https://wa.me/'+num))toast('Não consegui abrir o WhatsApp.');
+}
+
+/* ============================================================
+   PEDIDOS / OBRAS
+   ============================================================ */
+const PED_FLOW=['medicao','corte','acabamento','entrega','concluido'];
+const PED_LABEL={medicao:'Medição',corte:'Corte',acabamento:'Acabamento',entrega:'Entrega/Instalação',concluido:'Concluído'};
+let pedFilter='ativas';
+function setPedFilter(f){pedFilter=f;renderPedidos();}
+function renderPedFilters(){
+ const defs=[['ativas','Em andamento'],['concluido','Concluídas'],['todas','Todas']];
+ $('pedFilters').innerHTML=defs.map(([k,l])=>'<button class="chip'+(pedFilter===k?' active':'')+'" onclick="setPedFilter(\''+k+'\')">'+l+'</button>').join('');
+}
+function pedRecebido(id){return round2(act(data.lancamentos).filter(l=>l.tipo==='receita'&&l.pedidoId===id&&l.pago).reduce((s,l)=>s+(+l.valor||0),0));}
+// custos reais lançados nesta obra (despesas vinculadas)
+function pedGasto(id){return round2(act(data.lancamentos).filter(l=>l.tipo==='despesa'&&l.pedidoId===id).reduce((s,l)=>s+(+l.valor||0),0));}
+function pedCustoPrevisto(p){
+ if(typeof p.custoPrevisto==='number')return p.custoPrevisto;
+ const o=byId(data.orcamentos,p.orcamentoId);return o?orcCusto(o):0;
+}
+
+/* ---------- Tempo em cada etapa ----------
+   p.historico = [{etapa, inicio:'AAAA-MM-DD'}]. Cada registro termina quando o próximo começa;
+   o último segue contando até hoje (exceto "Concluído", que encerra a contagem). */
+function dayDiff(a,b){
+ const[y1,m1,d1]=a.split('-').map(Number),[y2,m2,d2]=b.split('-').map(Number);
+ return Math.round((Date.UTC(y2,m2-1,d2)-Date.UTC(y1,m1-1,d1))/86400000);
+}
+const fmtDias=n=>n+(n===1?' dia':' dias');
+function ensureHist(p){
+ if(!Array.isArray(p.historico)||!p.historico.length){   // obras criadas antes deste recurso
+  p.historico=[{etapa:p.status,inicio:new Date(p.createdAt||Date.now()).toLocaleDateString('sv')}];
+  save();
+ }
+ return p.historico;
+}
+function diasRegistro(h,i){
+ const r=h[i],fim=h[i+1]?h[i+1].inicio:(r.etapa==='concluido'?null:isoToday());
+ return fim==null?null:Math.max(0,dayDiff(r.inicio,fim));
+}
+function diasEtapaAtual(p){const h=ensureHist(p);return diasRegistro(h,h.length-1);}
+function diasTotalObra(p){
+ const h=ensureHist(p),last=h[h.length-1];
+ return Math.max(0,dayDiff(h[0].inicio,last.etapa==='concluido'?last.inicio:isoToday()));
+}
+function setEtapa(p,nova,voltando){
+ const h=ensureHist(p),hoje=isoToday();
+ if(voltando&&h.length>1&&h[h.length-1].inicio===hoje)h.pop();   // clique errado no mesmo dia: desfaz sem deixar rastro
+ if(h[h.length-1].etapa!==nova)h.push({etapa:nova,inicio:hoje});
+ p.status=nova;p.updatedAt=now();
+}
+function setHistData(pid,i,valor){
+ const p=byId(data.pedidos,pid);if(!p)return;const h=ensureHist(p);
+ if(!valor){viewPedido(pid,true);return;}
+ if((i>0&&valor<h[i-1].inicio)||(h[i+1]&&valor>h[i+1].inicio)){toast('A data precisa ficar entre a etapa anterior e a seguinte.');viewPedido(pid,true);return;}
+ h[i].inicio=valor;p.updatedAt=now();save();viewPedido(pid,true);renderAll();
+}
+function tempoHtml(p){
+ const h=ensureHist(p);
+ const rows=h.map((r,i)=>{
+  const d=diasRegistro(h,i),atual=i===h.length-1&&r.etapa!=='concluido';
+  return '<div class="detail-row" style="align-items:center;gap:8px">'+
+   '<div style="flex:1"><div style="font-weight:600">'+PED_LABEL[r.etapa]+(atual?' <span class="badge b-sent">agora</span>':'')+'</div>'+
+   '<div class="dk" style="font-size:12px">'+(r.etapa==='concluido'?'concluída em':'começou em')+'</div></div>'+
+   '<input type="date" value="'+r.inicio+'" style="width:auto" onchange="setHistData(\''+p.id+'\','+i+',this.value)">'+
+   '<div class="dv" style="min-width:64px">'+(d==null?'—':fmtDias(d))+'</div></div>';
+ }).join('');
+ return '<div class="section-title">Tempo em cada etapa</div>'+rows+
+  '<div class="detail-row"><span class="dk">Total da obra</span><span class="dv">'+fmtDias(diasTotalObra(p))+(p.status==='concluido'?'':' (até hoje)')+'</span></div>'+
+  '<div class="hint">Ao avançar a etapa, o app anota a data. Se esqueceu de avançar, corrija a data de início acima.</div>';
+}
+function renderPedidos(){
+ renderPedFilters();
+ let list=act(data.pedidos).slice().sort((a,b)=>(b.numero||0)-(a.numero||0));
+ if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
+ else if(pedFilter==='concluido')list=list.filter(p=>p.status==='concluido');
+ const el=$('pedidosList');
+ if(!list.length){el.innerHTML=emptyBox('Nenhuma obra','Aprove um orçamento para abrir uma obra.');return;}
+ el.innerHTML=list.map(p=>{
+  const done=p.status==='concluido';
+  const rec=pedRecebido(p.id),falta=round2(p.valorTotal-rec);
+  return '<div class="list-item" onclick="viewPedido(\''+p.id+'\')">'+
+   '<div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>'+
+   '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div>'+
+    '<div class="s">Obra Nº '+(p.numero||'')+' · '+(done?'concluída em '+fmtDias(diasTotalObra(p)):PED_LABEL[p.status]+' há '+fmtDias(diasEtapaAtual(p)))+(p.dataPrevista?' · entrega '+fmtDate(p.dataPrevista):'')+'</div></div>'+
+   '<div class="end"><div class="money">'+money(p.valorTotal)+'</div><div class="cap">'+
+    (done?'<span class="badge b-ok">Concluída</span>':(falta>0.009?'<span class="badge b-warn">falta '+money(falta)+'</span>':'<span class="badge b-ok">pago</span>'))+'</div></div></div>';
+ }).join('');
+}
+function viewPedido(id,detalhes){
+ const p=byId(data.pedidos,id);if(!p)return;
+ const rec=pedRecebido(id),falta=round2(p.valorTotal-rec);
+ const idx=PED_FLOW.indexOf(p.status);
+ const flow='<div class="flow">'+PED_FLOW.map((s,i)=>'<span class="step '+(i<idx?'done':(i===idx?'cur':''))+'">'+PED_LABEL[s]+'</span>').join('')+'</div>';
+ const orc=byId(data.orcamentos,p.orcamentoId),nf=orc?orcFotos(orc).length:0;
+ const movs=act(data.lancamentos).filter(l=>l.pedidoId===id).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+ openModal('Obra Nº '+(p.numero||''),
+  '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+(p.clienteId?'<a href="#" onclick="closeModal();viewCliente(\''+p.clienteId+'\');return false" style="color:var(--brand);font-weight:600;text-decoration:none">'+esc(clienteName(p.clienteId))+' ›</a>':esc(clienteName(p.clienteId)))+'</span></div>'+
+  (p.obs?'<div style="white-space:pre-wrap;font-size:14px;margin:6px 0">'+esc(p.obs)+'</div>':'')+
+  flow+
+  '<div class="btn-row" style="margin-top:12px">'+
+   (idx>0?'<button class="btn sec sm" style="flex:1" onclick="moveEtapa(\''+id+'\',-1)">← Voltar etapa</button>':'')+
+   (idx<PED_FLOW.length-1?'<button class="btn sm" style="flex:1" onclick="moveEtapa(\''+id+'\',1)">Avançar etapa →</button>':'<button class="btn ok sm" style="flex:1" disabled>Finalizada</button>')+
+  '</div>'+
+  '<label class="fld"><span>Data prevista de entrega</span><input type="date" id="pedData" value="'+(p.dataPrevista||'')+'" onchange="setPedData(\''+id+'\')"></label>'+
+  '<div class="detail-row"><span class="dk">Valor da obra</span><span class="dv">'+money(p.valorTotal)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Recebido</span><span class="dv" style="color:var(--ok)">'+money(rec)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Falta receber</span><span class="dv" style="color:'+(falta>0.009?'var(--warn)':'var(--ok)')+'">'+money(falta)+'</span></div>'+
+  '<div class="btn-row" style="margin-top:10px">'+
+   (falta>0.009?'<button class="btn ok sm" style="flex:1" onclick="registrarRecebimento(\''+id+'\')">Registrar recebimento</button>':'')+
+   (orc&&orc.local&&orc.local.lat!=null?'<button class="btn sec sm" style="flex:1" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa</button>':'')+
+  '</div>'+
+  '<details class="mais"'+(detalhes?' open':'')+'><summary>Mais detalhes'+(nf?' · '+nf+' foto'+(nf>1?'s':''):'')+'</summary>'+
+   tempoHtml(p)+
+   (nf?'<div class="section-title">Fotos do serviço e local ('+nf+')</div>'+fotosOrcHtml(orc,'ped',id,false):'')+
+   (movs.length?'<div class="section-title">Recebimentos desta obra</div><div class="card">'+movs.map(l=>{
+    const r=l.tipo==='receita';
+    return '<div class="list-item" onclick="closeModal();go(\'pageFinanceiro\');editLancamento(\''+l.id+'\')"><div class="body"><div class="t">'+esc(l.descricao)+'</div><div class="s">'+fmtDate(l.data)+(l.pago?'':' · em aberto')+(l.obs?' · '+esc(l.obs):'')+'</div></div><div class="end"><div class="money" style="color:'+(r?'var(--ok)':'var(--danger)')+'">'+(r?'+':'−')+' '+money(l.valor)+'</div></div></div>';
+   }).join('')+'</div>':'')+
+  '</details>'+
+  (p.status!=='concluido'?'<div style="margin-top:14px"><button class="btn ok" style="width:100%" onclick="finalizarPedido(\''+id+'\')">✓ Finalizar obra</button></div>':'')+
+  '<div style="margin-top:14px" class="btn-row">'+
+   (orc?'<button class="btn ghost" onclick="closeModal();viewOrcamento(\''+orc.id+'\')">Ver orçamento</button>':'')+
+   '<button class="btn sec" onclick="delPedido(\''+id+'\')">Excluir obra</button></div>');
+ if(!detalhes)$('modalBox').scrollTop=0;   // obra sempre abre do topo
+}
+function finalizarPedido(id){   // com saldo: escolhe os pagamentos antes; sem saldo: conclui direto
+ const p=byId(data.pedidos,id);if(!p)return;
+ if(round2(p.valorTotal-pedRecebido(id))>0.009)registrarRecebimento(id,true);
+ else concluirObra(p);
+}
+function concluirObra(p){
+ setEtapa(p,'concluido');save();closeModal();go('pagePedidos');renderAll();
+ toast('Obra Nº '+(p.numero||'')+' finalizada.');
+}
+function novaObra(){
+ openModal('Nova obra',
+  '<label class="fld"><span>Cliente *</span><input id="oClienteNome" placeholder="Digite o nome ou escolha abaixo" autocomplete="off" oninput="cliSug()"></label>'+
+  '<div id="oSug"></div>'+
+  '<label class="fld"><span>Valor da obra (R$)</span><input id="nobValor" inputmode="decimal" placeholder="0,00" oninput="echoMoney(this)">'+echoInit(0)+'</label>'+
+  '<label class="fld"><span>Data prevista de entrega</span><input type="date" id="nobData"></label>'+
+  '<label class="fld"><span>Observações</span><textarea id="nobObs" style="min-height:70px" placeholder="O que vai ser feito"></textarea></label>'+
+  '<div class="hint">Para obra com cálculo de material e lucro, crie um orçamento e aprove. Aqui é a obra direta.</div>'+
+  '<div style="margin-top:14px" class="btn-row"><button class="btn sec" onclick="closeModal()">Cancelar</button><button class="btn" onclick="salvarNovaObra()">Criar obra</button></div>');
+ cliSug();
+}
+function salvarNovaObra(){
+ const nome=$('oClienteNome').value.trim();
+ if(!nome){toast('Informe o cliente.');return;}
+ const t=now();
+ let cli=findClienteByNome(nome),novoCli=false;
+ if(!cli){cli={id:uid(),nome,telefone:'',createdAt:t,updatedAt:t,deleted:false};data.clientes.push(cli);novoCli=true;}
+ data.seq.pedido=(data.seq.pedido||0)+1;
+ const ped={id:uid(),numero:data.seq.pedido,orcamentoId:'',clienteId:cli.id,
+  status:'medicao',dataPrevista:$('nobData').value||'',valorTotal:parseMoney($('nobValor').value),custoPrevisto:0,
+  historico:[{etapa:'medicao',inicio:isoToday()}],obs:$('nobObs').value.trim(),createdAt:t,updatedAt:t,deleted:false};
+ data.pedidos.push(ped);
+ save();closeModal();go('pagePedidos');renderAll();
+ toast('Obra Nº '+ped.numero+' criada'+(novoCli?' e cliente cadastrado':'')+'.');
+ setTimeout(()=>viewPedido(ped.id),250);
+}
+function moveEtapa(id,delta){const p=byId(data.pedidos,id);if(!p)return;
+ const i=PED_FLOW.indexOf(p.status)+delta;if(i<0||i>=PED_FLOW.length)return;
+ setEtapa(p,PED_FLOW[i],delta<0);save();viewPedido(id);renderAll();}
+function setPedData(id){const p=byId(data.pedidos,id);if(!p)return;p.dataPrevista=$('pedData').value;p.updatedAt=now();save();renderAll();}
+function delPedido(id){
+ const p=byId(data.pedidos,id);if(!p)return;
+ if(!confirm('Excluir esta obra? O orçamento continua.'))return;
+ logExclusao('Obra','Nº '+(p.numero||'—')+' · '+clienteName(p.clienteId)+' · '+money(p.valorTotal));
+ softDelete(data.pedidos,id);save();closeModal();renderAll();toast('Obra excluída.');}
+// divide um valor total em n parcelas que somam exatamente o total (centavos nas primeiras)
+function splitTotal(total,n){
+ n=Math.max(1,Math.floor(n)||1);
+ const base=Math.floor(round2(total)*100/n)/100,parts=new Array(n).fill(base);
+ let resto=Math.round((round2(total)-base*n)*100);
+ for(let i=0;i<resto;i++)parts[i]=round2(parts[i]+0.01);
+ return parts;
+}
+let recForma='Pix';   // forma de pagamento escolhida no recebimento
+const FORMAS=['Pix','Dinheiro','Cartão','Cheque'];
+function setRecForma(f){recForma=f;document.querySelectorAll('#recFormaChips .chip').forEach(b=>b.classList.toggle('active',b.textContent===f));recPreview();}
+let recFinalizar=false;   // true quando o recebimento vem do botão Finalizar obra
+function registrarRecebimento(id,finalizar){
+ recFinalizar=!!finalizar;
+ const p=byId(data.pedidos,id);if(!p)return;
+ const falta=round2(p.valorTotal-pedRecebido(id));
+ recForma='Pix';
+ openModal((recFinalizar?'Finalizar obra':'Registrar recebimento')+' — Obra Nº '+(p.numero||''),
+  '<div class="detail-row"><span class="dk">Valor da obra</span><span class="dv">'+money(p.valorTotal)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Falta receber</span><span class="dv" style="color:var(--warn)">'+money(falta)+'</span></div>'+
+  '<label class="fld"><span>Valor acertado a receber (R$)</span><input id="recValor" inputmode="decimal" value="'+fmtNum(falta)+'" oninput="echoMoney(this);recPreview()">'+echoInit(falta)+'</label>'+
+  '<label class="fld"><span>Entrada (R$)</span><input id="recEntrada" inputmode="decimal" value="" placeholder="0,00 (opcional)" oninput="echoMoney(this);recPreview()"><div class="hint" id="recEntradaEcho"></div></label>'+
+  '<div class="section-title">Forma de pagamento</div>'+
+  '<div class="chip-row" id="recFormaChips">'+FORMAS.map(f=>'<button type="button" class="chip'+(recForma===f?' active':'')+'" onclick="setRecForma(\''+f+'\')">'+f+'</button>').join('')+'</div>'+
+  '<label class="fld"><span>Restante em quantas parcelas?</span><input id="recParc" inputmode="numeric" value="1" oninput="recPreview()"></label>'+
+  '<div class="hint" id="recPrev" style="color:var(--brand);font-weight:600"></div>'+
+  '<label class="fld"><span>Vencimento da 1ª parcela</span><input type="date" id="recData" value="'+(p.dataPrevista||isoToday())+'"><div class="hint">'+(p.dataPrevista?'Preenchido com o prazo de entrega da obra. Pode alterar.':'Sem prazo de entrega definido na obra: usando hoje.')+'</div></label>'+
+  '<label class="fld"><span>Observações</span><textarea id="recObs" style="min-height:70px" placeholder="Ex.: vai pagar com Pix na entrega · vai pagar com cartão daqui 10 dias"></textarea></label>'+
+  '<label class="fld" style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="recPago1" style="width:auto"><span style="margin:0">1ª parcela já recebida</span></label>'+
+  '<div class="hint">A entrada já entra como recebida. As parcelas do restante ficam "a receber", uma por mês.</div>'+
+  '<div style="margin-top:14px"><button class="btn ok" onclick="enviarRecebimentoWhats(\''+id+'\')">Enviar no WhatsApp (valores + Pix)</button></div>'+
+  '<div style="margin-top:10px" class="btn-row"><button class="btn sec" onclick="viewPedido(\''+id+'\')">Cancelar</button>'+
+   '<button class="btn" onclick="confirmarRecebimento(\''+id+'\')">'+(recFinalizar?'Confirmar e finalizar obra':'Confirmar recebimento')+'</button></div>');
+ recPreview();
+}
+function recPlano(){   // lê a tela e devolve {total,entrada,restante,n,partes}
+ const total=parseMoney($('recValor')?.value),entrada=Math.min(parseMoney($('recEntrada')?.value),total),n=Math.max(1,Math.floor(num($('recParc')?.value))||1);
+ const restante=round2(Math.max(0,total-entrada));
+ return{total:round2(total),entrada:round2(entrada),restante,n,partes:restante>0?splitTotal(restante,n):[]};
+}
+function recPreview(){
+ const el=$('recPrev');if(!el)return;
+ const pl=recPlano();
+ const ee=$('recEntradaEcho');if(ee)ee.textContent=pl.entrada>0?('Entrada de '+money(pl.entrada)+' (recebida agora)'):'';
+ if(!(pl.total>0)){el.textContent='';return;}
+ let t='';
+ if(pl.entrada>0)t+='Entrada '+money(pl.entrada)+' + ';
+ if(pl.restante>0)t+=(pl.n>1?(pl.n+'x de '+money(pl.partes[0])+(pl.partes[0]!==pl.partes[pl.n-1]?' (últimas '+money(pl.partes[pl.n-1])+')':'')):money(pl.restante));
+ else t+='tudo na entrada';
+ t+=' · total '+money(pl.total);
+ el.textContent=t;
+}
+function confirmarRecebimento(id){
+ const p=byId(data.pedidos,id);if(!p)return;
+ const pl=recPlano();
+ if(!(pl.total>0)){toast('Informe o valor acertado.');return;}
+ const t=now(),grupo=uid(),d0=$('recData').value||isoToday(),pago1=$('recPago1').checked,forma=recForma,nObra=p.numero||'',obs=($('recObs')?.value||'').trim();
+ if(pl.entrada>0)data.lancamentos.push({id:uid(),tipo:'receita',descricao:'Entrada - Obra Nº '+nObra,valor:pl.entrada,data:isoToday(),categoria:'Entrada',forma,obs,pedidoId:id,pago:true,createdAt:t,updatedAt:t,deleted:false});
+ for(let k=0;k<pl.n&&pl.restante>0;k++){
+  const l={id:uid(),tipo:'receita',descricao:'Recebimento obra Nº '+nObra+(pl.n>1?' ('+(k+1)+'/'+pl.n+')':''),
+   valor:pl.partes[k],data:addMonthsISO(d0,k),categoria:'Recebimento',forma,obs,pedidoId:id,
+   pago:k===0?pago1:false,createdAt:t,updatedAt:t,deleted:false};
+  if(pl.n>1){l.grupo=grupo;l.parcelaNum=k+1;l.parcelaTotal=pl.n;}
+  data.lancamentos.push(l);
+ }
+ save();
+ if(recFinalizar){recFinalizar=false;concluirObra(p);return;}
+ viewPedido(id);toast('Recebimento registrado.');
+}
+function mensagemRecebimento(id){
+ const p=byId(data.pedidos,id),c=byId(data.clientes,p.clienteId),e=data.config.empresa,pl=recPlano();
+ let t=saudacao()+(c&&c.nome?', '+primeiroNome(c.nome):'')+'!\n\n';
+ t+='Aqui é da *'+(e.nome||'Marmoraria Itapiruba')+'*. Segue o combinado do pagamento do seu serviço:\n\n';
+ t+='Valor total: *'+money(pl.total)+'*\n';
+ if(pl.entrada>0)t+='Entrada: '+money(pl.entrada)+'\n';
+ if(pl.restante>0)t+='Restante: '+(pl.n>1?(pl.n+'x de '+money(pl.partes[0])):money(pl.restante))+'\n';
+ if(recForma)t+='Forma de pagamento: '+recForma+'\n';
+ if(e.pixChave){t+='\n*Chave Pix'+(e.cnpj&&e.pixChave.replace(/\D/g,'')===e.cnpj.replace(/\D/g,'')?' (CNPJ)':'')+':* '+e.pixChave+'\n';if(e.nome)t+=e.nome+'\n';}
+ t+='\nObrigado pela preferência!';
+ return t;
+}
+function enviarRecebimentoWhats(id){
+ const p=byId(data.pedidos,id),c=byId(data.clientes,p.clienteId),num=waNumero(c&&c.telefone);
+ const txt=mensagemRecebimento(id);
+ if(!num){toast('Cliente sem telefone. Toque em Editar cliente.');previewText(txt);return;}
+ if(!abrirLink('https://wa.me/'+num+'?text='+encodeURIComponent(txt)))previewText(txt);
+}
+
+/* ============================================================
+   FINANCEIRO
+   ============================================================ */
+let finTipo='todos',finSit='todas',finBusca='';   // filtros do Caixa
+let lRep='unico';   // repetição do lançamento em edição: unico | parcelado | fixo
+// atalhos (quadros do topo e Início): tipo + situação
+function setFinFilter(f){
+ const m={todos:['todos','todas'],receita:['receita','todas'],despesa:['despesa','todas'],aberto:['todos','aberto'],
+  recebido:['receita','quitado'],areceber:['receita','aberto'],pago:['despesa','quitado'],apagar:['despesa','aberto'],atrasado:['todos','atrasado']}[f]||['todos','todas'];
+ const igual=finTipo===m[0]&&finSit===m[1];
+ [finTipo,finSit]=igual&&f!=='todos'&&f!=='atrasado'?['todos','todas']:m;   // tocar de novo no mesmo quadro limpa
+ go('pageFinanceiro');
+}
+function finSetTipo(t){finTipo=t;renderFinanceiro();}
+function finSetSit(x){finSit=x;renderFinanceiro();}
+function finLimpar(){finTipo='todos';finSit='todas';finBusca='';const b=$('finBusca');if(b)b.value='';renderFinanceiro();}
+const MESES_LONGOS=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function mesLongo(key){const[a,m]=key.split('-');return MESES_LONGOS[(+m||1)-1]+' de '+a;}
+const atrasado=l=>!l.pago&&(l.data||'')<isoToday();
+function newLancamento(tipo,pre){
+ editLancamento(null,tipo,pre);
+}
+// soma meses mantendo o dia (encolhe para o último dia do mês quando preciso)
+function addMonthsISO(iso,k){
+ const p=String(iso||isoToday()).slice(0,10).split('-').map(Number);
+ const dt=new Date(p[0],p[1]-1+k,1);
+ const last=new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate();
+ dt.setDate(Math.min(p[2]||1,last));
+ return dt.toLocaleDateString('sv');
+}
+function marcarPago(id){
+ const l=byId(data.lancamentos,id);if(!l)return;
+ l.pago=true;l.updatedAt=now();save();renderAll();
+ toast(l.tipo==='receita'?'Marcado como recebido.':'Marcado como pago.');
+}
+function setRepeticao(mode){
+ lRep=mode;
+ document.querySelectorAll('#lRepChips .chip').forEach(b=>b.classList.toggle('active',b.dataset.rep===mode));
+ const campo=$('lRepCampo');if(!campo)return;
+ if(mode==='parcelado')campo.innerHTML='<label class="fld"><span>Número de parcelas</span><input id="lParc" inputmode="numeric" value="2" oninput="repPreview()"></label><div class="hint" id="lRepPrev"></div>';
+ else if(mode==='fixo')campo.innerHTML='<label class="fld"><span>Repetir por quantos meses</span><input id="lMeses" inputmode="numeric" value="12" oninput="repPreview()"></label><div class="hint" id="lRepPrev"></div>';
+ else campo.innerHTML='';
+ repPreview();
+}
+function repPreview(){
+ const el=$('lRepPrev'),isRec=$('lTipo')&&$('lTipo').value==='receita';
+ const ph=$('lPagoHint');
+ if(ph)ph.textContent=(lRep!=='unico')?('Marca só a 1ª como '+(isRec?'recebida':'paga')+'. As próximas ficam em aberto.'):'';
+ if(!el)return;
+ const v=parseMoney($('lValor').value);
+ if(lRep==='parcelado'){const n=Math.max(2,Math.floor(num($('lParc')?.value))||2);el.textContent=n+'x de '+money(v)+' = total '+money(round2(v*n))+' · uma por mês';}
+ else if(lRep==='fixo'){const n=Math.max(1,Math.floor(num($('lMeses')?.value))||1);el.textContent=money(v)+' por mês, por '+n+(n===1?' mês':' meses');}
+}
+function editLancamento(id,tipo,pre){
+ let l;
+ if(id){l=byId(data.lancamentos,id);if(!l)return;tipo=l.tipo;}
+ else {l=Object.assign({tipo:tipo||'despesa',descricao:'',valor:'',data:isoToday(),categoria:'',pedidoId:'',pago:true},pre||{});lRep='unico';}
+ const pedOpt='<option value="">— nenhuma —</option>'+act(data.pedidos).sort((a,b)=>(b.numero||0)-(a.numero||0))
+  .map(p=>'<option value="'+p.id+'"'+(p.id===l.pedidoId?' selected':'')+'>Obra Nº '+(p.numero||'')+' — '+esc(clienteName(p.clienteId))+'</option>').join('');
+ const isRec=tipo==='receita';
+ openModal(id?'Editar lançamento':(isRec?'Nova receita':'Nova despesa'),
+  '<label class="fld"><span>Descrição *</span><input id="lDesc" value="'+esc(l.descricao)+'" placeholder="'+(isRec?'Ex.: Sinal da obra':'Ex.: Compra de chapa')+'"></label>'+
+  '<div class="grid2">'+
+   '<label class="fld"><span>Valor (R$) *</span><input id="lValor" inputmode="decimal" value="'+(l.valor?fmtNum(l.valor):'')+'" placeholder="0,00" oninput="echoMoney(this);repPreview()">'+echoInit(l.valor)+'</label>'+
+   '<label class="fld"><span>'+(isRec?'Data':'Vencimento / data')+'</span><input type="date" id="lData" value="'+(l.data||isoToday())+'"></label>'+
+  '</div>'+
+  '<label class="fld"><span>Categoria</span><input id="lCat" value="'+esc(l.categoria||'')+'" placeholder="'+(isRec?'Recebimento, sinal…':'Material, fornecedor, salário…')+'" list="catList"></label>'+
+  '<datalist id="catList">'+catSuggestions(tipo).map(c=>'<option value="'+esc(c)+'">').join('')+'</datalist>'+
+  '<input type="hidden" id="lPedido" value="'+esc(l.pedidoId||'')+'">'+
+  '<input type="hidden" id="lTipo" value="'+tipo+'">'+
+  (id?'':
+   '<div class="section-title">Repetição</div>'+
+   '<div class="chip-row" id="lRepChips">'+
+    '<button type="button" class="chip active" data-rep="unico" onclick="setRepeticao(\'unico\')">Único</button>'+
+    '<button type="button" class="chip" data-rep="parcelado" onclick="setRepeticao(\'parcelado\')">Parcelado</button>'+
+    '<button type="button" class="chip" data-rep="fixo" onclick="setRepeticao(\'fixo\')">Fixo mensal</button>'+
+   '</div><div id="lRepCampo"></div>')+
+  '<label class="fld" style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="lPago" style="width:auto" '+(l.pago?'checked':'')+'><span style="margin:0">'+(isRec?'Já recebido':'Já pago')+'</span></label>'+
+  '<div class="hint" id="lPagoHint"></div>'+
+  '<label class="fld"><span>Observações</span><textarea id="lObs" style="min-height:60px" placeholder="'+(isRec?'Ex.: vai pagar com Pix na entrega':'Opcional')+'">'+esc(l.obs||'')+'</textarea></label>'+
+  (id&&l.pedidoId&&byId(data.pedidos,l.pedidoId)?'<div style="margin-top:12px"><button class="btn ghost" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+l.pedidoId+'\')">Ver obra Nº '+(byId(data.pedidos,l.pedidoId).numero||'')+' ›</button></div>':'')+
+  '<div style="margin-top:16px" class="btn-row">'+(id?'<button class="btn sec" onclick="delLancamento(\''+id+'\')">Excluir</button>':'')+
+   '<button class="btn '+(isRec?'ok':'danger')+'" onclick="saveLancamento(\''+(id||'')+'\')">Salvar</button></div>');
+}
+function catSuggestions(tipo){
+ const base=tipo==='receita'?['Sinal','Saldo final','Recebimento','Serviço avulso']
+  :['Chapa / material','Fornecedor','Mão de obra','Transporte','Ferramenta','Imposto','Aluguel','Energia','Outros'];
+ const usados=[...new Set(act(data.lancamentos).filter(l=>l.tipo===tipo&&l.categoria).map(l=>l.categoria))];
+ return [...new Set([...usados,...base])];
+}
+function saveLancamento(id){
+ const desc=$('lDesc').value.trim(),valor=parseMoney($('lValor').value);
+ if(!desc){toast('Informe a descrição.');return;}
+ if(valor<=0){toast('Informe um valor.');return;}
+ const t=now(),tipo=$('lTipo').value;
+ const base={tipo,descricao:desc,valor,data:$('lData').value,categoria:$('lCat').value.trim(),
+  pedidoId:$('lPedido')?.value||'',pago:$('lPago').checked,obs:($('lObs')?.value||'').trim(),updatedAt:t};
+ if(id){Object.assign(byId(data.lancamentos,id),base);save();closeModal();renderAll();toast('Lançamento salvo.');return;}
+ const rep=lRep||'unico';
+ if(rep==='unico'){
+  data.lancamentos.push(Object.assign({id:uid(),createdAt:t,deleted:false},base));
+  save();closeModal();renderAll();toast('Lançamento salvo.');return;
+ }
+ const n=rep==='parcelado'?Math.max(2,Math.floor(num($('lParc')?.value))||2):Math.max(1,Math.floor(num($('lMeses')?.value))||1);
+ const grupo=uid();
+ for(let k=0;k<n;k++){
+  const item=Object.assign({},base,{id:uid(),grupo,data:addMonthsISO(base.data,k),pago:k===0?base.pago:false,createdAt:t,deleted:false});
+  if(rep==='parcelado'){item.parcelaNum=k+1;item.parcelaTotal=n;item.descricao=desc+' ('+(k+1)+'/'+n+')';}
+  else item.recorrente=true;
+  data.lancamentos.push(item);
+ }
+ save();closeModal();renderAll();
+ toast(rep==='parcelado'?('Parcelado em '+n+'x.'):('Lançamento fixo criado ('+n+' meses).'));
+}
+function delLancamento(id){
+ const l=byId(data.lancamentos,id);if(!l)return;
+ let alvos=[l];
+ if(l.grupo){
+  if(confirm('Faz parte de uma série ('+(l.parcelaTotal?'parcelado':'fixo mensal')+').\n\nOK: excluir esta e as próximas da série.\nCancelar: excluir só esta.'))
+   alvos=act(data.lancamentos).filter(x=>x.grupo===l.grupo&&(x.data||'')>=(l.data||''));
+ }else if(!confirm('Excluir este lançamento?'))return;
+ alvos.forEach(x=>{logExclusao(x.tipo==='receita'?'Receita':'Despesa',x.descricao+' · '+money(x.valor)+' · '+fmtDate(x.data));softDelete(data.lancamentos,x.id);});
+ save();closeModal();renderAll();toast(alvos.length>1?alvos.length+' lançamentos excluídos.':'Lançamento excluído.');
+}
+function renderFinFilters(){
+ $('finSegTipo').innerHTML=[['todos','Todos'],['receita','Entradas'],['despesa','Saídas']].map(([k,l])=>'<button class="'+(finTipo===k?'on':'')+'" onclick="finSetTipo(\''+k+'\')">'+l+'</button>').join('');
+ const defs=[['todas','Todas'],['aberto','Em aberto'],['quitado',finTipo==='receita'?'Recebidos':finTipo==='despesa'?'Pagos':'Quitados'],['atrasado','⚠ Atrasados']];
+ $('finFilters').innerHTML=defs.map(([k,l])=>'<button class="chip'+(finSit===k?' active':'')+'" onclick="finSetSit(\''+k+'\')">'+l+'</button>').join('');
+}
+function changeMonth(d){const[a,m]=viewMonth.split('-').map(Number);const dt=new Date(a,m-1+d,1);
+ viewMonth=dt.toLocaleDateString('sv').slice(0,7);renderAll();}
+// situação do lançamento: cor (var --st-*) e texto
+function stLanc(l){
+ const rec=l.tipo==='receita',atras=!l.pago&&(l.data||'')<isoToday();
+ if(rec)return l.pago?{k:'rec',t:'recebido'}:atras?{k:'recat',t:'a receber · atrasado'}:{k:'arec',t:'a receber'};
+ return l.pago?{k:'pago',t:'pago'}:atras?{k:'pagat',t:'a pagar · atrasado'}:{k:'apag',t:'a pagar'};
+}
+function renderFinanceiro(){
+ renderFinFilters();
+ const todos=act(data.lancamentos),no=l=>monthKey(l.data)===viewMonth,doMes=todos.filter(no);
+ const soma=a=>round2(a.reduce((s,l)=>s+(+l.valor||0),0));
+ const grp={rec:doMes.filter(l=>l.tipo==='receita'&&l.pago),arec:doMes.filter(l=>l.tipo==='receita'&&!l.pago),
+  pago:doMes.filter(l=>l.tipo==='despesa'&&l.pago),apag:doMes.filter(l=>l.tipo==='despesa'&&!l.pago)};
+ const v={};Object.keys(grp).forEach(k=>v[k]=soma(grp[k]));
+ const qtd=n=>n+(n===1?' lançamento':' lançamentos');
+ {const ml=mesLongo(viewMonth);$('finMesNome').textContent=ml[0].toUpperCase()+ml.slice(1);}
+ $('finMesHoje').innerHTML=viewMonth===thisMonth()?'mês atual':'<a href="#" onclick="viewMonth=thisMonth();renderAll();return false" style="color:var(--brand);font-weight:600;text-decoration:none">voltar para o mês atual</a>';
+ const saldo=round2(v.rec-v.pago),prev=round2(v.rec+v.arec-v.pago-v.apag);
+ $('finSaldo').textContent=money(saldo);$('finSaldo').style.color=saldo<0?'var(--st-pagat)':'var(--st-rec)';
+ $('finPrevisto').innerHTML='Previsto ao quitar tudo do mês: <b style="color:'+(prev<0?'var(--st-pagat)':'var(--text)')+'">'+money(prev)+'</b>';
+ $('finRecebido').textContent=money(v.rec);$('finRecebidoN').textContent=qtd(grp.rec.length);
+ $('finAReceber').textContent=money(v.arec);$('finAReceberN').textContent=qtd(grp.arec.length);
+ $('finPago').textContent=money(v.pago);$('finPagoN').textContent=qtd(grp.pago.length);
+ $('finAPagarFin').textContent=money(v.apag);$('finAPagarN').textContent=qtd(grp.apag.length);
+ const on={tileRec:['receita','quitado'],tileARec:['receita','aberto'],tilePago:['despesa','quitado'],tileAPag:['despesa','aberto']};
+ Object.keys(on).forEach(id=>$(id).classList.toggle('on',finTipo===on[id][0]&&finSit===on[id][1]));
+ // atrasados de qualquer mês
+ const atr=todos.filter(atrasado),ar=atr.filter(l=>l.tipo==='receita'),ap=atr.filter(l=>l.tipo==='despesa');
+ $('finAlerta').innerHTML=atr.length&&finSit!=='atrasado'?'<div class="fin-alert" onclick="finVerAtrasados()"><span style="font-size:20px">⚠</span><div style="flex:1">'+
+  (ar.length?'<div><b style="color:var(--st-recat)">'+ar.length+' a receber atrasado'+(ar.length>1?'s':'')+'</b> · '+money(soma(ar))+'</div>':'')+
+  (ap.length?'<div><b>'+ap.length+' a pagar atrasado'+(ap.length>1?'s':'')+'</b> · '+money(soma(ap))+'</div>':'')+
+  '</div><span style="color:var(--brand);font-weight:600">Ver ›</span></div>':'';
+ // lista: busca e "atrasados" olham todos os meses; o resto, o mês escolhido
+ const q=normNome(finBusca||'');
+ let list=(q||finSit==='atrasado')?todos.slice():doMes.slice();
+ if(finTipo!=='todos')list=list.filter(l=>l.tipo===finTipo);
+ if(finSit==='aberto')list=list.filter(l=>!l.pago);
+ else if(finSit==='quitado')list=list.filter(l=>l.pago);
+ else if(finSit==='atrasado')list=list.filter(atrasado);
+ if(q)list=list.filter(l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
+  return normNome([l.descricao,l.categoria,l.obs,l.forma,ped?'obra '+(ped.numero||'')+' '+clienteName(ped.clienteId):''].join(' ')).includes(q);});
+ list.sort(finSit==='atrasado'?(a,b)=>(a.data||'').localeCompare(b.data||''):(a,b)=>(b.data||'').localeCompare(a.data||'')||(b.createdAt||'').localeCompare(a.createdAt||''));
+ const ent=soma(list.filter(l=>l.tipo==='receita')),sai=soma(list.filter(l=>l.tipo==='despesa'));
+ const filtrado=finTipo!=='todos'||finSit!=='todas'||q;
+ $('finInfo').innerHTML='<span>'+qtd(list.length)+((q||finSit==='atrasado')?' · todos os meses':' · '+monthName(viewMonth))+'</span>'+
+  (ent?'<span style="color:var(--st-rec)">entradas '+money(ent)+'</span>':'')+(sai?'<span style="color:var(--st-apag)">saídas '+money(sai)+'</span>':'')+
+  (filtrado?'<a href="#" onclick="finLimpar();return false">✕ Limpar filtros</a>':'');
+ const el=$('financeiroList');
+ if(!list.length){el.innerHTML=emptyBox('Nenhum lançamento',filtrado?'Nada com esses filtros. Toque em "Limpar filtros".':'Nada em '+mesLongo(viewMonth)+'. Use "Nova receita" ou "Nova despesa".');return;}
+ const DS=['dom','seg','ter','qua','qui','sex','sáb'];
+ let h='',dia=null;
+ list.forEach(l=>{
+  if(l.data!==dia){dia=l.data;const doDia=list.filter(x=>x.data===dia),liq=round2(soma(doDia.filter(x=>x.tipo==='receita'))-soma(doDia.filter(x=>x.tipo==='despesa')));
+   const dt=dia?new Date(dia+'T12:00:00'):null;
+   h+='<div class="day-h"><span>'+(dt?DS[dt.getDay()]+', '+fmtDate(dia)+(dia===isoToday()?' · hoje':''):'sem data')+'</span><span>'+(liq>=0?'+ ':'− ')+money(Math.abs(liq))+'</span></div>';}
+  const rec=l.tipo==='receita';
+  const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
+  const st=stLanc(l);
+  const sub=(l.categoria||'')+(ped?(l.categoria?' · ':'')+'Obra '+(ped.numero||'')+' · '+clienteName(ped.clienteId):'')+(l.forma?' · '+l.forma:'')+(l.parcelaTotal?' · '+l.parcelaNum+'/'+l.parcelaTotal:'')+(l.recorrente?' · mensal':'')+(l.obs?' · '+l.obs:'');
+  h+='<div class="list-item" onclick="editLancamento(\''+l.id+'\')">'+
+   '<div class="av" style="background:var(--st-'+st.k+'-soft);color:var(--st-'+st.k+')">'+
+    (rec?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>')+'</div>'+
+   '<div class="body"><div class="t">'+esc(l.descricao)+'</div><div class="s"><b style="color:var(--st-'+st.k+')">'+st.t+'</b>'+(sub?' · '+esc(sub):'')+'</div></div>'+
+   '<div class="end"><div class="money" style="color:var(--st-'+st.k+')">'+(rec?'+':'−')+' '+money(l.valor)+'</div>'+
+    (l.pago?'':'<button class="btn sec sm" style="margin-top:4px;padding:5px 9px" onclick="event.stopPropagation();marcarPago(\''+l.id+'\')">✓ '+(rec?'Recebi':'Paguei')+'</button>')+'</div></div>';
+ });
+ el.innerHTML=h;
+}
+function finVerAtrasados(){finTipo='todos';finSit='atrasado';renderFinanceiro();$('finBusca').scrollIntoView({behavior:'smooth'});}
+
+/* ============================================================
+   HOME / dashboard
+   ============================================================ */
+function renderHome(){
+ $('homeMonthLbl').textContent='· '+monthName(viewMonth);
+ const ent=round2(act(data.lancamentos).filter(l=>l.tipo==='receita'&&l.pago&&monthKey(l.data)===viewMonth).reduce((s,l)=>s+(+l.valor||0),0));
+ const sai=round2(act(data.lancamentos).filter(l=>l.tipo==='despesa'&&l.pago&&monthKey(l.data)===viewMonth).reduce((s,l)=>s+(+l.valor||0),0));
+ $('homeResultado').textContent=money(ent-sai);
+ $('homeEntradas').textContent=money(ent);
+ $('homeSaidas').textContent=money(sai);
+ // a receber = saldo em aberto de todas as obras não concluídas + receitas a receber
+ const aReceberObras=act(data.pedidos).reduce((s,p)=>s+Math.max(0,round2(p.valorTotal-pedRecebido(p.id))),0);
+ $('homeAReceber').textContent=money(aReceberObras);
+
+ const abertos=act(data.orcamentos).filter(o=>o.status==='rascunho'||o.status==='enviado');
+ $('homeOrcAbertos').textContent=abertos.length;
+ $('homeOrcValor').textContent=money(abertos.reduce((s,o)=>s+orcTotal(o),0))+' em propostas';
+ const ativos=act(data.pedidos).filter(p=>p.status!=='concluido');
+ $('homePedidosAtivos').textContent=ativos.length;
+ const prox=ativos.filter(p=>p.dataPrevista).sort((a,b)=>a.dataPrevista.localeCompare(b.dataPrevista))[0];
+ $('homePedidosEntrega').textContent=prox?('próx. entrega '+fmtDate(prox.dataPrevista)):'—';
+ $('homeClientes').textContent=act(data.clientes).length;
+ // a pagar = despesas ainda não pagas que vencem dentro do mês aberto
+ const abertas=act(data.lancamentos).filter(l=>l.tipo==='despesa'&&!l.pago&&monthKey(l.data)===viewMonth);
+ $('homeAPagar').textContent=money(round2(abertas.reduce((s,l)=>s+(+l.valor||0),0)));
+ $('homeAPagarSub').textContent=abertas.length?abertas.length+(abertas.length===1?' conta':' contas')+' em '+monthName(viewMonth):'nada a pagar em '+monthName(viewMonth);
+
+ const recent=act(data.orcamentos).slice().sort((a,b)=>(b.numero||0)-(a.numero||0)).slice(0,5);
+ $('homeRecentOrc').innerHTML=recent.length?recent.map(o=>{
+  const st=ORC_STATUS[o.status]||ORC_STATUS.rascunho;
+  return '<div class="list-item" onclick="viewOrcamento(\''+o.id+'\')"><div class="body"><div class="t">'+esc(clienteName(o.clienteId))+'</div><div class="s">'+orcLabel(o)+' · '+fmtDate(o.data)+'</div></div><div class="end"><div class="money">'+money(orcTotal(o))+'</div><div class="cap"><span class="badge '+st.c+'">'+st.l+'</span></div></div></div>';
+ }).join(''):'<div class="empty">Nenhum orçamento ainda.</div>';
+}
+
+/* ============================================================
+   AJUSTES
+   ============================================================ */
+function openSettings(){
+ const dark=document.body.classList.contains('dark');
+ openModal('Ajustes',
+  '<div class="section-title" style="margin-top:4px">Cadastros</div>'+
+  '<div class="card"><div class="list-item" onclick="openCatalogos(\'materiais\')"><div class="body"><div class="t">Materiais</div><div class="s">'+act(data.materiais).length+' cadastrados · custo por m²</div></div></div>'+
+   '<div class="list-item" onclick="openCatalogos(\'produtos\')"><div class="body"><div class="t">Produtos</div><div class="s">'+act(data.produtos).length+' cadastrados · aparecem no orçamento</div></div></div>'+
+   '<div class="list-item" onclick="openCatalogos(\'insumos\')"><div class="body"><div class="t">Insumos</div><div class="s">Custo por m² de serviço: '+money(insumosRate())+'</div></div></div>'+
+  '</div>'+
+  '<div class="section-title">Relatórios</div>'+
+  '<div class="card"><div class="list-item" onclick="openRelatorios(\'ajustes\')"><div class="body"><div class="t">Relatórios</div><div class="s">Resumo do mês · fluxo do ano · contas a receber e a pagar · obras</div></div></div></div>'+
+  '<div class="section-title">Empresa</div>'+
+  '<div class="card"><div class="list-item" onclick="openEmpresa()"><div class="body"><div class="t">Dados da empresa e Pix</div><div class="s">'+(data.config.empresa.pixChave?'Chave Pix: '+esc(data.config.empresa.pixChave):'Preencha a chave Pix para enviar ao cliente')+'</div></div></div></div>'+
+  '<div class="section-title">Preço e mão de obra</div>'+
+  '<div class="card"><div class="list-item" onclick="openMetas()"><div class="body"><div class="t">Percentual de lucro e mão de obra</div><div class="s">Lucro padrão '+fmtNum(data.config.pct)+'% sobre o custo · '+data.config.funcionarios+' funcionário'+(data.config.funcionarios>1?'s':'')+' · diária '+(data.config.diaria>0?money(data.config.diaria):'não definida')+'</div></div></div>'+
+  '</div>'+
+  '<div class="section-title">Aparência e registros</div>'+
+  '<div class="card">'+
+   '<div class="list-item" onclick="verificarAtualizacao()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir. Toque para procurar agora.</div></div></div>'+
+   '<div class="list-item" onclick="openLog()"><div class="body"><div class="t">Registro de exclusões</div><div class="s">'+(data.log.length?data.log.length+(data.log.length===1?' item excluído':' itens excluídos'):'Nada excluído até agora')+'</div></div></div>'+
+   '<div class="list-item" onclick="toggleDark()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
+  '</div>'+
+  '<div class="section-title">Dados</div>'+
+  '<div class="card">'+
+   '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
+   '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
+  '</div>'+
+  '<div class="hint" style="text-align:center;margin-top:22px">Marmoraria Itapiruba · versão '+APP_VERSION+'</div>'+
+  '<input type="file" id="importFile" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)">');
+}
+function openEmpresa(){
+ const e=data.config.empresa;
+ openModal('Dados da empresa e Pix',
+  '<div class="hint" style="margin:0 0 6px">Usados na mensagem enviada ao cliente (valores, forma de pagamento e chave Pix).</div>'+
+  '<label class="fld"><span>Nome da empresa</span><input id="empNome" value="'+esc(e.nome||'')+'" placeholder="Marmoraria Itapiruba"></label>'+
+  '<label class="fld"><span>CNPJ</span><input id="empCnpj" value="'+esc(e.cnpj||'')+'" inputmode="numeric" placeholder="00.000.000/0001-00"></label>'+
+  '<label class="fld"><span>Chave Pix (CNPJ)</span><input id="empPix" value="'+esc(e.pixChave||'')+'" placeholder="Chave Pix para o cliente pagar"><div class="hint">Pode ser o CNPJ, telefone, e-mail ou chave aleatória.</div></label>'+
+  '<div style="margin-top:16px" class="btn-row"><button class="btn sec" onclick="openSettings()">Voltar</button><button class="btn" onclick="saveEmpresa()">Salvar</button></div>');
+}
+function saveEmpresa(){
+ const e=data.config.empresa;
+ e.nome=$('empNome').value.trim()||'Marmoraria Itapiruba';e.cnpj=$('empCnpj').value.trim();e.pixChave=$('empPix').value.trim();
+ save();openSettings();toast('Dados da empresa salvos.');
+}
+function openMetas(){
+ const c=data.config;
+ openModal('Percentual de lucro e mão de obra',
+  '<label class="fld"><span>Percentual de lucro padrão (%)</span><input id="cfgPct" inputmode="decimal" value="'+fmtNum(c.pct)+'" placeholder="60"><div class="hint">É aplicado sobre o custo: custo de R$ 1.000 com 60% vira R$ 1.600. Cada material ou produto pode ter o seu próprio percentual no cadastro.</div></label>'+
+  '<label class="fld"><span>Funcionários por obra</span><input id="cfgFunc" inputmode="numeric" value="'+c.funcionarios+'" placeholder="1"><div class="hint">Quantos funcionários trabalham em cada obra. No orçamento você informa só os dias.</div></label>'+
+  '<label class="fld"><span>Valor da diária de cada funcionário (R$ por dia)</span><input id="cfgMao" inputmode="decimal" value="'+(c.diaria?fmtNum(c.diaria):'')+'" placeholder="Ex.: 200,00" oninput="echoMoney(this)">'+echoInit(c.diaria)+'<div class="hint">Mão de obra do orçamento = funcionários × diária × dias. Meio dia vale metade. Orçamentos já salvos mantêm os valores da época.</div></label>'+
+  '<div class="section-title">Avisos (opcional)</div>'+
+  '<label class="fld"><span>Margem mínima com que posso trabalhar (%)</span><input id="cfgMargem" inputmode="decimal" value="'+(c.margemMin?fmtNum(c.margemMin):'')+'" placeholder="Ex.: 30"><div class="hint">Margem = lucro ÷ preço final. Se o orçamento ficar abaixo, o app avisa.</div></label>'+
+  '<label class="fld"><span>Lucro mínimo por orçamento (R$)</span><input id="cfgLucro" inputmode="decimal" value="'+(c.lucroMeta?fmtNum(c.lucroMeta):'')+'" placeholder="Ex.: 500,00" oninput="echoMoney(this)">'+echoInit(c.lucroMeta)+'</label>'+
+  '<div style="margin-top:16px" class="btn-row"><button class="btn sec" onclick="openSettings()">Voltar</button><button class="btn" onclick="saveMetas()">Salvar</button></div>');
+}
+function saveMetas(){
+ const c=data.config,p=num($('cfgPct').value),m=num($('cfgMargem').value);
+ if(p<0||p>1000){toast('Informe um percentual de lucro válido.');return;}
+ if(m<0||m>=100){toast('A margem mínima precisa ser entre 0 e 99%.');return;}
+ c.pct=p;c.margemMin=m;c.lucroMeta=parseMoney($('cfgLucro').value);c.diaria=parseMoney($('cfgMao').value);c.funcionarios=Math.max(1,Math.floor(num($('cfgFunc').value))||1);
+ save();openSettings();toast('Salvo.');
+}
+function toggleDark(){
+ const on=!document.body.classList.contains('dark');
+ document.body.classList.toggle('dark',on);
+ try{localStorage.setItem('marmoraria.theme',on?'dark':'light');}catch(e){}
+ openSettings();
+}
+
+/* ============================================================
+   BACKUP — navegador agora; ponte nativa quando no APK
+   ============================================================ */
+function backupObject(){return {app:'marmoraria.itapiruba',version:APP_VERSION,exportedAt:now(),data};}
+/* Salva um arquivo gerado pelo app. No APK vai pela ponte nativa (quem chama trata isso).
+   No navegador comum (site/GitHub Pages) usa o <a download>. Dentro do visualizador da claude.ai
+   (quando o app é aberto pelo link no iPhone) o <a download> é bloqueado, então usa a ponte de
+   downloads do visualizador. Tudo protegido: se nada existir, avisa. */
+async function baixarArquivo(filename,data,mime){
+ const blob=(data instanceof Blob)?data:new Blob([data],{type:mime||'application/octet-stream'});
+ try{
+  if(window.claude&&typeof window.claude.use==='function'){
+   const dl=await window.claude.use('downloads');
+   if(dl&&typeof dl.save==='function'){
+    try{await dl.save({filename:filename,data:blob});toast('Arquivo salvo.');}
+    catch(e){toast(e&&e.code==='declined'?'Download cancelado.':'Não consegui salvar o arquivo aqui.');}
+    return;
+   }
+  }
+ }catch(e){}
+ try{
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Arquivo gerado.');
+ }catch(e){toast('Não consegui salvar o arquivo aqui.');}
+}
+function exportBackup(){
+ const json=JSON.stringify(backupObject(),null,2);
+ if(typeof Android!=='undefined'&&Android.exportBackup){try{Android.exportBackup(json);toast('Backup gerado.');return;}catch(e){}}
+ baixarArquivo('MarmorariaItapiruba_Backup_'+isoToday()+'.json',json,'application/json');
+}
+function importBackupPrompt(){
+ if(typeof Android!=='undefined'&&Android.importBackup){try{Android.importBackup();return;}catch(e){}}
+ $('importFile').click();
+}
+function importBackupFile(ev){
+ const f=ev.target.files[0];if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{try{applyBackup(r.result);}catch(e){toast('Arquivo inválido.');}};
+ r.readAsText(f);
+}
+function applyBackup(text){
+ const obj=JSON.parse(text);
+ const d=obj&&obj.data?obj.data:obj;
+ if(!d||!Array.isArray(d.orcamentos&&d.orcamentos)&&!Array.isArray(d.clientes)){toast('Backup não reconhecido.');return;}
+ if(!confirm('Restaurar o backup substitui os dados atuais deste aparelho. Continuar?'))return;
+ data=d;normalize();
+ save();closeModal();renderAll();toast('Backup restaurado.');
+}
+// Botão "voltar" do Android: o nativo chama isto. Retorna true se tratou (não sai do app).
+window.appBack=function(){
+ try{
+  const bg=$('modalBg');
+  if(bg&&bg.classList.contains('open')){closeModal();return true;}   // fecha a janela aberta
+  const ativa=document.querySelector('.page.active');
+  if(ativa&&ativa.id!=='pageHome'){go('pageHome');return true;}        // volta para o início
+ }catch(e){}
+ return false;                                                         // nada a voltar: sai do app
+};
+// chamado pelo nativo (quando empacotado): window.nativeEvent('backupImported', base64url)
+window.nativeEvent=function(event,encoded){
+ try{
+  const txt=()=>decodeURIComponent(escape(atob((encoded||'').replace(/-/g,'+').replace(/_/g,'/'))));
+  if(event==='backupImported'){applyBackup(txt());}
+  else if(event==='interfaceUpdate'){avisoAtualizacao((JSON.parse(txt())||{}).version);}   // OTA baixada e conferida
+  else if(event==='updateStatus'){const o=JSON.parse(txt())||{};if(o.message)toast(o.message);}
+ }catch(e){console.warn('nativeEvent',event,e);}
+};
+/* ---- Atualização automática (OTA): o nativo baixa a interface assinada; aqui só avisamos e recarregamos ---- */
+function avisoAtualizacao(ver){
+ if($('otaAviso'))return;
+ const d=document.createElement('div');d.id='otaAviso';
+ d.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;background:var(--brand);color:#fff;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.3);font-size:14px';
+ d.innerHTML='<div style="flex:1"><b>Nova versão'+(ver?' '+esc(ver):'')+' pronta</b><div style="font-size:12px;opacity:.9">Seus dados continuam salvos.</div></div>'+
+  '<button class="btn sm" style="background:#fff;color:var(--brand)" onclick="aplicarAtualizacao()">Atualizar</button>'+
+  '<button class="btn sm" style="background:transparent;color:#fff;padding:9px 6px" onclick="this.parentNode.remove()" aria-label="Depois">✕</button>';
+ document.body.appendChild(d);
+}
+function aplicarAtualizacao(){
+ try{save();}catch(e){}
+ if(typeof Android!=='undefined'&&Android.reloadInterface){Android.reloadInterface();}else location.reload();
+}
+function verificarAtualizacao(){
+ if(typeof Android!=='undefined'&&Android.checkUpdates){Android.checkUpdates();toast('Procurando atualização…');}
+ else toast('Disponível só no app instalado.');
+}
+
+/* ============================================================
+   Compartilhar / imprimir (ponte nativa protegida)
+   ============================================================ */
+function nativeShareOrPrint(titulo,texto){
+ if(typeof Android!=='undefined'){
+  if(Android.shareText){try{Android.shareText(titulo,texto);return;}catch(e){}}
+  if(Android.copyText){try{Android.copyText(texto);toast('Proposta copiada.');return;}catch(e){}}
+ }
+ if(navigator.share){navigator.share({title:titulo,text:texto}).catch(()=>{});return;}
+ if(navigator.clipboard){navigator.clipboard.writeText(texto).then(()=>toast('Proposta copiada.')).catch(()=>previewText(texto));return;}
+ previewText(texto);
+}
+function previewText(texto){
+ openModal('Proposta','<textarea style="min-height:320px" readonly>'+esc(texto)+'</textarea><div class="hint">Copie o texto acima para enviar ao cliente.</div>');
+}
+
+/* ============================================================
+   EXPORTAR EXCEL (.xlsx de verdade, com filtro nas colunas)
+   Gera o arquivo no próprio app e entrega ao nativo (Android.exportCsv
+   com prefixo __FAMILIA_XLSX_BASE64__), ou baixa pelo navegador.
+   ============================================================ */
+const _crcTable=(()=>{let c,t=[];for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);t[n]=c>>>0;}return t;})();
+function crc32(buf){let c=0xFFFFFFFF;for(let i=0;i<buf.length;i++)c=_crcTable[(c^buf[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function bytesToBase64(bytes){let bin='';const CH=0x8000;for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));return btoa(bin);}
+function zipStore(files){
+ const u16=n=>[n&0xFF,(n>>8)&0xFF],u32=n=>[n&0xFF,(n>>8)&0xFF,(n>>16)&0xFF,(n>>24)&0xFF];
+ const parts=[],central=[];let offset=0;
+ files.forEach(f=>{
+  const name=new TextEncoder().encode(f.name),data=f.data,crc=crc32(data);
+  parts.push(new Uint8Array([0x50,0x4b,0x03,0x04,...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]));
+  parts.push(name);parts.push(data);
+  central.push(new Uint8Array([0x50,0x4b,0x01,0x02,...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)]));
+  central.push(name);
+  offset+=30+name.length+data.length;
+ });
+ let cdSize=0;central.forEach(a=>cdSize+=a.length);
+ const eocd=new Uint8Array([0x50,0x4b,0x05,0x06,0,0,0,0,...u16(files.length),...u16(files.length),...u32(cdSize),...u32(offset),0,0]);
+ const all=parts.concat(central,[eocd]);let total=0;all.forEach(a=>total+=a.length);
+ const out=new Uint8Array(total);let p=0;all.forEach(a=>{out.set(a,p);p+=a.length;});
+ return out;
+}
+function colLetter(n){let s='';n++;while(n>0){const r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
+function excelDate(iso){const p=String(iso||'').slice(0,10).split('-').map(Number);if(!p[0])return null;return Math.round((Date.UTC(p[0],p[1]-1,p[2])-Date.UTC(1899,11,30))/86400000);}
+function xmlEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function buildXlsx(sheetName,columns,rows){
+ const enc=new TextEncoder();
+ const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="&quot;R$ &quot;#,##0.00"/><numFmt numFmtId="165" formatCode="dd/mm/yyyy"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+ let colsXml='<cols>';columns.forEach((c,i)=>{colsXml+='<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+(c.width||16)+'" customWidth="1"/>';});colsXml+='</cols>';
+ const cT=(ref,val,s)=>'<c r="'+ref+'" t="inlineStr" s="'+s+'"><is><t xml:space="preserve">'+xmlEsc(val)+'</t></is></c>';
+ const cN=(ref,val,s)=>'<c r="'+ref+'" s="'+s+'"><v>'+val+'</v></c>';
+ let sd='<sheetData><row r="1">';
+ columns.forEach((c,i)=>{sd+=cT(colLetter(i)+'1',c.header,3);});
+ sd+='</row>';
+ rows.forEach((row,ri)=>{const r=ri+2;sd+='<row r="'+r+'">';
+  columns.forEach((c,i)=>{const ref=colLetter(i)+r,v=row[i];
+   if(v==null||v==='')return;
+   if(c.type==='money')sd+=cN(ref,round2(+v||0),1);
+   else if(c.type==='number')sd+=cN(ref,(+v||0),0);
+   else if(c.type==='date'){const s=excelDate(v);sd+=(s!=null)?cN(ref,s,2):cT(ref,v,0);}
+   else sd+=cT(ref,v,0);
+  });sd+='</row>';});
+ sd+='</sheetData>';
+ const lastRef=colLetter(columns.length-1)+(rows.length+1);
+ const sheetXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+colsXml+sd+'<autoFilter ref="A1:'+lastRef+'"/></worksheet>';
+ const sn=xmlEsc(String(sheetName||'Planilha').replace(/[\\\/\?\*\[\]:]/g,' ').slice(0,31));
+ const wb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+sn+'" sheetId="1" r:id="rId1"/></sheets></workbook>';
+ const ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
+ const relsRoot='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+ const relsWb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+ return zipStore([
+  {name:'[Content_Types].xml',data:enc.encode(ct)},
+  {name:'_rels/.rels',data:enc.encode(relsRoot)},
+  {name:'xl/workbook.xml',data:enc.encode(wb)},
+  {name:'xl/_rels/workbook.xml.rels',data:enc.encode(relsWb)},
+  {name:'xl/styles.xml',data:enc.encode(styles)},
+  {name:'xl/worksheets/sheet1.xml',data:enc.encode(sheetXml)},
+ ]);
+}
+function exportExcel(filename,sheetName,columns,rows){
+ if(!rows.length){toast('Nada para exportar neste relatório.');return;}
+ let bytes;try{bytes=buildXlsx(sheetName,columns,rows);}catch(e){toast('Falha ao gerar a planilha.');return;}
+ if(typeof Android!=='undefined'&&Android.exportCsv){try{Android.exportCsv(filename,'__FAMILIA_XLSX_BASE64__:'+bytesToBase64(bytes));return;}catch(e){}}
+ baixarArquivo(filename,bytes,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+function relatorioFinanceiroExcel(){
+ const cols=[
+  {header:'Data',type:'date',width:12},{header:'Mês',type:'text',width:10},{header:'Tipo',type:'text',width:10},
+  {header:'Descrição',type:'text',width:32},{header:'Categoria',type:'text',width:18},{header:'Obra / cliente',type:'text',width:26},
+  {header:'Situação',type:'text',width:12},{header:'Forma pagto',type:'text',width:12},{header:'Parcela',type:'text',width:9},{header:'Mensal fixo',type:'text',width:10},
+  {header:'Entrada (R$)',type:'money',width:14},{header:'Saída (R$)',type:'money',width:14},{header:'Valor (R$)',type:'money',width:14},
+ ];
+ const rows=act(data.lancamentos).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||'')).map(l=>{
+  const rec=l.tipo==='receita',ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
+  return [l.data||'',monthName(monthKey(l.data)),rec?'Receita':'Despesa',l.descricao||'',l.categoria||'',
+   ped?('Obra '+(ped.numero||'')+' — '+clienteName(ped.clienteId)):'',
+   l.pago?(rec?'Recebido':'Pago'):(rec?'A receber':'A pagar'),l.forma||'',
+   l.parcelaTotal?(l.parcelaNum+'/'+l.parcelaTotal):'',l.recorrente?'Sim':'',
+   rec?(+l.valor||0):'',rec?'':(+l.valor||0),(+l.valor||0)];
+ });
+ exportExcel('Financeiro_MarmorariaItapiruba_'+isoToday()+'.xlsx','Financeiro',cols,rows);
+}
+function relatorioEntregaExcel(){
+ const cols=[
+  {header:'Obra Nº',type:'number',width:9},{header:'Cliente',type:'text',width:24},{header:'Telefone',type:'text',width:16},
+  {header:'Etapa',type:'text',width:18},{header:'Entrega prevista',type:'date',width:15},{header:'Dias na etapa',type:'number',width:12},
+  {header:'Dias total',type:'number',width:11},{header:'Situação',type:'text',width:14},{header:'Valor (R$)',type:'money',width:14},
+  {header:'Recebido (R$)',type:'money',width:14},{header:'Falta receber (R$)',type:'money',width:16},{header:'Orçamento Nº',type:'number',width:12},
+ ];
+ const hoje=isoToday();
+ const rows=act(data.pedidos).slice().sort((a,b)=>((a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999'))||((a.numero||0)-(b.numero||0))).map(p=>{
+  const c=byId(data.clientes,p.clienteId),rec=pedRecebido(p.id),orc=byId(data.orcamentos,p.orcamentoId);
+  const sit=p.status==='concluido'?'Concluída':((p.dataPrevista&&p.dataPrevista<hoje)?'Atrasada':'Em andamento');
+  return [p.numero||'',clienteName(p.clienteId),c?(c.telefone||''):'',PED_LABEL[p.status]||'',p.dataPrevista||'',
+   diasEtapaAtual(p),diasTotalObra(p),sit,(+p.valorTotal||0),rec,round2(p.valorTotal-rec),orc?(orc.numero||''):''];
+ });
+ exportExcel('Obras_MarmorariaItapiruba_'+isoToday()+'.xlsx','Obras por entrega',cols,rows);
+}
+
+/* ============================================================
+   RELATÓRIOS
+   ============================================================ */
+let relMes=thisMonth();
+let relOrigem='ajustes';   // de onde o usuário abriu os relatórios (para o Voltar)
+function openRelatorios(origem){
+ if(origem)relOrigem=origem;
+ const item=(fn,ic,t,s)=>'<div class="list-item" onclick="'+fn+'"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'+ic+'</svg></div><div class="body"><div class="t">'+t+'</div><div class="s">'+s+'</div></div><div style="color:var(--muted)">›</div></div>';
+ openModal('Relatórios',
+  '<div class="hint" style="margin:0 0 10px">Escolha o relatório. Cada um pode ser compartilhado (WhatsApp, PDF/impressão) ou exportado para Excel.</div>'+
+  '<div class="section-title" style="margin-top:6px">Dinheiro</div><div class="card">'+
+   item("relMes=viewMonth;relatorioFinanceiro()",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>','Resumo do mês','Entradas, saídas, saldo e despesas por categoria')+
+   item("relatorioFluxoAno()",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>','Fluxo de caixa do ano','Mês a mês: entrou, saiu e saldo acumulado')+
+   item("relatorioContas(\'receita\')",'<path d="M12 19V5M5 12l7-7 7 7"/>','Contas a receber','Tudo que clientes ainda devem, com atrasados')+
+   item("relatorioContas(\'despesa\')",'<path d="M12 5v14M5 12l7 7 7-7"/>','Contas a pagar','Tudo que falta pagar, por vencimento')+
+  '</div>'+
+  '<div class="section-title">Obras</div><div class="card">'+
+   item("relatorioEntrega()",'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>','Obras por ordem de entrega','O que entregar primeiro, com o que falta receber')+
+  '</div>'+
+  '<div class="section-title">Planilhas</div><div class="card">'+
+   item("relatorioFinanceiroExcel()",'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>','Exportar Caixa para Excel','Todos os lançamentos, com filtros prontos')+
+   item("relatorioEntregaExcel()",'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>','Exportar obras para Excel','Todas as obras com valores e prazos')+
+  '</div>'+
+  '<div style="margin-top:14px"><button class="btn sec" onclick="'+(relOrigem==='caixa'?'closeModal()':'openSettings()')+'">Voltar</button></div>');
+}
+/* ---- Contas a receber / a pagar (todos os meses) ---- */
+function relatorioContas(tipo){
+ const rec=tipo==='receita',hoje=isoToday();
+ const list=act(data.lancamentos).filter(l=>l.tipo===tipo&&!l.pago).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+ const atr=list.filter(l=>(l.data||'')<hoje),prox=list.filter(l=>(l.data||'')>=hoje);
+ const soma=a=>round2(a.reduce((s,l)=>s+(+l.valor||0),0));
+ const linha=l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null,st=stLanc(l);
+  return '<div class="list-item" onclick="closeModal();go(\'pageFinanceiro\');editLancamento(\''+l.id+'\')"><div class="body"><div class="t">'+esc(l.descricao)+'</div><div class="s">'+fmtDate(l.data)+(ped?' · '+esc(clienteName(ped.clienteId)):'')+(l.obs?' · '+esc(l.obs):'')+'</div></div><div class="end"><div class="money" style="color:var(--st-'+st.k+')">'+money(l.valor)+'</div></div></div>';};
+ openModal(rec?'Contas a receber':'Contas a pagar',
+  '<div class="stat-grid" style="margin-bottom:6px">'+
+   '<div class="stat"><div class="k">Atrasado</div><div class="v small" style="color:var(--st-'+(rec?'recat':'pagat')+')">'+money(soma(atr))+'</div><div class="n">'+atr.length+' lançamento(s)</div></div>'+
+   '<div class="stat"><div class="k">A vencer</div><div class="v small" style="color:var(--st-'+(rec?'arec':'apag')+')">'+money(soma(prox))+'</div><div class="n">'+prox.length+' lançamento(s)</div></div>'+
+  '</div>'+
+  '<div class="detail-row"><span class="dk"><b style="color:var(--text)">Total '+(rec?'a receber':'a pagar')+'</b></span><span class="dv">'+money(soma(list))+'</span></div>'+
+  (atr.length?'<div class="section-title">⚠ Atrasados</div><div class="card">'+atr.map(linha).join('')+'</div>':'')+
+  (prox.length?'<div class="section-title">A vencer</div><div class="card">'+prox.map(linha).join('')+'</div>':'')+
+  (!list.length?'<div class="empty">Nada '+(rec?'a receber':'a pagar')+'. Tudo em dia!</div>':'')+
+  '<div style="margin-top:14px" class="btn-row"><button class="btn sec" onclick="openRelatorios()">Voltar</button>'+(list.length?'<button class="btn sec" onclick="shareRelContas(\''+tipo+'\')">Compartilhar</button>':'')+'</div>');
+}
+function shareRelContas(tipo){
+ const rec=tipo==='receita',hoje=isoToday();
+ const list=act(data.lancamentos).filter(l=>l.tipo===tipo&&!l.pago).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+ let txt='*MARMORARIA ITAPIRUBA*\n'+(rec?'Contas a receber':'Contas a pagar')+' · '+fmtDate(hoje)+'\n\n';
+ list.forEach(l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
+  txt+='• '+fmtDate(l.data)+((l.data||'')<hoje?' (ATRASADO)':'')+' · '+l.descricao+(ped?' · '+clienteName(ped.clienteId):'')+': '+money(l.valor)+'\n';});
+ txt+='\nTotal: '+money(round2(list.reduce((s,l)=>s+(+l.valor||0),0)));
+ nativeShareOrPrint(rec?'Contas a receber':'Contas a pagar',txt);
+}
+/* ---- Fluxo de caixa do ano ---- */
+let relAno=new Date().getFullYear();
+function fluxoAno(){
+ const meses=[];let acum=0;
+ for(let m=1;m<=12;m++){const key=relAno+'-'+String(m).padStart(2,'0');
+  const mv=act(data.lancamentos).filter(l=>monthKey(l.data)===key);
+  const s=f=>round2(mv.filter(f).reduce((t,l)=>t+(+l.valor||0),0));
+  const e=s(l=>l.tipo==='receita'&&l.pago),sa=s(l=>l.tipo==='despesa'&&l.pago),pe=s(l=>l.tipo==='receita'&&!l.pago),ps=s(l=>l.tipo==='despesa'&&!l.pago);
+  acum=round2(acum+e-sa);meses.push({key,e,sa,saldo:round2(e-sa),acum,pe,ps});}
+ return meses;
+}
+function fluxoAbrirMes(key){viewMonth=key;finLimpar();closeModal();go('pageFinanceiro');}
+function relatorioFluxoAno(){
+ const ms=fluxoAno(),tot=k=>round2(ms.reduce((t,m)=>t+m[k],0)),mx=Math.max(1,...ms.map(m=>Math.max(m.e,m.sa)));
+ const bar=(v,c)=>'<div style="height:6px;border-radius:3px;background:'+c+';width:'+Math.round(v/mx*100)+'%;min-width:'+(v>0?'3px':'0')+'"></div>';
+ openModal('Fluxo de caixa '+relAno,
+  '<div class="chip-row" style="margin-bottom:12px;justify-content:center"><button class="chip" onclick="relAno--;relatorioFluxoAno()">‹</button><button class="chip active" style="pointer-events:none">'+relAno+'</button><button class="chip" onclick="relAno++;relatorioFluxoAno()">›</button></div>'+
+  '<div class="stat-grid" style="margin-bottom:6px">'+
+   '<div class="stat"><div class="k">Entrou no ano</div><div class="v small" style="color:var(--st-rec)">'+money(tot('e'))+'</div></div>'+
+   '<div class="stat"><div class="k">Saiu no ano</div><div class="v small" style="color:var(--st-apag)">'+money(tot('sa'))+'</div></div>'+
+  '</div>'+
+  '<div class="detail-row"><span class="dk"><b style="color:var(--text)">Saldo do ano</b></span><span class="dv" style="color:'+(tot('saldo')<0?'var(--st-pagat)':'var(--st-rec)')+'">'+money(tot('saldo'))+'</span></div>'+
+  '<div class="hint" style="margin:6px 0 4px">Só o que já foi recebido ou pago. Toque num mês para abrir no Caixa.</div>'+
+  '<div class="card">'+ms.map(m=>'<div class="list-item" style="display:block" onclick="fluxoAbrirMes(\''+m.key+'\')">'+
+   '<div style="display:flex;justify-content:space-between;font-weight:600;text-transform:capitalize"><span>'+MESES_LONGOS[+m.key.slice(5)-1]+'</span><span style="color:'+(m.saldo<0?'var(--st-pagat)':m.saldo>0?'var(--st-rec)':'var(--muted)')+'">'+money(m.saldo)+'</span></div>'+
+   '<div style="display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:12px;color:var(--muted);margin-top:4px">'+
+    bar(m.e,'var(--st-rec)')+'<span>entrou '+money(m.e)+'</span>'+bar(m.sa,'var(--st-apag)')+'<span>saiu '+money(m.sa)+'</span></div>'+
+   ((m.pe||m.ps)?'<div style="font-size:11px;color:var(--muted);margin-top:3px">em aberto: '+(m.pe?'a receber '+money(m.pe):'')+(m.pe&&m.ps?' · ':'')+(m.ps?'a pagar '+money(m.ps):'')+'</div>':'')+
+   '<div style="font-size:11px;color:var(--muted);margin-top:2px">acumulado no ano: '+money(m.acum)+'</div></div>').join('')+'</div>'+
+  '<div style="margin-top:14px" class="btn-row"><button class="btn sec" onclick="openRelatorios()">Voltar</button><button class="btn sec" onclick="shareFluxoAno()">Compartilhar</button></div>');
+}
+function shareFluxoAno(){
+ const ms=fluxoAno();
+ let txt='*MARMORARIA ITAPIRUBA*\nFluxo de caixa '+relAno+'\n\n';
+ ms.forEach(m=>{if(m.e||m.sa)txt+='• '+MESES_LONGOS[+m.key.slice(5)-1]+': entrou '+money(m.e)+' · saiu '+money(m.sa)+' · saldo '+money(m.saldo)+'\n';});
+ txt+='\nSaldo do ano: '+money(round2(ms.reduce((t,m)=>t+m.saldo,0)));
+ nativeShareOrPrint('Fluxo de caixa '+relAno,txt);
+}
+/* ---- Relatório por ordem de entrega ---- */
+function relatorioEntrega(){
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido');
+ const comData=ativas.filter(p=>p.dataPrevista).sort((a,b)=>a.dataPrevista.localeCompare(b.dataPrevista));
+ const semData=ativas.filter(p=>!p.dataPrevista).sort((a,b)=>(a.numero||0)-(b.numero||0));
+ const ordem=comData.concat(semData);
+ const hoje=isoToday();
+ const linha=p=>{
+  const falta=round2(p.valorTotal-pedRecebido(p.id));
+  const atrasada=p.dataPrevista&&p.dataPrevista<hoje;
+  return '<div class="list-item" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+p.id+'\')">'+
+   '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+' · Obra Nº '+(p.numero||'')+'</div>'+
+   '<div class="s">'+PED_LABEL[p.status]+' · '+(p.dataPrevista?'entrega '+fmtDate(p.dataPrevista):'sem data')+'</div></div>'+
+   '<div class="end"><div class="money">'+money(p.valorTotal)+'</div><div class="cap">'+
+    (atrasada?'<span class="badge b-danger">atrasada</span>':(falta>0.009?'<span class="badge b-warn">falta '+money(falta)+'</span>':'<span class="badge b-ok">pago</span>'))+'</div></div></div>';
+ };
+ openModal('Obras por ordem de entrega',
+  (ordem.length?'<div class="card">'+ordem.map(linha).join('')+'</div>':'<div class="empty">Nenhuma obra em andamento.</div>')+
+  '<div class="detail-row" style="margin-top:10px"><span class="dk">Obras em andamento</span><span class="dv">'+ordem.length+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Falta receber (todas)</span><span class="dv" style="color:var(--warn)">'+money(round2(ativas.reduce((s,p)=>s+Math.max(0,round2(p.valorTotal-pedRecebido(p.id))),0)))+'</span></div>'+
+  (act(data.pedidos).length?'<div style="margin-top:14px"><button class="btn" onclick="relatorioEntregaExcel()">Exportar Excel (com filtros)</button></div>':'')+
+  '<div style="margin-top:10px" class="btn-row"><button class="btn sec" onclick="openRelatorios()">Voltar</button>'+
+   (ordem.length?'<button class="btn sec" onclick="shareRelEntrega()">Compartilhar</button>':'')+'</div>');
+}
+function shareRelEntrega(){
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido');
+ const comData=ativas.filter(p=>p.dataPrevista).sort((a,b)=>a.dataPrevista.localeCompare(b.dataPrevista));
+ const semData=ativas.filter(p=>!p.dataPrevista);
+ let txt='*MARMORARIA ITAPIRUBA*\nObras por ordem de entrega\n\n';
+ comData.concat(semData).forEach(p=>{const falta=round2(p.valorTotal-pedRecebido(p.id));
+  txt+='• '+clienteName(p.clienteId)+' (Obra '+(p.numero||'')+')\n  '+PED_LABEL[p.status]+' · '+(p.dataPrevista?'entrega '+fmtDate(p.dataPrevista):'sem data')+'\n  Valor '+money(p.valorTotal)+(falta>0.009?' · falta '+money(falta):' · pago')+'\n';});
+ nativeShareOrPrint('Obras por entrega',txt);
+}
+/* ---- Relatório financeiro do mês ---- */
+function relMesMove(d){const[a,m]=relMes.split('-').map(Number);relMes=new Date(a,m-1+d,1).toLocaleDateString('sv').slice(0,7);relatorioFinanceiro();}
+function finDoMes(){
+ const no=l=>monthKey(l.data)===relMes;
+ const movs=act(data.lancamentos).filter(no);
+ const soma=f=>round2(movs.filter(f).reduce((s,l)=>s+(+l.valor||0),0));
+ const recebido=soma(l=>l.tipo==='receita'&&l.pago),aReceber=soma(l=>l.tipo==='receita'&&!l.pago);
+ const pago=soma(l=>l.tipo==='despesa'&&l.pago),aPagar=soma(l=>l.tipo==='despesa'&&!l.pago);
+ const porCat={};movs.filter(l=>l.tipo==='despesa').forEach(l=>{const k=l.categoria||'Sem categoria';porCat[k]=round2((porCat[k]||0)+(+l.valor||0));});
+ return{movs,recebido,aReceber,pago,aPagar,saldo:round2(recebido-pago),porCat};
+}
+function relatorioFinanceiro(){
+ const f=finDoMes();
+ const catHtml=Object.keys(f.porCat).sort((a,b)=>f.porCat[b]-f.porCat[a]).map(k=>
+  '<div class="detail-row"><span class="dk">'+esc(k)+'</span><span class="dv">'+money(f.porCat[k])+'</span></div>').join('')||'<div class="empty" style="padding:14px">Sem despesas no mês.</div>';
+ openModal('Resumo do mês',
+  '<div class="chip-row" style="margin-bottom:12px"><button class="chip" onclick="relMesMove(-1)">‹</button><button class="chip active" style="pointer-events:none">'+monthName(relMes)+'</button><button class="chip" onclick="relMesMove(1)">›</button></div>'+
+  '<div class="stat-grid" style="margin-bottom:6px">'+
+   '<div class="stat"><div class="k">Entradas recebidas</div><div class="v small" style="color:var(--ok)">'+money(f.recebido)+'</div></div>'+
+   '<div class="stat"><div class="k">Saídas pagas</div><div class="v small" style="color:var(--danger)">'+money(f.pago)+'</div></div>'+
+  '</div>'+
+  '<div class="detail-row"><span class="dk">Saldo do mês (recebido − pago)</span><span class="dv" style="color:'+(f.saldo<0?'var(--danger)':'var(--ok)')+'">'+money(f.saldo)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Ainda a receber no mês</span><span class="dv" style="color:var(--warn)">'+money(f.aReceber)+'</span></div>'+
+  '<div class="detail-row"><span class="dk">Ainda a pagar no mês</span><span class="dv" style="color:var(--warn)">'+money(f.aPagar)+'</span></div>'+
+  '<div class="section-title">Despesas por categoria</div>'+catHtml+
+  '<div style="margin-top:14px"><button class="btn" onclick="relatorioFinanceiroExcel()">Exportar Excel (com filtros)</button></div>'+
+  '<div style="margin-top:10px" class="btn-row"><button class="btn sec" onclick="openRelatorios()">Voltar</button><button class="btn sec" onclick="shareRelFin()">Compartilhar</button></div>');
+}
+function shareRelFin(){
+ const f=finDoMes();
+ let txt='*MARMORARIA ITAPIRUBA*\nFinanceiro de '+monthName(relMes)+'\n\n';
+ txt+='Entradas recebidas: '+money(f.recebido)+'\n';
+ txt+='Saídas pagas: '+money(f.pago)+'\n';
+ txt+='Saldo do mês: '+money(f.saldo)+'\n';
+ txt+='Ainda a receber: '+money(f.aReceber)+'\n';
+ txt+='Ainda a pagar: '+money(f.aPagar)+'\n';
+ const cats=Object.keys(f.porCat).sort((a,b)=>f.porCat[b]-f.porCat[a]);
+ if(cats.length){txt+='\nDespesas por categoria:\n';cats.forEach(k=>{txt+='• '+k+': '+money(f.porCat[k])+'\n';});}
+ nativeShareOrPrint('Financeiro '+monthName(relMes),txt);
+}
+
+/* ============================================================
+   Helpers de UI compartilhados
+   ============================================================ */
+function li(avInitials,title,sub,endTop,endBot,onclick){
+ return '<div class="list-item" onclick="'+onclick+'"><div class="av">'+esc(avInitials)+'</div>'+
+  '<div class="body"><div class="t">'+esc(title)+'</div><div class="s">'+esc(sub)+'</div></div>'+
+  (endTop||endBot?'<div class="end">'+(endTop?'<div class="cap">'+esc(endTop)+'</div>':'')+(endBot?'<div class="money">'+esc(endBot)+'</div>':'')+'</div>':'')+'</div>';
+}
+function emptyBox(titulo,sub){
+ return '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M3 9v6l9 5 9-5V9"/></svg><div style="font-weight:600;color:var(--text)">'+esc(titulo)+'</div><div>'+esc(sub)+'</div></div>';
+}
+function renderAll(){
+ try{renderHome();}catch(e){console.warn(e);}
+ try{renderClientes();}catch(e){console.warn(e);}
+ try{renderOrcamentos();}catch(e){console.warn(e);}
+ try{renderPedidos();}catch(e){console.warn(e);}
+ try{renderFinanceiro();}catch(e){console.warn(e);}
+}
+
+/* ============================================================
+   Teclado: não abre sozinho (sem autofoco). Ao focar um campo,
+   sobe o conteúdo para o campo não ficar escondido atrás dele.
+   ============================================================ */
+(function teclado(){
+ const vv=window.visualViewport;
+ const ehCampo=el=>el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)&&el.type!=='hidden';
+ function alturaTeclado(){return vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;}
+ function ajusta(){
+  const box=$('modalBox');if(!box)return;
+  const kb=alturaTeclado();
+  box.style.paddingBottom=(kb>90?(kb+24):18)+'px';
+  const el=document.activeElement;
+  if(kb>90&&ehCampo(el)&&box.contains(el)){try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
+ }
+ if(vv){vv.addEventListener('resize',ajusta);vv.addEventListener('scroll',ajusta);}
+ document.addEventListener('focusin',function(e){
+  const box=$('modalBox');
+  if(box&&box.contains(e.target)&&ehCampo(e.target))
+   setTimeout(()=>{try{e.target.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){}},300);
+ });
+})();
+
+/* ============================================================
+   Boot
+   ============================================================ */
+(function init(){
+ try{if(localStorage.getItem('marmoraria.theme')==='dark')document.body.classList.add('dark');}catch(e){}
+ load();
+ $('appSub').textContent='Orçamentos e obras';
+ renderAll();
+})();
+</script>
+</body>
+</html>
