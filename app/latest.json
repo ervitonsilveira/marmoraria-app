@@ -1,8 +1,8 @@
 {
- "version": "1.30.0",
- "interfaceVersion": 13000,
- "notes": "Recebimento só na aba Receber; Financeiro só mostra",
- "publishedAt": "2026-10-22T20:24:12",
+ "version": "1.31.0",
+ "interfaceVersion": 13100,
+ "notes": "Receber simples com cobrança Pix; Concluir na lista de obras; painel da obra igual ao do montador",
+ "publishedAt": "2026-10-22T20:33:08",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",

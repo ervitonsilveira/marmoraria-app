@@ -423,7 +423,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.30.0';
+const APP_VERSION='1.31.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1600,11 +1600,26 @@ function verParcelasObra(pid){
    return '<label class="list-item" style="gap:12px;cursor:pointer">'+
     '<input type="checkbox" style="width:24px;height:24px;flex:none;accent-color:var(--st-rec)" '+(l.pago?'checked':'')+' onchange="marcarParcela(\''+l.id+'\',this.checked,\''+pid+'\')">'+
     '<div class="body"><div class="t">'+fmtDate(l.data)+' · '+money(l.valor)+'</div><div class="s"><b style="color:'+cor+'">'+(l.pago?'recebido':atr?'atrasado':'a receber')+'</b> · '+esc(l.descricao)+(l.forma?' · '+esc(l.forma):'')+(l.obs?' · '+esc(l.obs):'')+'</div></div>'+
-    '<button class="btn sec sm" style="padding:6px 10px;flex:none" onclick="event.preventDefault();event.stopPropagation();editarParcela(\''+l.id+'\',\''+pid+'\')">✏️</button></label>';}).join('')+'</div>'+
+    '<div style="display:flex;flex-direction:column;gap:5px;flex:none">'+
+     (l.pago?'':'<button class="btn ok sm" style="padding:6px 10px" onclick="event.preventDefault();event.stopPropagation();enviarCobranca(\''+l.id+'\')">📲 Cobrar</button>')+
+     '<button class="btn sec sm" style="padding:6px 10px" onclick="event.preventDefault();event.stopPropagation();editarParcela(\''+l.id+'\',\''+pid+'\')">✏️ Editar</button></div></label>';}).join('')+'</div>'+
    '<div class="hint" style="margin:6px 2px 0">Marque a caixinha quando o cliente pagar. Desmarque se marcou errado.</div>':
    '<div class="empty" style="padding:16px">Nenhuma parcela lançada ainda.</div>')+
   (sem>0.009?'<div style="margin-top:12px"><button class="btn ok" onclick="registrarRecebimento(\''+pid+'\')">Lançar o que falta parcelar ('+money(sem)+')</button></div>':'')+
   '<div style="margin-top:10px" class="btn-row"><button class="btn sec" onclick="closeModal()">Fechar</button><button class="btn sec" onclick="go(\'pagePedidos\');viewPedido(\''+pid+'\')">Ver obra</button></div>');
+}
+// cobrança pelo WhatsApp com a chave Pix da empresa (Ajustes → Dados da empresa e Pix)
+function enviarCobranca(id){
+ const l=byId(data.lancamentos,id);if(!l)return;
+ const p=l.pedidoId?byId(data.pedidos,l.pedidoId):null,c=p?byId(data.clientes,p.clienteId):null,num=waNumero(c&&c.telefone);
+ if(!num){toast('Cliente sem telefone. Cadastre o telefone em Clientes.');return;}
+ const e=data.config.empresa||{},venc=(l.data||'')<isoToday();
+ if(!e.pixChave)toast('Dica: cadastre a chave Pix em Ajustes → Dados da empresa e Pix.');
+ let t=saudacao()+(c&&c.nome?', '+primeiroNome(c.nome):'')+'!\n\nAqui é da *'+(e.nome||'Marmoraria Itapiruba')+'*.\n';
+ t+=(venc?'Consta em aberto a parcela de ':'Lembrete da parcela de ')+'*'+money(l.valor)+'*'+(l.data?(venc?', vencida em ':', com vencimento em ')+fmtDate(l.data):'')+(p?' (obra Nº '+(p.numero||'')+')':'')+'.\n';
+ if(e.pixChave)t+='\n*Chave Pix'+(e.cnpj&&e.pixChave.replace(/\D/g,'')===e.cnpj.replace(/\D/g,'')?' (CNPJ)':'')+':* '+e.pixChave+'\n'+(e.nome?e.nome+'\n':'');
+ t+='\nSe já pagou, desconsidere. Obrigado!';
+ if(!abrirLink('https://wa.me/'+num+'?text='+encodeURIComponent(t)))previewText(t);
 }
 let parcForma='';
 function editarParcela(id,pid){
@@ -2113,48 +2128,22 @@ function avisoAtualizacao(ver){
    RECEBIMENTOS (1.27.0): etapa entre Obras e Financeiro.
    Obras com saldo, parcelas a receber (atrasadas primeiro) e o que entrou por último.
    ============================================================ */
-let recebMes=thisMonth();   // 1.28.3: mês escolhido na aba Receber
-function recebMudaMes(d){const[a,m]=recebMes.split('-').map(Number);recebMes=new Date(a,m-1+d,1).toLocaleDateString('sv').slice(0,7);renderRecebimentos();}
-function renderRecebimentos(){
+function renderRecebimentos(){   // 1.31.0: só as obras com pagamento pendente; toque abre as parcelas
  const topo=$('recebTopo'),el=$('recebList');if(!topo||!el||MONTADOR)return;
- const hoje=isoToday(),mes=recebMes,atual=mes===thisMonth(),soma=a=>round2(a.reduce((t,l)=>t+(+l.valor||0),0));
- const rec=act(data.lancamentos).filter(l=>l.tipo==='receita');
- // parcelas do mês escolhido; no mês atual entram também as atrasadas de meses anteriores
- const abertas=rec.filter(l=>!l.pago&&(monthKey(l.data)===mes||(atual&&(l.data||'')<hoje))).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
- const atr=abertas.filter(l=>(l.data||'')<hoje),recMes=rec.filter(l=>l.pago&&monthKey(l.data)===mes);
- // todas as obras que ainda têm pagamento faltando (com ou sem parcela lançada)
+ const hoje=isoToday(),rec=act(data.lancamentos).filter(l=>l.tipo==='receita');
  const obras=act(data.pedidos).map(p=>{const ab=rec.filter(l=>l.pedidoId===p.id&&!l.pago).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
-   return {p,falta:round2((+p.valorTotal||0)-pedRecebido(p.id)),sem:semParcelar(p),prox:ab[0]||null,atras:ab.some(l=>(l.data||'')<hoje)};})
+   return {p,falta:round2((+p.valorTotal||0)-pedRecebido(p.id)),sem:semParcelar(p),prox:ab[0]||null,atras:ab.some(l=>(l.data||'')<hoje),n:ab.length};})
   .filter(x=>x.falta>0.009)
-  .sort((a,b)=>(b.atras?1:0)-(a.atras?1:0)||(b.sem>0.009?1:0)-(a.sem>0.009?1:0)||((a.prox&&a.prox.data)||'9999').localeCompare((b.prox&&b.prox.data)||'9999'));
- topo.innerHTML='<div class="fin-month"><button class="chip" onclick="recebMudaMes(-1)" aria-label="Mês anterior">‹</button>'+
-  '<div style="text-align:center"><div class="fin-month-t">'+mesLongo(mes).replace(/^./,x=>x.toUpperCase())+'</div><div class="fin-month-s">'+(atual?'mês atual':'<a href="#" onclick="recebMes=thisMonth();renderRecebimentos();return false" style="color:var(--brand);font-weight:600;text-decoration:none">voltar para o mês atual</a>')+'</div></div>'+
-  '<button class="chip" onclick="recebMudaMes(1)" aria-label="Próximo mês">›</button></div>'+
-  '<div class="stat-grid" style="margin-bottom:12px">'+
-  '<div class="stat"><div class="k"><i class="dot" style="background:var(--st-arec)"></i>A receber</div><div class="v small" style="color:var(--st-arec)">'+money(soma(abertas))+'</div><div class="n">'+abertas.length+' parcela(s)</div></div>'+
-  '<div class="stat"><div class="k"><i class="dot" style="background:var(--st-recat)"></i>Atrasado</div><div class="v small" style="color:var(--st-recat)">'+money(soma(atr))+'</div><div class="n">'+atr.length+' parcela(s)</div></div>'+
-  '<div class="stat" style="grid-column:1/-1"><div class="k"><i class="dot" style="background:var(--st-rec)"></i>Recebido em '+mesLongo(mes)+'</div><div class="v small" style="color:var(--st-rec)">'+money(soma(recMes))+'</div></div></div>';
- const linhaParc=l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null,st=stLanc(l),d=mDiasAte(l.data);
-  return cartao({cor:'var(--st-'+st.k+')',soft:'var(--st-'+st.k+'-soft)',data:l.data,titulo:ped?clienteName(ped.clienteId):l.descricao,sub:esc(l.descricao),
-   tags:[tag(st.k==='recat'?'Atrasado '+(-d)+(d===-1?' dia':' dias'):d===0?'Vence hoje':d===1?'Vence amanhã':'Em '+d+' dias',true),l.forma?tag(esc(l.forma)):'',l.obs?tag(esc(l.obs)):''].filter(Boolean),
-   direita:'<div class="money" style="color:var(--st-'+st.k+');font-weight:700">'+money(l.valor)+'</div><button class="btn sec sm" style="padding:5px 9px" onclick="event.stopPropagation();marcarPago(\''+l.id+'\')">✓ Recebi</button>',
-   onclick:"editLancamento('"+l.id+"')"});};
- el.innerHTML=
-  (obras.length?'<div class="section-title">Obras com pagamento pendente ('+obras.length+')</div>'+obras.map(x=>{
-   const cor=x.atras?'recat':x.sem>0.009?'apag':'arec';
-   return cartao({cor:'var(--st-'+cor+')',soft:'var(--st-'+cor+'-soft)',sigla:initials(clienteName(x.p.clienteId)),titulo:clienteName(x.p.clienteId),
-    sub:'Obra Nº '+(x.p.numero||'')+' · '+(x.p.status==='concluido'?'concluída':'em andamento')+' · valor '+money(x.p.valorTotal),
-    tags:[x.atras?tag('parcela atrasada',true):'',x.sem>0.009?tag('lançar '+money(x.sem),!x.atras):'',x.prox?tag('próxima '+fmtDate(x.prox.data).slice(0,5)+' · '+money(x.prox.valor)):''].filter(Boolean),
-    direita:'<div class="money" style="font-weight:700">falta<br>'+money(x.falta)+'</div>',
-    onclick:"verParcelasObra('"+x.p.id+"')"});}).join('')+
-   '<div class="hint" style="margin:6px 2px 0">Toque na obra para ver as parcelas e marcar o que já recebeu. Laranja: falta lançar parcela · Amarelo: parcelas lançadas · Roxo: parcela atrasada.</div>':'')+
-  '<div class="section-title">Parcelas a receber'+(atual?'':' em '+mesLongo(mes))+'</div>'+
-  (abertas.length?abertas.map(linhaParc).join(''):'<div class="empty" style="padding:18px">Nada a receber'+(atual?'. Tudo em dia! 🎉':' neste mês.')+'</div>')+
-  (()=>{const ult=recMes.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||'')).slice(0,12);
-   return ult.length?'<div class="section-title">Recebidos em '+mesLongo(mes)+'</div><div class="card">'+ult.map(l=>{const ped=l.pedidoId?byId(data.pedidos,l.pedidoId):null;
-    return '<div class="list-item" onclick="editLancamento(\''+l.id+'\')"><div class="body"><div class="t">'+esc(ped?clienteName(ped.clienteId):l.descricao)+'</div><div class="s">'+fmtDate(l.data)+' · '+esc(l.descricao)+'</div></div><div class="end"><div class="money" style="color:var(--st-rec)">+ '+money(l.valor)+'</div></div></div>';}).join('')+'</div>'+
-    '':'';})()+
-  '<div class="btn-row" style="margin-top:14px"><button class="btn sec" onclick="newLancamento(\'receita\')">+ Recebimento avulso</button><button class="btn sec" onclick="go(\'pageFinanceiro\')">Financeiro ›</button></div>';
+  .sort((a,b)=>(b.atras?1:0)-(a.atras?1:0)||((a.prox&&a.prox.data)||'0000').localeCompare((b.prox&&b.prox.data)||'0000'));
+ topo.innerHTML='';
+ el.innerHTML=obras.length?obras.map(x=>{
+  const cor=x.atras?'recat':x.sem>0.009?'apag':'arec';
+  return cartao({cor:'var(--st-'+cor+')',soft:'var(--st-'+cor+'-soft)',sigla:initials(clienteName(x.p.clienteId)),titulo:clienteName(x.p.clienteId),
+   sub:'Obra Nº '+(x.p.numero||'')+' · valor '+money(x.p.valorTotal),
+   tags:[x.atras?tag('parcela atrasada',true):'',x.n?tag(x.n+(x.n>1?' parcelas':' parcela')+' em aberto'):'',x.sem>0.009?tag('falta lançar '+money(x.sem),!x.atras):''].filter(Boolean),
+   direita:'<div class="money" style="font-weight:700;text-align:right">falta<br>'+money(x.falta)+'</div>',
+   onclick:"verParcelasObra('"+x.p.id+"')"});}).join(''):
+  '<div class="m-vazio"><div style="font-size:40px">🎉</div><b>Nenhuma obra com pagamento pendente</b><span>Quando finalizar uma obra, ela aparece aqui até o cliente pagar tudo.</span></div>';
 }
 /* ---- 1.27.0: obra nasce de um orçamento ---- */
 function novaObra(){
@@ -3242,8 +3231,56 @@ if(!MONTADOR){
    const u=mUrgencia(p),falta=round2((+p.valorTotal||0)-pedRecebido(p.id)),nr=retNovos(p.id);
    return cartao({cor:u.cor,soft:u.soft,data:p.dataPrevista,titulo:clienteName(p.clienteId),sub:'Obra Nº '+(p.numero||'')+(p.dataPrevista?' · entrega '+DIAS_SEMANA[new Date(p.dataPrevista+'T12:00:00').getDay()]:' · sem data de entrega'),
     tags:[nr?'<span class="m-tag st" style="--mcs:var(--st-pagat-soft);--mc:var(--st-pagat)">📷 retorno novo</span>':'',tag(u.txt,true),tag(money(p.valorTotal)),falta>0.009?tag('falta '+money(falta)):tag('pago ✓')].filter(Boolean),
+    direita:'<button class="btn ok sm" style="padding:8px 10px" onclick="event.stopPropagation();finalizarPedido(\''+p.id+'\')">✓ Concluir</button>',
     onclick:"viewPedido('"+p.id+"')"});
   }).join('');
+ };
+}
+
+/* ---- 1.31.0: tela da obra do administrador no mesmo estilo do painel do montador ---- */
+if(!MONTADOR){
+ viewPedido=function(id){
+  const p=byId(data.pedidos,id);if(!p)return;
+  const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId),u=mUrgencia(p);
+  const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
+  const dt=p.dataPrevista?new Date(p.dataPrevista+'T12:00:00'):null;
+  const rec=pedRecebido(id),falta=round2((+p.valorTotal||0)-rec);
+  const pecas=orc?(orc.pecas||[]).map(pc=>{const un=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
+   const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
+   return '<div class="m-peca"><div class="n">'+esc(pc.descricao||'Peça')+(q>1?' <span class="m-tag">'+q+' un</span>':'')+'</div>'+
+    '<div class="mat">'+esc(nm(data.materiais,pc.materialId)||'material não informado')+'</div>'+
+    '<div class="med">'+fmtNum(pc.comprimento)+' × '+fmtNum(pc.largura)+' <small>'+un+'</small></div>'+
+    (ac.length?'<div class="mat">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join(''):'';
+  const itens=orc?(orc.itens||[]).map(i=>'<div class="m-item"><span>'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><b>'+fmtNum(num(i.qtd)||1)+'</b></div>').join(''):'';
+  const nf=orc?orcFotos(orc).length:0,temTel=c&&soDigitos(c.telefone),temMapa=orc&&orc.local&&orc.local.lat!=null,rs=retornosDa(id),nNovos=retNovos(id);
+  openModal('Obra Nº '+(p.numero||''),
+   '<div class="m-hero" style="--mc:'+u.cor+'">'+
+    '<div class="k">Entrega</div>'+
+    '<div class="d">'+(dt?DIAS_SEMANA[dt.getDay()].replace(/^./,x=>x.toUpperCase())+', '+dt.getDate()+' de '+MESES_LONGOS[dt.getMonth()]:'Sem data marcada')+'</div>'+
+    '<span class="r">'+u.txt+'</span>'+
+    '<div class="c" onclick="closeModal();viewCliente(\''+p.clienteId+'\')" style="cursor:pointer">👤 '+esc(clienteName(p.clienteId))+' ›</div>'+
+    ((temTel||temMapa)?'<div class="m-acts">'+
+     (temTel?'<button class="m-act" onclick="abrirWhatsAppCliente(\''+c.id+'\')">💬 WhatsApp</button>':'')+
+     (temMapa?'<button class="m-act" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Como chegar</button>':'')+'</div>':'')+
+   '</div>'+
+   (rs.length?'<div class="m-sec"'+(nNovos?' style="border:2px solid var(--st-pagat);background:var(--st-pagat-soft)"':'')+'><h3'+(nNovos?' style="color:var(--st-pagat)"':'')+'>📷 Retorno dos montadores ('+rs.length+')'+(nNovos?' · <b style="color:var(--st-pagat)">'+nNovos+' novo'+(nNovos>1?'s':'')+'</b>':'')+'</h3>'+rs.map(retornoHtml).join('')+'</div>':'')+
+   '<div class="m-sec"><h3>💰 Valores</h3>'+
+    '<div class="m-item"><span>Valor da obra</span><b>'+money(p.valorTotal)+'</b></div>'+
+    '<div class="m-item"><span>Recebido</span><b style="color:var(--st-rec)">'+money(rec)+'</b></div>'+
+    '<div class="m-item"><span>Falta receber</span><b style="color:'+(falta>0.009?'var(--st-arec)':'var(--st-rec)')+'">'+money(falta)+'</b></div>'+
+    (act(data.lancamentos).some(l=>l.tipo==='receita'&&l.pedidoId===id)?'<div style="margin-top:10px"><button class="btn sec sm" style="width:100%" onclick="go(\'pageRecebimentos\');verParcelasObra(\''+id+'\')">Ver parcelas</button></div>':'')+
+   '</div>'+
+   (p.obs?'<div class="m-sec"><h3>📝 Observações</h3><div style="white-space:pre-wrap;font-size:15px;line-height:1.45">'+esc(p.obs)+'</div></div>':'')+
+   (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
+   (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
+   (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+
+   (p.status!=='concluido'?'<div style="margin-top:4px"><button class="btn ok" style="width:100%" onclick="finalizarPedido(\''+id+'\')">✓ Concluir obra</button></div>':'<div class="hint" style="text-align:center">Obra concluída.</div>')+
+   '<div class="btn-row" style="margin-top:10px">'+
+    '<button class="btn sec" onclick="editarObra(\''+id+'\')">✏️ Editar</button>'+
+    (orc?'<button class="btn sec" onclick="closeModal();viewOrcamento(\''+orc.id+'\')">Orçamento</button>':'')+
+    '<button class="btn sec" style="color:var(--st-pagat)" onclick="delPedido(\''+id+'\')">Excluir</button></div>');
+  $('modalBox').scrollTop=0;
+  if(nNovos){marcaRetVistos(id);renderPedidos();}
  };
 }
 
