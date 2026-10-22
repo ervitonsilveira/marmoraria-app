@@ -411,7 +411,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.32.0';
+const APP_VERSION='1.32.1';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1033,6 +1033,7 @@ function editOrcamento(id,clientePre){
   '<div class="section-title">Desconto</div>'+
   '<label class="fld"><span>Desconto final (R$)</span><input id="oDesc" inputmode="decimal" value="'+g(o.desconto)+'" placeholder="0,00" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.desconto)+'</label>'+
   '<div class="section-title">Resumo <span style="text-transform:none;letter-spacing:0">(só você vê)</span></div><div id="oResumo"></div>'+
+  '<label class="fld"><span>Data provável de entrega</span><input type="date" id="oEntrega" value="'+(o.dataEntrega||'')+'"><div class="hint">Vai para a obra quando o orçamento for aprovado (dá para mudar depois).</div></label>'+
   '<label class="fld"><span>Observações e negociação</span><textarea id="oObs" style="min-height:90px" placeholder="Como foi a negociação: forma de pagamento, sinal, prazo, desconto combinado, pedidos do cliente…">'+esc(o.obs||'')+'</textarea></label>'+
   '<div style="margin-top:16px" class="btn-row">'+
    (id?'<button class="btn sec" onclick="delOrcamento(\''+id+'\')">Excluir</button>':'')+
@@ -1217,7 +1218,7 @@ function saveOrcamento(id){
  // guarda os valores da época: mudar o cadastro depois não altera orçamentos já feitos
  const snap={parts:orcCustoParts(base),lucroBruto:orcLucroBruto(base),subtotal:orcSubtotal(base)};
  snap.linhas=linhasCliente(Object.assign({},base,{snap:{parts:snap.parts,lucroBruto:snap.lucroBruto,subtotal:snap.subtotal}}));
- const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
+ const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),dataEntrega:($('oEntrega')||{}).value||'',fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
  if(id){
   Object.assign(byId(data.orcamentos,id),fields);
   const ped=act(data.pedidos).find(x=>x.orcamentoId===id),novo=orcTotal(byId(data.orcamentos,id));
@@ -1279,6 +1280,7 @@ function viewOrcamento(id){
   '<div style="margin-bottom:8px"><span class="badge '+st.c+'">'+st.l+'</span></div>'+
   '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+(o.clienteId?'<a href="#" onclick="closeModal();viewCliente(\''+o.clienteId+'\');return false" style="color:var(--brand);font-weight:600;text-decoration:none">'+esc(clienteName(o.clienteId))+' ›</a>':esc(clienteName(o.clienteId)))+'</span></div>'+
   '<div class="detail-row"><span class="dk">Data</span><span class="dv">'+fmtDate(o.data)+'</span></div>'+
+  (o.dataEntrega?'<div class="detail-row"><span class="dk">Entrega provável</span><span class="dv">'+fmtDate(o.dataEntrega)+'</span></div>':'')+
   corpo+
   '<div class="detail-row" style="margin-top:8px"><span class="dk">Subtotal</span><span class="dv">'+money(orcSubtotal(o))+'</span></div>'+
   (o.desconto>0?'<div class="detail-row"><span class="dk">Desconto</span><span class="dv">− '+money(o.desconto)+'</span></div>':'')+
@@ -1301,7 +1303,7 @@ function aprovarEgerar(id){
  data.seq.pedido=(data.seq.pedido||0)+1;
  const t=now();
  const ped={id:uid(),numero:data.seq.pedido,orcamentoId:id,clienteId:o.clienteId,
-  status:'medicao',dataPrevista:'',valorTotal:orcTotal(o),custoPrevisto:orcCusto(o),
+  status:'medicao',dataPrevista:o.dataEntrega||'',valorTotal:orcTotal(o),custoPrevisto:orcCusto(o),
   historico:[{etapa:'medicao',inicio:isoToday()}],obs:'',createdAt:t,updatedAt:t,deleted:false};
  data.pedidos.push(ped);
  save();closeModal();go('pagePedidos');
@@ -1313,6 +1315,7 @@ function propostaTexto(o,incluirObs){
  const c=byId(data.clientes,o.clienteId);
  let txt='*MARMORARIA ITAPIRUBA*\nProposta de orçamento Nº '+(o.numero||'')+'\n';
  txt+='Data: '+fmtDate(o.data)+'\n';
+ if(o.dataEntrega)txt+='Previsão de entrega: '+fmtDate(o.dataEntrega)+'\n';
  if(c){txt+='Cliente: '+c.nome+'\n';if(c.obra)txt+='Obra: '+c.obra+'\n';}
  txt+='\n';
  if(isNovo(o)){
