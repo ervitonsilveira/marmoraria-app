@@ -423,7 +423,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.28.0';
+const APP_VERSION='1.28.1';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -1302,9 +1302,6 @@ function viewOrcamento(id){
    '<div class="section-title">Situação</div><div class="chip-row">'+['rascunho','enviado','recusado'].map(k=>'<button class="chip'+(o.status===k?' active':'')+'" onclick="setOrcStatus(\''+id+'\',\''+k+'\')">'+ORC_STATUS[k].l+'</button>').join('')+'</div>')+
   (o.obs?'<label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px"><input type="checkbox" id="shObs" style="width:auto"><span>Incluir as observações na proposta enviada</span></label>':'')+
   '<div style="margin-top:14px"><button class="btn ok" onclick="enviarWhatsApp(\''+id+'\')">Enviar ao cliente no WhatsApp</button></div>'+
-  '<div style="margin-top:10px" class="btn-row">'+
-   '<button class="btn sec" onclick="editOrcamento(\''+id+'\')">Editar</button>'+
-   '<button class="btn sec" onclick="shareOrcamento(\''+id+'\')">Compartilhar</button></div>'+
   (pedido
     ?'<div style="margin-top:10px"><button class="btn ghost" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+pedido.id+'\')">Ver obra gerada</button></div>'
     :(o.status!=='recusado'?'<div style="margin-top:10px"><button class="btn ok" onclick="aprovarEgerar(\''+id+'\')">Aprovar e gerar obra</button></div>':''))+
