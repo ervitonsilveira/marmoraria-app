@@ -135,7 +135,7 @@ textarea{min-height:70px;resize:vertical}
 /* Chips */
 .chip-row{display:flex;flex-wrap:wrap;gap:8px}
 .titles #syncBadge{font-size:12px;opacity:.85}
-body.montador nav.tabbar button[data-tab="pageOrcamentos"],body.montador nav.tabbar button[data-tab="pageFinanceiro"],body.montador .admin-only{display:none!important}
+body.montador nav.tabbar,body.montador .admin-only{display:none!important}
 /* Caixa */
 .fin-month{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .fin-month .chip{padding:8px 16px;font-size:18px;line-height:1}
@@ -380,7 +380,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.15.0';
+const APP_VERSION='1.16.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -2365,6 +2365,8 @@ function montadorInit(){
  $('appSub').textContent='Montador · só consulta';
  const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
  const home=$('pageHome');if(home)home.innerHTML='<div id="mHome"></div>';
+ const ped=$('pagePedidos');if(ped)ped.insertAdjacentHTML('afterbegin','<div id="mTopo"></div>');
+ go('pagePedidos');
 }
 function mDadosInfo(){
  return data.recebidoEm?'Dados do escritório de '+new Date(data.recebidoEm).toLocaleDateString('pt-BR')+' às '+new Date(data.recebidoEm).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Ainda sem dados do escritório.';
@@ -2372,7 +2374,7 @@ function mDadosInfo(){
 function mObraLinha(p){
  const hoje=isoToday(),atr=p.status!=='concluido'&&p.dataPrevista&&p.dataPrevista<hoje;
  return '<div class="list-item" onclick="viewPedido(\''+p.id+'\')"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>'+
-  '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+' · '+PED_LABEL[p.status]+'</div></div>'+
+  '<div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+'</div></div>'+
   '<div class="end"><div class="cap">'+(p.status==='concluido'?'<span class="badge b-ok">Concluída</span>':p.dataPrevista?'<span class="badge '+(atr?'b-danger':'b-sent')+'">'+(atr?'atrasada · ':'entrega ')+fmtDate(p.dataPrevista).slice(0,5)+'</span>':'<span class="badge">sem data</span>')+'</div></div></div>';
 }
 function mOrdemEntrega(a,b){return (a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999')||(a.numero||0)-(b.numero||0);}
@@ -2404,6 +2406,9 @@ function viewClienteM(id){
   (obras.length?'<div class="card">'+obras.map(p=>mObraLinha(p).replace('viewPedido(','closeModal();viewPedido(')).join('')+'</div>':'<div class="empty" style="padding:18px">Nenhuma obra.</div>'));
 }
 function renderPedidosM(){
+ const topo=$('mTopo');
+ if(topo)topo.innerHTML=(sync.user?'':'<div style="margin-bottom:10px"><button class="btn" onclick="openSync()">☁ Entrar para receber as obras automaticamente</button></div>')+
+  '<div class="hint" style="margin:0 2px 10px">'+esc(sync.user?syncResumo():mDadosInfo())+'</div>';
  renderPedFilters();
  let list=act(data.pedidos).slice().sort(mOrdemEntrega);
  if(pedFilter==='ativas')list=list.filter(p=>p.status!=='concluido');
@@ -2413,8 +2418,7 @@ function renderPedidosM(){
 }
 function viewPedidoM(id){
  const p=byId(data.pedidos,id);if(!p)return;
- const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId),idx=PED_FLOW.indexOf(p.status);
- const flow='<div class="flow">'+PED_FLOW.map((s,i)=>'<span class="step '+(i<idx?'done':(i===idx?'cur':''))+'">'+PED_LABEL[s]+'</span>').join('')+'</div>';
+ const orc=byId(data.orcamentos,p.orcamentoId),c=byId(data.clientes,p.clienteId);
  const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
  const pecas=orc?(orc.pecas||[]).map(pc=>{const u=pc.un==='m'?'m':'cm',q=Math.max(1,Math.floor(num(pc.qtd))||1);
   const ac=(pc.acabamentos||[]).map(a=>nm(data.acabamentos,a.acabamentoId)+(num(a.qtd)>1?' ('+fmtNum(a.qtd)+')':'')).filter(Boolean);
@@ -2426,16 +2430,23 @@ function viewPedidoM(id){
  const nf=orc?orcFotos(orc).length:0;
  openModal('Obra Nº '+(p.numero||''),
   '<div class="detail-row"><span class="dk">Cliente</span><span class="dv">'+esc(clienteName(p.clienteId))+'</span></div>'+
-  (c&&soDigitos(c.telefone)?'<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="abrirWhatsAppCliente(\''+c.id+'\')">Falar no WhatsApp</button></div>':'')+
+  (c&&soDigitos(c.telefone)?'<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="whatsEntregaM(\''+c.id+'\')">Falar no WhatsApp (avisar entrega)</button></div>':'')+
   (orc&&orc.local&&orc.local.lat!=null?'<div style="margin-top:8px"><button class="btn sec sm" style="width:100%" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Abrir no mapa (como chegar)</button></div>':'')+
-  '<div class="section-title">Etapa</div>'+flow+
-  '<div class="detail-row"><span class="dk">Entrega prevista</span><span class="dv">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</span></div>'+
+  '<div class="detail-row" style="margin-top:8px"><span class="dk">Entrega prevista</span><span class="dv">'+(p.dataPrevista?fmtDate(p.dataPrevista):'sem data')+'</span></div>'+
   (p.obs?'<div class="section-title">Observações</div><div style="white-space:pre-wrap;font-size:14px">'+esc(p.obs)+'</div>':'')+
   (pecas?'<div class="section-title">Peças e medidas</div><div class="card">'+pecas+'</div>':'')+
   (itens?'<div class="section-title">Produtos</div>'+itens:'')+
   (nf?'<div class="section-title">Fotos do serviço e local ('+nf+')</div>'+fotosOrcHtml(orc,'ped',id,false):'')+
   '<div class="hint" style="margin-top:14px">Só consulta. Mudanças são feitas pelo escritório.</div>');
  $('modalBox').scrollTop=0;
+}
+// WhatsApp do montador já com o aviso de saída para entrega
+function whatsEntregaM(clienteId){
+ const c=byId(data.clientes,clienteId),num=waNumero(c&&c.telefone);
+ if(!num){toast('Cliente sem telefone.');return;}
+ const emp=(data.config.empresa&&data.config.empresa.nome)||'Marmoraria Itapiruba';
+ const txt=saudacao()+(c.nome?', '+primeiroNome(c.nome):'')+'! Aqui é da *'+emp+'*.\n\nSeu produto está saindo para entrega. Entraremos em contato em seguida.';
+ if(!abrirLink('https://wa.me/'+num+'?text='+encodeURIComponent(txt)))toast('Não consegui abrir o WhatsApp.');
 }
 function receberDadosM(){importBackupPrompt();}
 function aplicarPacoteMontador(obj){
@@ -2459,7 +2470,8 @@ function openSettingsM(){
 if(MONTADOR){
  renderHome=renderHomeM;renderClientes=renderClientesM;viewCliente=viewClienteM;renderPedidos=renderPedidosM;viewPedido=viewPedidoM;
  renderOrcamentos=function(){};renderFinanceiro=function(){};openSettings=openSettingsM;
- const goAdmin=go;go=function(page){if(page==='pageOrcamentos'||page==='pageFinanceiro')page='pageHome';goAdmin(page);};
+ const goAdmin=go;go=function(){goAdmin('pagePedidos');};   // montador só tem a tela de Obras
+ window.appBack=function(){const bg=$('modalBg');if(bg&&bg.classList.contains('open')){closeModal();return true;}return false;};
 }
 
 /* ============================================================
