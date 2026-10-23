@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.32.4';
+const APP_VERSION='1.33.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -867,6 +867,7 @@ let orcFilter='todos';
 let draftPecas=[];           // serviços em edição
 let draftItens=[];           // produtos em edição
 let draftMeta={lucroMeta:0,margemMin:0};
+let orcPgForma='Pix';   // 1.33.0: forma de pagamento combinada no orçamento
 let draftMao={funcionarios:1,diaria:0,pct:null};   // vem de Ajustes (novo) ou do próprio orçamento (edição)
 function setOrcFilter(f){orcFilter=f;renderOrcamentos();}
 function newOrcamento(clienteId){
@@ -1002,6 +1003,7 @@ function editOrcamento(id,clientePre){
  draftFotos=o.fotos?JSON.parse(JSON.stringify(o.fotos)):[];
  draftLoc=o.local?JSON.parse(JSON.stringify(o.local)):null;
  draftMao={funcionarios:o.funcionarios>=1?Math.floor(o.funcionarios):data.config.funcionarios,diaria:o.diaria>0?o.diaria:data.config.diaria,pct:typeof o.pct==='number'?o.pct:null};
+ orcPgForma=(o.pagamento&&o.pagamento.forma)||'Pix';
  draftMeta={lucroMeta:typeof o.lucroMeta==='number'?o.lucroMeta:data.config.lucroMeta,margemMin:typeof o.margemMin==='number'?o.margemMin:data.config.margemMin};
  const cli=byId(data.clientes,o.clienteId);
  const g=(v)=>v?fmtNum(v):'';
@@ -1036,6 +1038,13 @@ function editOrcamento(id,clientePre){
   '<label class="fld"><span>Desconto final (R$)</span><input id="oDesc" inputmode="decimal" value="'+g(o.desconto)+'" placeholder="0,00" oninput="echoMoney(this);recalcOrc()">'+echoInit(o.desconto)+'</label>'+
   '<div class="section-title">Resumo <span style="text-transform:none;letter-spacing:0">(só você vê)</span></div><div id="oResumo"></div>'+
   '<label class="fld"><span>Data provável de entrega</span><input type="date" id="oEntrega" value="'+(o.dataEntrega||'')+'"><div class="hint">Vai para a obra quando o orçamento for aprovado (dá para mudar depois).</div></label>'+
+  '<div class="section-title">💳 Forma de pagamento</div>'+
+  '<div class="chip-row" id="oPgFormas">'+FORMAS.map(f=>'<button type="button" class="chip'+(orcPgForma===f?' active':'')+'" onclick="orcPgForma=\''+f+'\';document.querySelectorAll(\'#oPgFormas .chip\').forEach(b=>b.classList.toggle(\'active\',b.textContent===orcPgForma))">'+f+'</button>').join('')+'</div>'+
+  '<div class="grid2" style="margin-top:6px">'+
+   '<label class="fld"><span>Entrada (R$)</span><input id="oPgEntrada" inputmode="decimal" value="'+((o.pagamento&&o.pagamento.entrada)?fmtNum(o.pagamento.entrada):'')+'" placeholder="0,00" oninput="echoMoney(this)">'+echoInit((o.pagamento&&o.pagamento.entrada)||0)+'</label>'+
+   '<label class="fld"><span>Restante em quantas vezes</span><input id="oPgParc" inputmode="numeric" value="'+((o.pagamento&&o.pagamento.parcelas)||1)+'"></label>'+
+  '</div>'+
+  '<label class="fld"><span>1º vencimento (do restante)</span><input type="date" id="oPgVenc" value="'+((o.pagamento&&o.pagamento.venc)||'')+'"><div class="hint">Vazio = usa a data de entrega. As demais parcelas vencem uma por mês.</div></label>'+
   '<label class="fld"><span>Observações e negociação</span><textarea id="oObs" style="min-height:90px" placeholder="Como foi a negociação: forma de pagamento, sinal, prazo, desconto combinado, pedidos do cliente…">'+esc(o.obs||'')+'</textarea></label>'+
   '<div style="margin-top:16px" class="btn-row">'+
    (id?'<button class="btn sec" onclick="delOrcamento(\''+id+'\')">Excluir</button>':'')+
@@ -1220,7 +1229,7 @@ function saveOrcamento(id){
  // guarda os valores da época: mudar o cadastro depois não altera orçamentos já feitos
  const snap={parts:orcCustoParts(base),lucroBruto:orcLucroBruto(base),subtotal:orcSubtotal(base)};
  snap.linhas=linhasCliente(Object.assign({},base,{snap:{parts:snap.parts,lucroBruto:snap.lucroBruto,subtotal:snap.subtotal}}));
- const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),dataEntrega:($('oEntrega')||{}).value||'',fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
+ const fields=Object.assign({},base,{clienteId:cli.id,data:$('oData').value,obs:$('oObs').value.trim(),dataEntrega:($('oEntrega')||{}).value||'',pagamento:{forma:orcPgForma,entrada:parseMoney(($('oPgEntrada')||{}).value||0),parcelas:Math.max(1,Math.floor(num(($('oPgParc')||{}).value))||1),venc:($('oPgVenc')||{}).value||''},fotos:draftFotos,local:draftLoc,snap,updatedAt:t});
  let salvoId=id;
  if(id){
   Object.assign(byId(data.orcamentos,id),fields);
@@ -1267,6 +1276,11 @@ function setOrcStatus(id,st){
  const o=byId(data.orcamentos,id);if(!o)return;
  o.status=st;o.updatedAt=now();save();viewOrcamento(id);renderAll();
 }
+function pagamentoTexto(o){
+ const pg=o&&o.pagamento;if(!pg||!pg.forma)return '';
+ const tot=orcTotal(o),ent=Math.min(+pg.entrada||0,tot),rest=round2(tot-ent),n=Math.max(1,+pg.parcelas||1);
+ return pg.forma+(ent>0?' · entrada '+money(ent):'')+(rest>0.009?(ent>0?' + ':' · ')+(n>1?n+'x de '+money(splitTotal(rest,n)[0]):money(rest)+(ent>0?' restante':' à vista')):'')+(pg.venc?' · 1º venc. '+fmtDate(pg.venc):'');
+}
 // 1.32.4: tudo o que foi preenchido no orçamento (peças, medidas, produtos, mão de obra, fotos, local)
 function orcPreenchidoHtml(o){
  const nm=(arr,i)=>{const x=byId(arr,i);return x?x.nome:'';};
@@ -1278,7 +1292,8 @@ function orcPreenchidoHtml(o){
    (ac.length?'<div class="mat">Acabamento: '+esc(ac.join(', '))+'</div>':'')+'</div>';}).join('');
  const itens=(o.itens||[]).map(i=>'<div class="m-item"><span>'+esc(nm(data.produtos,i.produtoId)||'Produto')+'</span><b>'+fmtNum(num(i.qtd)||1)+'</b></div>').join('');
  const mao=maoDescricao(o),nf=orcFotos(o).length,temMapa=o.local&&o.local.lat!=null;
- return (pecas?'<div class="m-sec" style="margin-top:12px"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
+ return (pagamentoTexto(o)?'<div class="m-sec" style="margin-top:12px"><h3>💳 Forma de pagamento</h3><div style="font-weight:600">'+esc(pagamentoTexto(o))+'</div></div>':'')+
+  (pecas?'<div class="m-sec" style="margin-top:12px"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
   (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
   (mao?'<div class="m-sec"><h3>👷 Mão de obra</h3><div>'+esc(mao)+'</div></div>':'')+
   (nf?'<div class="m-sec"><h3>🖼️ Fotos ('+nf+')</h3>'+fotosOrcHtml(o,'orc',o.id,false)+'</div>':'')+
@@ -1339,6 +1354,7 @@ function propostaTexto(o,incluirObs){
  let txt='*MARMORARIA ITAPIRUBA*\nProposta de orçamento Nº '+(o.numero||'')+'\n';
  txt+='Data: '+fmtDate(o.data)+'\n';
  if(o.dataEntrega)txt+='Previsão de entrega: '+fmtDate(o.dataEntrega)+'\n';
+ if(pagamentoTexto(o))txt+='Pagamento: '+pagamentoTexto(o)+'\n';
  if(c){txt+='Cliente: '+c.nome+'\n';if(c.obra)txt+='Obra: '+c.obra+'\n';}
  txt+='\n';
  if(isNovo(o)){
@@ -1546,7 +1562,18 @@ function finalizarPedido(id){   // com saldo: escolhe os pagamentos antes; sem s
  if(!confirm('Finalizar a obra Nº '+(p.numero||'')+'? O recebimento é lançado na aba Receber.'))return;
  concluirObra(p);
 }
+function gerarParcelasDoOrcamento(p){   // 1.33.0
+ const o=byId(data.orcamentos,p.orcamentoId),pg=o&&o.pagamento;
+ if(!pg||!pg.forma||act(data.lancamentos).some(l=>l.tipo==='receita'&&l.pedidoId===p.id))return 0;
+ const tot=round2(+p.valorTotal||0),ent=Math.min(+pg.entrada||0,tot),rest=round2(tot-ent),n=Math.max(1,+pg.parcelas||1),t=now(),nObra=p.numero||'',grupo=uid();
+ const d0=pg.venc||p.dataPrevista||isoToday();let k=0;
+ if(ent>0){data.lancamentos.push({id:uid(),tipo:'receita',descricao:'Entrada - Obra Nº '+nObra,valor:ent,data:isoToday(),categoria:'Entrada',forma:pg.forma,pedidoId:p.id,pago:false,createdAt:t,updatedAt:t,deleted:false});k++;}
+ if(rest>0.009)splitTotal(rest,n).forEach((v,i)=>{const l={id:uid(),tipo:'receita',descricao:'Recebimento obra Nº '+nObra+(n>1?' ('+(i+1)+'/'+n+')':''),valor:v,data:addMonthsISO(d0,i),categoria:'Recebimento',forma:pg.forma,pedidoId:p.id,pago:false,createdAt:t,updatedAt:t,deleted:false};
+  if(n>1){l.grupo=grupo;l.parcelaNum=i+1;l.parcelaTotal=n;}data.lancamentos.push(l);k++;});
+ return k;
+}
 function concluirObra(p){
+ gerarParcelasDoOrcamento(p);
  setEtapa(p,'concluido');save();closeModal();go('pageRecebimentos');renderAll();
  toast('Obra Nº '+(p.numero||'')+' finalizada.');
  if(round2((+p.valorTotal||0)-pedRecebido(p.id))>0.009)setTimeout(()=>verParcelasObra(p.id),200);   // já mostra o que falta receber
@@ -1679,7 +1706,8 @@ function registrarRecebimento(id,finalizar){
  recFinalizar=!!finalizar;
  const p=byId(data.pedidos,id);if(!p)return;
  const falta=round2(p.valorTotal-pedRecebido(id)),sugerido=semParcelar(p);
- recForma='Pix';
+ const pgOrc=(byId(data.orcamentos,p.orcamentoId)||{}).pagamento||null;
+ recForma=(pgOrc&&pgOrc.forma)||'Pix';
  openModal((recFinalizar?'Finalizar obra':'Registrar recebimento')+' — Obra Nº '+(p.numero||''),
   '<div class="detail-row"><span class="dk">Valor da obra</span><span class="dv">'+money(p.valorTotal)+'</span></div>'+
   '<div class="detail-row"><span class="dk">Falta receber</span><span class="dv" style="color:var(--warn)">'+money(falta)+'</span></div>'+
@@ -1688,7 +1716,7 @@ function registrarRecebimento(id,finalizar){
   '<label class="fld"><span>Entrada (R$)</span><input id="recEntrada" inputmode="decimal" value="" placeholder="0,00 (opcional)" oninput="echoMoney(this);recPreview()"><div class="hint" id="recEntradaEcho"></div></label>'+
   '<div class="section-title">Forma de pagamento</div>'+
   '<div class="chip-row" id="recFormaChips">'+FORMAS.map(f=>'<button type="button" class="chip'+(recForma===f?' active':'')+'" onclick="setRecForma(\''+f+'\')">'+f+'</button>').join('')+'</div>'+
-  '<label class="fld"><span>Restante em quantas parcelas?</span><input id="recParc" inputmode="numeric" value="1" oninput="recPreview()"></label>'+
+  '<label class="fld"><span>Restante em quantas parcelas?</span><input id="recParc" inputmode="numeric" value="'+((pgOrc&&pgOrc.parcelas)||1)+'" oninput="recPreview()"></label>'+
   '<div class="hint" id="recPrev" style="color:var(--brand);font-weight:600"></div>'+
   '<label class="fld"><span>Vencimento da 1ª parcela</span><input type="date" id="recData" value="'+(p.dataPrevista||isoToday())+'"><div class="hint">'+(p.dataPrevista?'Preenchido com o prazo de entrega da obra. Pode alterar.':'Sem prazo de entrega definido na obra: usando hoje.')+'</div></label>'+
   '<label class="fld"><span>Observações</span><textarea id="recObs" style="min-height:70px" placeholder="Ex.: vai pagar com Pix na entrega · vai pagar com cartão daqui 10 dias"></textarea></label>'+
