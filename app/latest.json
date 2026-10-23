@@ -1,15 +1,15 @@
 {
- "version": "1.40.0",
- "interfaceVersion": 14000,
- "notes": "Novo administrador mitapiruba@gmail.com e botão Apagar tudo",
- "publishedAt": "2026-10-23T00:19:31",
- "apkVersionName": "1.39.0",
- "apkVersionCode": 30,
- "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.39.0/MarmorariaItapiruba-1.39.0.apk",
- "apkMontadorVersionName": "1.39.0",
- "apkMontadorVersionCode": 30,
- "apkMontadorUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/montador-1.39.0/ItapirubaMontador-1.39.0.apk",
- "apkProducaoVersionName": "1.39.0",
- "apkProducaoVersionCode": 30,
- "apkProducaoUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/producao-1.39.0/ItapirubaProducao-1.39.0.apk"
+ "version": "1.40.1",
+ "interfaceVersion": 14001,
+ "notes": "APKs 1.40.0",
+ "publishedAt": "2026-10-23T00:25:03",
+ "apkVersionName": "1.40.0",
+ "apkVersionCode": 31,
+ "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.40.0/MarmorariaItapiruba-1.40.0.apk",
+ "apkMontadorVersionName": "1.40.0",
+ "apkMontadorVersionCode": 31,
+ "apkMontadorUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/montador-1.40.0/ItapirubaMontador-1.40.0.apk",
+ "apkProducaoVersionName": "1.40.0",
+ "apkProducaoVersionCode": 31,
+ "apkProducaoUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/producao-1.40.0/ItapirubaProducao-1.40.0.apk"
 }
