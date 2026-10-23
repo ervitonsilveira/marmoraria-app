@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.33.0';
+const APP_VERSION='1.33.1';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 const MONTADOR=(function(){
  try{
@@ -3281,6 +3281,11 @@ if(!MONTADOR){
  };
 }
 
+// 1.33.1: observações para o montador direto na tela da obra
+function salvarObsMontador(id){
+ const p=byId(data.pedidos,id),t=$('obsMontador');if(!p||!t)return;
+ p.obs=t.value.trim();p.updatedAt=now();save();renderAll();toast('Observações salvas. O montador já recebe.');
+}
 /* ---- 1.31.0: tela da obra do administrador no mesmo estilo do painel do montador ---- */
 if(!MONTADOR){
  viewPedido=function(id){
@@ -3314,7 +3319,10 @@ if(!MONTADOR){
     '<div class="m-item"><span>Falta receber</span><b style="color:'+(falta>0.009?'var(--st-arec)':'var(--st-rec)')+'">'+money(falta)+'</b></div>'+
     (act(data.lancamentos).some(l=>l.tipo==='receita'&&l.pedidoId===id)?'<div style="margin-top:10px"><button class="btn sec sm" style="width:100%" onclick="go(\'pageRecebimentos\');verParcelasObra(\''+id+'\')">Ver parcelas</button></div>':'')+
    '</div>'+
-   (p.obs?'<div class="m-sec"><h3>📝 Observações</h3><div style="white-space:pre-wrap;font-size:15px;line-height:1.45">'+esc(p.obs)+'</div></div>':'')+
+   '<div class="m-sec"><h3>📝 Observações para o montador</h3>'+
+    '<textarea id="obsMontador" style="min-height:90px" placeholder="Ex.: entrar pela garagem, cliente só à tarde, levar cola extra…">'+esc(p.obs||'')+'</textarea>'+
+    '<div style="margin-top:8px"><button class="btn sm" style="width:100%" onclick="salvarObsMontador(\''+id+'\')">Salvar observações</button></div>'+
+    '<div class="hint" style="margin-top:6px">O montador vê isso na tela da obra dele.</div></div>'+
    (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
    (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
    (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+

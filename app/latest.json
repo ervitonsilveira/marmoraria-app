@@ -1,8 +1,8 @@
 {
- "version": "1.33.0",
- "interfaceVersion": 13300,
- "notes": "Forma de pagamento no orçamento; parcelas geradas sozinhas ao concluir a obra",
- "publishedAt": "2026-10-22T21:04:20",
+ "version": "1.33.1",
+ "interfaceVersion": 13301,
+ "notes": "Obra: campo de observações para o montador",
+ "publishedAt": "2026-10-22T21:06:27",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",
