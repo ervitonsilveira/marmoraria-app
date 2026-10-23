@@ -1,8 +1,8 @@
 {
- "version": "1.35.2",
- "interfaceVersion": 13502,
- "notes": "Financeiro: escolha do mês abaixo das ferramentas",
- "publishedAt": "2026-10-22T22:06:24",
+ "version": "1.35.3",
+ "interfaceVersion": 13503,
+ "notes": "Obra aberta: sem Concluir, com Voltar para a lista",
+ "publishedAt": "2026-10-22T22:19:20",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",

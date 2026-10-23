@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.35.2';
+const APP_VERSION='1.35.3';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -3412,7 +3412,8 @@ if(!MONTADOR){
    (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
    (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
    (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+
-   (p.status!=='concluido'?'<div style="margin-top:4px"><button class="btn ok" style="width:100%" onclick="finalizarPedido(\''+id+'\')">✓ Concluir obra</button></div>':'<div class="hint" style="text-align:center">Obra concluída.</div>')+
+   // 1.35.3: concluir fica só na lista de obras; aqui, voltar para a lista
+   '<div style="margin-top:4px"><button class="btn" style="width:100%" onclick="closeModal();go(\'pagePedidos\')">← Voltar para a lista de obras</button></div>'+
    '<div class="btn-row" style="margin-top:10px">'+
     '<button class="btn sec" onclick="editarObra(\''+id+'\')">✏️ Editar</button>'+
     (orc?'<button class="btn sec" onclick="closeModal();viewOrcamento(\''+orc.id+'\')">Orçamento</button>':'')+
