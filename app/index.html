@@ -453,7 +453,7 @@ nav.tabbar button.active svg{background:var(--brand-soft)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.40.1';
+const APP_VERSION='1.40.2';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -3180,7 +3180,7 @@ async function syncEnviar(){
 function traduzErroFb(e){
  const c=(e&&e.code)||'',m=(e&&e.message)||String(e||'');
  if(/network|offline|unavailable/i.test(c+m))return 'Sem internet. Os dados ficam no aparelho e sobem quando voltar.';
- if(/permission/i.test(c+m))return MONTADOR?'Acesso bloqueado ou não cadastrado. Fale com o administrador.':'Sem permissão para estes dados.';
+ if(/permission/i.test(c+m))return MONTADOR?'Acesso bloqueado ou não cadastrado. Fale com o administrador.':'Sem permissão: as regras do Firebase ainda não liberam '+EMAIL_ADMIN+' (publique as regras novas no console).';
  if(/invalid-credential|wrong-password|user-not-found|invalid-login/i.test(c))return 'E-mail ou senha incorretos. Se é o primeiro acesso, toque em "Primeiro acesso".';
  if(/email-already-in-use/.test(c))return 'Esse acesso já foi criado. Use "Entrar" com a senha.';
  if(/weak-password/.test(c))return 'A senha precisa ter pelo menos 6 caracteres.';
