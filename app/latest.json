@@ -1,8 +1,8 @@
 {
- "version": "1.35.0",
- "interfaceVersion": 13500,
- "notes": "Insumo por m², por metro de pedra ou fixo por serviço",
- "publishedAt": "2026-10-22T21:47:43",
+ "version": "1.35.1",
+ "interfaceVersion": 13501,
+ "notes": "Mensagem do orçamento no WhatsApp com forma de pagamento e entrega",
+ "publishedAt": "2026-10-22T22:02:05",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",
