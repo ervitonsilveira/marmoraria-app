@@ -453,7 +453,7 @@ nav.tabbar button.active svg{background:var(--brand-soft)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.39.0';
+const APP_VERSION='1.40.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -2114,6 +2114,7 @@ function openSettings(){
   '<div class="card">'+
    '<div class="list-item" onclick="openSync()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12.5 3.5 3.5 0 0 0 6 19z"/></svg></div><div class="body"><div class="t">Sincronização</div><div class="s">'+esc(syncResumo())+'</div></div></div>'+
    '<div class="list-item" onclick="openUsuarios()"><div class="body"><div class="t">Colaboradores</div><div class="s">Cadastrar montadores: nome + senha de 6 números</div></div></div>'+
+   '<div class="list-item" onclick="apagarTudo()"><div class="body"><div class="t" style="color:var(--st-pagat)">Apagar tudo e começar do zero</div><div class="s">Nuvem, colaboradores e este aparelho · faz backup antes</div></div></div>'+
    (sync.user?'<div class="list-item" onclick="syncSair()"><div class="body"><div class="t" style="color:var(--st-pagat)">Sair da conta</div><div class="s">'+esc(sync.user.email||'')+'</div></div></div>':'')+
    '<div class="list-item" onclick="exportBackup()"><div class="body"><div class="t">Fazer backup</div><div class="s">Salvar um arquivo com tudo</div></div></div>'+
    '<div class="list-item" onclick="importBackupPrompt()"><div class="body"><div class="t">Restaurar backup</div><div class="s">Carregar de um arquivo</div></div></div>'+
@@ -3027,8 +3028,8 @@ const FB_CFG={apiKey:'AIzaSyAtAlU_bq24E_xeiiEfCweDS5AswibEVa4',authDomain:'marmo
 const FB_VER='10.14.1';
 const SYNC_COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','caixaPreta'];
 const MONT_COLS=['clientes','pedidos','orcamentos','materiais','produtos','acabamentos'];
-const EMAIL_ADMIN='ervitonsilveira@gmail.com';   // só ele cadastra; colaboradores são criados por ele (Colaboradores)
-const sync={db:null,user:null,authPronto:null,depoisLogin:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
+const EMAIL_ADMIN='mitapiruba@gmail.com';   // 1.40.0: novo administrador (antes ervitonsilveira@gmail.com)   // só ele cadastra; colaboradores são criados por ele (Colaboradores)
+const sync={resetando:false,db:null,user:null,authPronto:null,depoisLogin:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
 function syncLS(k,v){
  try{if(v===undefined)return JSON.parse(localStorage.getItem(STORE_KEY+'.sync.'+k)||'null');
   if(v===null)localStorage.removeItem(STORE_KEY+'.sync.'+k);else localStorage.setItem(STORE_KEY+'.sync.'+k,JSON.stringify(v));}catch(e){return null;}
@@ -3048,7 +3049,9 @@ function fbIniciar(){
    sync.app=firebase.initializeApp(FB_CFG,MONTADOR?'montador':'[DEFAULT]');sync.db=sync.app.firestore();
    // 1.36.1: promessa resolvida quando o Firebase termina de restaurar o login salvo (antes disso sync.user é null)
    let authOk;sync.authPronto=new Promise(r=>{authOk=r;});
-   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;authOk();if(u&&!MONTADOR&&typeof Android!=='undefined'&&Android.askNotifyPermission){try{Android.askNotifyPermission();}catch(e){}}if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
+   sync.app.auth().onAuthStateChanged(u=>{
+    if(u&&!MONTADOR&&String(u.email||'').toLowerCase()!==EMAIL_ADMIN){authOk();acessoRevogado('Este e-mail não é mais o administrador. Entre com '+EMAIL_ADMIN+'.');return;}
+    sync.user=u;authOk();if(u&&!MONTADOR&&typeof Android!=='undefined'&&Android.askNotifyPermission){try{Android.askNotifyPermission();}catch(e){}}if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
    return true;
   }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
  })();
@@ -3090,7 +3093,10 @@ function ouvir(nome,fn){
   let mud=false;qs.docChanges().forEach(ch=>{if(ch.type!=='removed'&&fn(ch.doc.data()))mud=true;});
   if(mud)syncDepoisDeReceber();
   sync.status='ok';sync.erro='';sync.ultimo=now();atualizaSyncUI();
- },err=>{sync.status='erro';sync.erro=traduzErroFb(err);atualizaSyncUI();}));
+ },err=>{
+  // 1.40.0: colaborador apagado/bloqueado perde a permissão -> sai e limpa as obras do aparelho
+  if(MONTADOR&&/permission/i.test(((err&&err.code)||'')+((err&&err.message)||''))){acessoRevogado('Seu acesso foi removido pelo escritório.');return;}
+  sync.status='erro';sync.erro=traduzErroFb(err);atualizaSyncUI();}));
 }
 async function syncLigar(){
  syncDesligar(true);
@@ -3133,7 +3139,7 @@ function syncDesligar(silencioso){
  if(!silencioso){sync.status='off';atualizaSyncUI();}
 }
 function syncAgendar(ms){
- if(MONTADOR||!sync.user||!sync.db)return;
+ if(sync.resetando||MONTADOR||!sync.user||!sync.db)return;
  clearTimeout(sync.timer);sync.timer=setTimeout(syncEnviar,ms||1500);
 }
 // junta o que precisa subir: registros que mudaram (hash), fotos novas, ajustes e a cópia dos montadores
@@ -3155,7 +3161,7 @@ function syncPendentes(){
  return ops;
 }
 async function syncEnviar(){
- if(MONTADOR||!sync.user||!sync.db)return;
+ if(sync.resetando||MONTADOR||!sync.user||!sync.db)return;
  if(sync.enviando){syncAgendar(1500);return;}
  sync.enviando=true;
  try{
@@ -3316,6 +3322,55 @@ async function trocarSenhaColab(uid){
 async function ativarColab(uid,ativo){
  try{await fsCol('usuarios').doc(uid).update({ativo});toast(ativo?'Acesso liberado.':'Acesso bloqueado.');openUsuarios();}
  catch(e){toast(traduzErroFb(e));}
+}
+// 1.40.0: limpa tudo deste aparelho (dados e estado da sincronização) e recarrega
+function limparAparelho(manterLogin){
+ try{Object.keys(localStorage).filter(k=>k.indexOf(STORE_KEY)===0).forEach(k=>localStorage.removeItem(k));}catch(e){}
+ if(manterLogin)syncLS('ativo',true);
+}
+let _revogando=false;
+async function acessoRevogado(msg){
+ if(_revogando)return;_revogando=true;
+ sync.resetando=true;syncDesligar(true);
+ try{await sync.app.auth().signOut();}catch(e){}
+ limparAparelho(false);
+ alert(msg+'\n\nOs dados deste aparelho foram apagados.');
+ location.reload();
+}
+// 1.40.0: administrador apaga TUDO (nuvem + logins dos colaboradores + este aparelho). Faz backup antes.
+async function apagarTudo(){
+ if(MONTADOR||!sync.user||!sync.db){toast('Entre como administrador (Ajustes → Sincronização) para apagar tudo.');return;}
+ const r=prompt('ATENÇÃO: isto apaga TODOS os dados da Marmoraria (clientes, orçamentos, obras, Caixa, fotos, retornos, produção, cadastros, ajustes) e os logins dos montadores e da produção. Não tem volta.\n\nPara confirmar, digite APAGAR');
+ if(r===null)return;
+ if(r.trim().toUpperCase()!=='APAGAR'){toast('Nada foi apagado.');return;}
+ try{exportBackup();}catch(e){}
+ if(!confirm('Um backup foi gerado (salve o arquivo). Continuar e apagar tudo agora?'))return;
+ sync.resetando=true;clearTimeout(sync.timer);syncDesligar(true);
+ openModal('Apagando…','<div class="empty" id="resetMsg">Começando…</div>');
+ const msg=t=>{const e=$('resetMsg');if(e)e.textContent=t;};
+ try{
+  // 1) logins dos colaboradores (entra com a senha guardada e apaga a conta)
+  const us=await fsCol('usuarios').get(),sec=appCadastro();let i=0;
+  for(const d of us.docs){
+   i++;msg('Removendo colaboradores… '+i+'/'+us.size);
+   const u=d.data();
+   try{const c=await sec.auth().signInWithEmailAndPassword(u.email,u.pin);await c.user.delete();}catch(e){console.warn('colaborador',u.email,e);}
+   try{await sec.auth().signOut();}catch(e){}
+  }
+  // 2) todas as coleções da nuvem
+  const cols=[...SYNC_COLS,'fotos','meta','retornos','producaoStatus','usuarios','log',...MONT_COLS.map(k=>'montador_'+k),'montador_fotos'];
+  for(const nome of [...new Set(cols)]){
+   msg('Apagando '+nome+'…');
+   for(;;){
+    const qs=await fsCol(nome).limit(300).get();if(qs.empty)break;
+    const b=sync.db.batch();qs.docs.forEach(d=>b.delete(d.ref));await b.commit();
+   }
+  }
+ }catch(e){sync.resetando=false;openModal('Erro',traduzErroFb(e)+'<div class="hint">Parte dos dados pode já ter sido apagada. Tente de novo.</div>');return;}
+ // 3) este aparelho
+ limparAparelho(true);
+ alert('Pronto: tudo foi apagado. O app vai reiniciar do zero.');
+ location.reload();
 }
 async function syncSair(){
  if(!confirm(MONTADOR?'Sair? As obras somem deste celular até entrar de novo.':'Sair da conta neste aparelho? Os dados continuam salvos aqui.'))return;
