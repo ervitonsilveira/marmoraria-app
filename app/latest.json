@@ -1,8 +1,8 @@
 {
- "version": "1.35.1",
- "interfaceVersion": 13501,
- "notes": "Mensagem do orçamento no WhatsApp com forma de pagamento e entrega",
- "publishedAt": "2026-10-22T22:02:05",
+ "version": "1.35.2",
+ "interfaceVersion": 13502,
+ "notes": "Financeiro: escolha do mês abaixo das ferramentas",
+ "publishedAt": "2026-10-22T22:06:24",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",
