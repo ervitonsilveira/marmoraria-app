@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.34.0';
+const APP_VERSION='1.34.1';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -2039,6 +2039,7 @@ function openSettings(){
   '<div class="section-title">Aparência e registros</div>'+
   '<div class="card">'+
    '<div class="list-item" onclick="verificarAtualizacao()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div><div class="body"><div class="t">Atualizações</div><div class="s">Versão '+APP_VERSION+' · o app se atualiza sozinho ao abrir. Toque para procurar agora.</div></div></div>'+
+   '<div class="list-item" onclick="histFiltro=\'todos\';openHistoricoRetornos()"><div class="body"><div class="t">💬 Histórico de retornos</div><div class="s">Tudo que a produção e os montadores mandaram</div></div></div>'+
    '<div class="list-item" onclick="openCaixaPreta()"><div class="body"><div class="t">⬛ Caixa preta</div><div class="s">Cancelamentos e exclusões com motivo e cópia dos dados</div></div></div>'+
    '<div class="list-item" onclick="openLog()"><div class="body"><div class="t">Registro de exclusões</div><div class="s">'+(data.log.length?data.log.length+(data.log.length===1?' item excluído':' itens excluídos'):'Nada excluído até agora')+'</div></div></div>'+
    '<div class="list-item" onclick="toggleDark()"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div><div class="body"><div class="t">Tema escuro</div><div class="s">'+(dark?'Ativado':'Desativado')+'</div></div></div>'+
@@ -2862,7 +2863,7 @@ if(!MONTADOR){
   let el=$('homeRetornos');
   if(!el){el=document.createElement('div');el.id='homeRetornos';home.insertBefore(el,home.firstChild);}
   const n=retornosNovosTotal();
-  el.innerHTML=n?'<div class="fin-alert" style="margin:0 0 12px" onclick="go(\'pagePedidos\')"><span style="font-size:20px">📷</span><div style="flex:1"><b>'+n+(n>1?' retornos novos':' retorno novo')+' dos montadores</b><div style="font-size:12px">Toque para ver nas Obras</div></div><span style="color:var(--brand);font-weight:600">Ver ›</span></div>':'';
+  el.innerHTML=n?'<div class="fin-alert" style="margin:0 0 12px" onclick="histFiltro=\'novos\';openHistoricoRetornos()"><span style="font-size:20px">📷</span><div style="flex:1"><b>'+n+(n>1?' retornos novos':' retorno novo')+' dos montadores</b><div style="font-size:12px">Toque para ver nas Obras</div></div><span style="color:var(--brand);font-weight:600">Ver ›</span></div>':'';
  };
 }
 if(MONTADOR){
@@ -3233,6 +3234,32 @@ function dispararAvisos(){
 }
 function retornosNovosTotal(){const v=retVistos();return act(data.retornos||[]).filter(r=>!v[r.id]&&byId(data.pedidos,r.pedidoId)).length;}
 let _retVistos=null;   // cópia em memória (vale mesmo se o armazenamento falhar)
+/* ---- 1.34.1: histórico de todos os retornos (produção e montadores), de todas as obras ---- */
+let histFiltro='todos';
+function openHistoricoRetornos(){
+ const v=retVistos();
+ let rs=act(data.retornos||[]).slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+ const tot=rs.length,novos=rs.filter(r=>!v[r.id]).length;
+ if(histFiltro==='novos')rs=rs.filter(r=>!v[r.id]);
+ else if(histFiltro==='producao')rs=rs.filter(r=>r.origem==='producao');
+ else if(histFiltro==='montador')rs=rs.filter(r=>r.origem!=='producao');
+ const chip=(k,l)=>'<button class="chip'+(histFiltro===k?' active':'')+'" onclick="histFiltro=\''+k+'\';openHistoricoRetornos()">'+l+'</button>';
+ openModal('Histórico de retornos',
+  '<div class="hint" style="margin:0 0 10px">Tudo que a produção e os montadores mandaram ('+tot+'). Os novos aparecem em vermelho.</div>'+
+  '<div class="chip-row" style="margin-bottom:12px">'+chip('todos','Todos')+chip('novos','Novos ('+novos+')')+chip('producao','🏭 Produção')+chip('montador','🔧 Montagem')+'</div>'+
+  (rs.length?rs.map(r=>{const p=byId(data.pedidos,r.pedidoId)||(data.pedidos||[]).find(x=>x.id===r.pedidoId),novo=!v[r.id];
+   return '<div class="m-sec"'+(novo?' style="border:2px solid var(--st-pagat);background:var(--st-pagat-soft)"':'')+'>'+
+    '<h3'+(novo?' style="color:var(--st-pagat)"':'')+'>'+(novo?'● NOVO · ':'')+(p?esc(clienteName(p.clienteId))+' · Obra Nº '+(p.numero||''):'Obra removida')+(p&&p.deleted?' (excluída)':p&&p.status==='concluido'?' (concluída)':'')+'</h3>'+
+    retornoHtml(r).replace('class="list-item"','class="list-item" style="padding:0;border:0"')+
+    (p&&!p.deleted?'<div style="margin-top:8px"><button class="btn sec sm" onclick="closeModal();go(\'pagePedidos\');viewPedido(\''+p.id+'\')">Abrir obra ›</button></div>':'')+'</div>';}).join(''):
+   '<div class="empty">Nenhum retorno'+(histFiltro!=='todos'?' com esse filtro':'')+'.</div>')+
+  '<div class="btn-row" style="margin-top:14px">'+(novos?'<button class="btn sec" onclick="marcarTodosRetVistos()">Marcar todos como vistos</button>':'')+'<button class="btn sec" onclick="closeModal()">Fechar</button></div>');
+}
+function marcarTodosRetVistos(){
+ const v=retVistos();act(data.retornos||[]).forEach(r=>{v[r.id]=1;});
+ try{localStorage.setItem(STORE_KEY+'.retVistos',JSON.stringify(v));}catch(e){}
+ renderAll();openHistoricoRetornos();toast('Tudo marcado como visto.');
+}
 function retVistos(){if(!_retVistos){try{_retVistos=JSON.parse(localStorage.getItem(STORE_KEY+'.retVistos')||'{}');}catch(e){_retVistos={};}}return _retVistos;}
 function retNovos(pid){const v=retVistos();return retornosDa(pid).filter(r=>!v[r.id]).length;}
 function marcaRetVistos(pid){const v=retVistos();retornosDa(pid).forEach(r=>{v[r.id]=1;});try{localStorage.setItem(STORE_KEY+'.retVistos',JSON.stringify(v));}catch(e){}}
@@ -3295,7 +3322,8 @@ if(!MONTADOR){
   const at=act(data.pedidos).filter(p=>p.status!=='concluido'),n=act(data.pedidos).length-at.length;
   const atr=at.filter(p=>{const d=mDiasAte(p.dataPrevista);return d!=null&&d<0;}).length,logo=at.filter(p=>{const d=mDiasAte(p.dataPrevista);return d===0||d===1;}).length;
   $('pedFilters').innerHTML=statsHtml([[atr,'Atrasadas','var(--st-pagat)'],[logo,'Hoje/amanhã','var(--st-apag)'],[at.length,'Em andamento','var(--brand)']])+
-   '<button class="chip" onclick="relatorioConcluidas()">📁 Obras concluídas'+(n?' ('+n+')':'')+'</button>';
+   '<button class="chip" onclick="relatorioConcluidas()">📁 Obras concluídas'+(n?' ('+n+')':'')+'</button>'+
+   '<button class="chip" onclick="histFiltro=\'todos\';openHistoricoRetornos()">💬 Histórico de retornos ('+act(data.retornos||[]).length+')</button>';
  };
  renderPedidos=function(){
   renderPedFilters();
