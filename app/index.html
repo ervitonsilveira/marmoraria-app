@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.34.1';
+const APP_VERSION='1.35.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -766,10 +766,10 @@ function openCatalogos(sec){
    ||'<div class="empty">Nenhum produto cadastrado.<br>Cadastre aqui para poder escolher no orçamento.</div>';
   novo='<button class="btn sec sm" onclick="editProduto(null)">+ Novo produto</button>';
  }else{
-  hint='Insumos são o que se gasta no serviço (disco de corte, cola, resina, lixa…). Informe quanto cada um custa <b>por m² de serviço</b>: o app aplica todos automaticamente, conforme a metragem do orçamento.';
-  const tot=insumosRate();
+  hint='Insumos são o que se gasta no serviço (disco de corte, cola, resina, lixa…). Cada um pode ser <b>por m² de pedra</b>, <b>por metro de pedra</b> ou <b>fixo por serviço</b>. O app aplica todos sozinho em cada orçamento.';
+  const tot=0;
   rows=act(data.insumos).sort((a,b)=>a.nome.localeCompare(b.nome)).map(x=>
-   '<div class="list-item" onclick="editInsumo(\''+x.id+'\')"><div class="body"><div class="t">'+esc(x.nome)+'</div></div><div class="end"><div class="money">'+money(x.custoM2)+'</div><div class="cap">por m²</div></div></div>').join('')
+   '<div class="list-item" onclick="editInsumo(\''+x.id+'\')"><div class="body"><div class="t">'+esc(x.nome)+'</div></div><div class="end"><div class="money">'+money(x.custoM2)+'</div><div class="cap">'+INS_TIPOS[insTipo(x)]+'</div></div></div>').join('')
    ||'<div class="empty">Nenhum insumo cadastrado.</div>';
   if(tot>0)rows+='<div class="list-item" style="cursor:default;background:var(--surface)"><div class="body"><div class="t">Total de insumos</div></div><div class="end"><div class="money">'+money(tot)+'</div><div class="cap">por m²</div></div></div>';
   novo='<button class="btn sec sm" onclick="editInsumo(null)">+ Novo insumo</button>';
@@ -836,22 +836,42 @@ function delProduto(id){
  if(!confirm('Excluir o produto "'+p.nome+'"?'))return;
  logExclusao('Produto',p.nome);softDelete(data.produtos,id);save();openCatalogos('produtos');
 }
-/* ---- Insumos (custo por m² de serviço) ---- */
-function insumosRate(){return round2(act(data.insumos).reduce((s,x)=>s+(+x.custoM2||0),0));}
+/* ---- Insumos (1.35.0): por m² de pedra, por metro (linear) de pedra ou valor fixo por serviço ---- */
+const INS_TIPOS={m2:'por m² de pedra',ml:'por metro de pedra',fixo:'fixo por serviço'};
+const insTipo=x=>INS_TIPOS[x.tipo]?x.tipo:'m2';
+function insumosRate(){return round2(act(data.insumos).filter(x=>insTipo(x)==='m2').reduce((s,x)=>s+(+x.custoM2||0),0));}
+function metrosLineares(pecas){return round2((pecas||[]).reduce((s,p)=>s+num(p.comprimento)*pecaFator(p)*pecaQtd(p),0));}
+// custo de insumos de um serviço (lista de peças) + detalhe para mostrar no resumo
+function insumosDoServico(pecas){
+ const ok=(pecas||[]).filter(p=>num(p.comprimento)>0&&num(p.largura)>0),area=areaTotal({pecas:ok}),ml=metrosLineares(ok),det=[];let tot=0;
+ if(!ok.length)return {total:0,det,area,ml};
+ act(data.insumos).forEach(x=>{const v=+x.custoM2||0,t=insTipo(x),q=t==='m2'?area:t==='ml'?ml:1,c=round2(v*q);
+  if(c>0){tot+=c;det.push({nome:x.nome,tipo:t,qtd:q,valor:v,custo:c});}});
+ return {total:round2(tot),det,area,ml};
+}
 function editInsumo(id){
- const x=id?byId(data.insumos,id):{nome:'',custoM2:''};
+ const x=id?byId(data.insumos,id):{nome:'',custoM2:'',tipo:'m2'},tp=insTipo(x);
  openModal(id?'Editar insumo':'Novo insumo',
   '<label class="fld"><span>Nome *</span><input id="iNome" value="'+esc(x.nome)+'" placeholder="Ex.: Disco de corte, cola, resina, lixa"></label>'+
-  '<label class="fld"><span>Custo por m² de serviço (R$) *</span><input id="iCusto" inputmode="decimal" value="'+(x.custoM2?fmtNum(x.custoM2):'')+'" placeholder="Ex.: 12,00" oninput="echoMoney(this)">'+echoInit(x.custoM2)+'</label>'+
-  '<div class="hint">Quanto esse insumo custa, em média, para cada 1 m² de serviço executado.</div>'+
+  '<label class="fld"><span>Como entra no orçamento</span><select id="iTipo" onchange="insHint()">'+Object.keys(INS_TIPOS).map(k=>'<option value="'+k+'"'+(k===tp?' selected':'')+'>'+INS_TIPOS[k][0].toUpperCase()+INS_TIPOS[k].slice(1)+'</option>').join('')+'</select></label>'+
+  '<label class="fld"><span id="iCustoLbl">Valor (R$) *</span><input id="iCusto" inputmode="decimal" value="'+(x.custoM2?fmtNum(x.custoM2):'')+'" placeholder="Ex.: 12,00" oninput="echoMoney(this)">'+echoInit(x.custoM2)+'</label>'+
+  '<div class="hint" id="iHint"></div>'+
   '<div style="margin-top:16px" class="btn-row">'+(id?'<button class="btn sec" onclick="delInsumo(\''+id+'\')">Excluir</button>':'')+
    '<button class="btn" onclick="saveInsumo(\''+(id||'')+'\')">Salvar</button></div>');
+ insHint();
+}
+function insHint(){
+ const t=($('iTipo')||{}).value||'m2',h=$('iHint'),l=$('iCustoLbl');
+ if(l)l.textContent=t==='m2'?'Valor por m² de pedra (R$) *':t==='ml'?'Valor por metro de pedra (R$) *':'Valor fixo por serviço (R$) *';
+ if(h)h.textContent=t==='m2'?'Multiplica pela área (m²) das peças do serviço. Ex.: R$ 12 × 2,5 m² = R$ 30.':
+  t==='ml'?'Multiplica pelos metros de pedra (comprimento das peças × quantidade). Ex.: R$ 8 × 4,2 m = R$ 33,60.':
+  'Entra uma vez em cada orçamento que tiver serviço (peças), não importa o tamanho.';
 }
 function saveInsumo(id){
- const nome=$('iNome').value.trim(),custo=parseMoney($('iCusto').value);
+ const nome=$('iNome').value.trim(),custo=parseMoney($('iCusto').value),tipo=($('iTipo')||{}).value||'m2';
  if(!nome){toast('Informe o nome.');return;}
- if(!(custo>0)){toast('Informe o custo por m².');return;}
- const t=now(),f={nome,custoM2:custo,updatedAt:t};
+ if(!(custo>0)){toast('Informe o valor.');return;}
+ const t=now(),f={nome,custoM2:custo,tipo,updatedAt:t};
  if(id)Object.assign(byId(data.insumos,id),f);
  else data.insumos.push(Object.assign({id:uid(),createdAt:t,deleted:false},f));
  save();openCatalogos('insumos');toast('Insumo salvo.');
@@ -1172,7 +1192,10 @@ function resumoHtml(o){
  if(c.acab>0)h+=L('Acabamentos',money(c.acab));
  if(c.prod>0)h+=L('Produtos',money(c.prod));
  h+=L('Mão de obra'+peq(maoDescricao(o)),money(c.mao));
- if(c.insumos>0)h+=L('Insumos'+peq(fmtM2(area)+' × '+money(o.insumosM2||0)+'/m²'),money(c.insumos));
+ if(c.insumos>0){
+  if(Array.isArray(o.insumosDet)&&o.insumosDet.length)o.insumosDet.forEach(d=>{h+=L('Insumo: '+esc(d.nome)+peq(d.tipo==='m2'?fmtM2(d.qtd)+' × '+money(d.valor)+'/m²':d.tipo==='ml'?fmtNum(d.qtd)+' m × '+money(d.valor)+'/m':'fixo'),money(d.custo));});
+  else h+=L('Insumos'+peq(fmtM2(area)+' × '+money(o.insumosM2||0)+'/m²'),money(c.insumos));
+ }
  if(c.outros>0)h+=L('Outros custos',money(c.outros));
  h+=L('Custo real total','<b>'+money(custo)+'</b>',' tot');
  if(novo){
@@ -1195,7 +1218,7 @@ function resumoHtml(o){
  if(falhas.length)h+='<div class="warn">'+falhas.join('<br>')+'</div>';
  const falt=custosFaltando(o);
  if(falt.length)h+='<div class="warn">Sem custo cadastrado: '+falt.map(esc).join(', ')+'. O preço está <b>menor que o correto</b>. Preencha em Ajustes.</div>';
- if(novo&&!(o.insumosM2>0)&&area>0)h+='<div class="cl"><span style="font-size:12px">Nenhum insumo cadastrado: o custo de insumos está em R$ 0,00 (Ajustes → Insumos).</span><span></span></div>';
+ if(novo&&!act(data.insumos).length&&area>0)h+='<div class="cl"><span style="font-size:12px">Nenhum insumo cadastrado: o custo de insumos está em R$ 0,00 (Ajustes → Insumos).</span><span></span></div>';
  if(novo&&!(o.diaria>0)&&o.dias>0)h+='<div class="warn">Defina o valor da diária em Ajustes → Percentual de lucro e mão de obra.</div>';
  return h+'</div>';
 }
@@ -1203,10 +1226,10 @@ function draftOrc(){
  readPecasFromDom();readItensFromDom();
  const g=id=>parseMoney($(id)?.value||0);
  const dias=parseDias($('oDias')?.value),func=draftMao.funcionarios,diaria=draftMao.diaria,maoFixa=g('oMao');
- const area=areaTotal({pecas:draftPecas}),taxa=insumosRate();
+ const area=areaTotal({pecas:draftPecas}),taxa=insumosRate(),ins=insumosDoServico(draftPecas);
  return{modo:'custo',pecas:draftPecas,itens:draftItens,desconto:g('oDesc'),acrescimo:g('oAcres'),
   dias,funcionarios:func,diaria,maoFixa,maoDeObra:round2(dias*func*diaria+maoFixa),
-  insumosM2:taxa,custoInsumos:round2(area*taxa),outrosCustos:g('oOutros'),
+  insumosM2:taxa,custoInsumos:ins.total,insumosDet:ins.det,outrosCustos:g('oOutros'),
   pct:draftMao.pct,lucroMeta:draftMeta.lucroMeta,margemMin:draftMeta.margemMin};
 }
 function recalcOrc(){
@@ -2027,7 +2050,7 @@ function openSettings(){
   '<div class="section-title" style="margin-top:4px">Cadastros</div>'+
   '<div class="card"><div class="list-item" onclick="openCatalogos(\'materiais\')"><div class="body"><div class="t">Materiais</div><div class="s">'+act(data.materiais).length+' cadastrados · custo por m²</div></div></div>'+
    '<div class="list-item" onclick="openCatalogos(\'produtos\')"><div class="body"><div class="t">Produtos</div><div class="s">'+act(data.produtos).length+' cadastrados · aparecem no orçamento</div></div></div>'+
-   '<div class="list-item" onclick="openCatalogos(\'insumos\')"><div class="body"><div class="t">Insumos</div><div class="s">Custo por m² de serviço: '+money(insumosRate())+'</div></div></div>'+
+   '<div class="list-item" onclick="openCatalogos(\'insumos\')"><div class="body"><div class="t">Insumos</div><div class="s">'+act(data.insumos).length+' cadastrado(s) · por m², por metro ou fixo</div></div></div>'+
   '</div>'+
   '<div class="section-title">Relatórios</div>'+
   '<div class="card"><div class="list-item" onclick="openRelatorios(\'ajustes\')"><div class="body"><div class="t">Relatórios</div><div class="s">Resumo do mês · fluxo do ano · contas a receber e a pagar · obras</div></div></div></div>'+
