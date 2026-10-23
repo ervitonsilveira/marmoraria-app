@@ -1,8 +1,8 @@
 {
- "version": "1.36.0",
- "interfaceVersion": 13600,
- "notes": "Todos os apps na versão 1.36.0",
- "publishedAt": "2026-10-22T22:55:08",
+ "version": "1.36.1",
+ "interfaceVersion": 13601,
+ "notes": "Colaboradores: espera o login do administrador carregar",
+ "publishedAt": "2026-10-22T23:22:40",
  "apkVersionName": "1.36.0",
  "apkVersionCode": 29,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.36.0/MarmorariaItapiruba-1.36.0.apk",

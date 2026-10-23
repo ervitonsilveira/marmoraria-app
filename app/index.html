@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.36.0';
+const APP_VERSION='1.36.1';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -2913,7 +2913,7 @@ const FB_VER='10.14.1';
 const SYNC_COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','caixaPreta'];
 const MONT_COLS=['clientes','pedidos','orcamentos','materiais','produtos','acabamentos'];
 const EMAIL_ADMIN='ervitonsilveira@gmail.com';   // só ele cadastra; colaboradores são criados por ele (Colaboradores)
-const sync={db:null,user:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
+const sync={db:null,user:null,authPronto:null,depoisLogin:null,unsubs:[],timer:null,status:'off',erro:'',pushed:{},fotoCache:{},iniciando:null,enviando:false};
 function syncLS(k,v){
  try{if(v===undefined)return JSON.parse(localStorage.getItem(STORE_KEY+'.sync.'+k)||'null');
   if(v===null)localStorage.removeItem(STORE_KEY+'.sync.'+k);else localStorage.setItem(STORE_KEY+'.sync.'+k,JSON.stringify(v));}catch(e){return null;}
@@ -2931,7 +2931,9 @@ function fbIniciar(){
    await carregaScript(b+'firebase-firestore-compat.js');
    // app com nome próprio no montador: no mesmo iPhone o login do admin e o do montador não se misturam
    sync.app=firebase.initializeApp(FB_CFG,MONTADOR?'montador':'[DEFAULT]');sync.db=sync.app.firestore();
-   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;if(u&&!MONTADOR&&typeof Android!=='undefined'&&Android.askNotifyPermission){try{Android.askNotifyPermission();}catch(e){}}if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
+   // 1.36.1: promessa resolvida quando o Firebase termina de restaurar o login salvo (antes disso sync.user é null)
+   let authOk;sync.authPronto=new Promise(r=>{authOk=r;});
+   sync.app.auth().onAuthStateChanged(u=>{sync.user=u;authOk();if(u&&!MONTADOR&&typeof Android!=='undefined'&&Android.askNotifyPermission){try{Android.askNotifyPermission();}catch(e){}}if(u)syncLigar();else syncDesligar();atualizaSyncUI();try{renderAll();}catch(e){}});
    return true;
   }catch(e){sync.iniciando=null;sync.status='offline';sync.erro='Sem internet: usando só os dados deste aparelho.';atualizaSyncUI();return false;}
  })();
@@ -3122,7 +3124,8 @@ async function syncEntrar(criar){
  try{
   if(criar)await sync.app.auth().createUserWithEmailAndPassword(EMAIL_ADMIN,senha);
   else await sync.app.auth().signInWithEmailAndPassword(EMAIL_ADMIN,senha);
-  syncLS('ativo',true);toast('Conectado.');openSync();
+  syncLS('ativo',true);toast('Conectado.');
+  if(sync.depoisLogin==='usuarios'){sync.depoisLogin=null;openUsuarios();}else openSync();
  }catch(e){toast(traduzErroFb(e));}
 }
 async function syncEntrarColab(){
@@ -3137,8 +3140,12 @@ async function syncEntrarColab(){
 // ---- administrador: cadastro dos colaboradores ----
 function appCadastro(){return firebase.apps.find(a=>a.name==='cadastro')||firebase.initializeApp(FB_CFG,'cadastro');}
 async function openUsuarios(){
- if(!sync.user||MONTADOR){toast('Entre como administrador primeiro.');return;}
+ if(MONTADOR)return;
  openModal('Colaboradores','<div class="empty">Carregando…</div>');
+ // 1.36.1: espera o Firebase carregar e restaurar o login antes de decidir (antes pedia login mesmo já conectado)
+ const ok=await fbIniciar();
+ if(ok&&sync.authPronto)await sync.authPronto;
+ if(!sync.user){sync.depoisLogin='usuarios';await openSync();toast('Entre com a senha do administrador para cadastrar colaboradores.');return;}
  let lista=[];
  try{const qs=await fsCol('usuarios').get();lista=qs.docs.map(d=>Object.assign({uid:d.id},d.data())).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));}
  catch(e){openModal('Colaboradores','<div class="hint">'+esc(traduzErroFb(e))+'</div><div style="margin-top:14px"><button class="btn sec" onclick="openSync()">Voltar</button></div>');return;}
