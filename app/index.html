@@ -413,16 +413,20 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.33.1';
+const APP_VERSION='1.34.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
-const MONTADOR=(function(){
+// 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
+const APP_PAPEL=(function(){
  try{
-  if(/[?&]montador\b/.test(location.search))return true;
-  if(typeof Android!=='undefined'&&Android.appInfo)return /\.montador$/.test((JSON.parse(Android.appInfo()||'{}').packageName)||'');
+  if(/[?&]producao\b/.test(location.search))return 'producao';
+  if(/[?&]montador\b/.test(location.search))return 'montador';
+  if(typeof Android!=='undefined'&&Android.appInfo){const pk=(JSON.parse(Android.appInfo()||'{}').packageName)||'';
+   if(/\.producao$/.test(pk))return 'producao';if(/\.montador$/.test(pk))return 'montador';}
  }catch(e){}
- return false;
+ return 'admin';
 })();
-const STORE_KEY=MONTADOR?'marmoraria.itapiruba.montador.v1':'marmoraria.itapiruba.v1';
+const PRODUCAO=APP_PAPEL==='producao',MONTADOR=APP_PAPEL!=='admin';
+const STORE_KEY=PRODUCAO?'marmoraria.itapiruba.producao.v1':MONTADOR?'marmoraria.itapiruba.montador.v1':'marmoraria.itapiruba.v1';
 const $=id=>document.getElementById(id);
 const now=()=>new Date().toISOString();
 const uid=()=>'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -491,7 +495,7 @@ function seed(){
  };
 }
 // garante que dados de versões antigas (e backups) tenham todos os campos novos
-const COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','log','retornos','caixaPreta'];
+const COLS=['clientes','materiais','acabamentos','produtos','insumos','orcamentos','pedidos','lancamentos','log','retornos','caixaPreta','producaoStatus'];
 function normalize(){
  COLS.forEach(k=>{if(!Array.isArray(data[k]))data[k]=[];});
  if(!data.seq)data.seq={orcamento:Math.max(0,...data.orcamentos.map(o=>o.numero||0)),pedido:Math.max(0,...data.pedidos.map(p=>p.numero||0))};
@@ -2262,8 +2266,9 @@ async function checarAtualizacoes(){
   if(!temNativo()){if(ifaceDe(f.version)>ifaceDe(APP_VERSION))upd.tela={versao:f.version,web:true};}
   else{
    const inst=+(JSON.parse(Android.appInfo()||'{}').versionCode)||0;
-   const code=+(MONTADOR?f.apkMontadorVersionCode:f.apkVersionCode)||0,url=MONTADOR?f.apkMontadorUrl:f.apkUrl;
-   if(url&&code>inst)upd.apk={versao:MONTADOR?f.apkMontadorVersionName:f.apkVersionName,url};
+   const pre=PRODUCAO?'apkProducao':MONTADOR?'apkMontador':'apk';
+   const code=+f[pre+'VersionCode']||0,url=f[pre+'Url'];
+   if(url&&code>inst)upd.apk={versao:f[pre+'VersionName'],url};
   }
  }catch(e){}
  renderUpd();
@@ -2675,9 +2680,9 @@ function exportMontador(){
 }
 // ---- lado do montador ----
 function montadorInit(){
- document.body.classList.add('montador','dark');   // montador sempre no tema escuro
- $('appSub').textContent='Montador';
- document.title='Itapiruba Montador';{const m=document.querySelector('meta[name=apple-mobile-web-app-title]');if(m)m.content='Montador';}
+ document.body.classList.add('montador','dark');   // montador/produção sempre no tema escuro
+ $('appSub').textContent=PRODUCAO?'Produção':'Montador';
+ document.title=PRODUCAO?'Itapiruba Produção':'Itapiruba Montador';{const m=document.querySelector('meta[name=apple-mobile-web-app-title]');if(m)m.content=PRODUCAO?'Produção':'Montador';}
  const g=document.querySelector('header .iconbtn');if(g)g.setAttribute('onclick','openSettingsM()');
  const home=$('pageHome');if(home)home.innerHTML='<div id="mHome"></div>';
  const ped=$('pagePedidos');if(ped)ped.insertAdjacentHTML('afterbegin','<div id="mTopo"></div>');
@@ -2708,12 +2713,12 @@ function mObraLinha(p){
    '<div class="s">Obra Nº '+(p.numero||'')+(dt?' · '+DIAS_SEMANA[dt.getDay()]:'')+'</div>'+
    '<div class="m-tags"><span class="m-tag st">'+u.txt+'</span>'+(np?'<span class="m-tag">'+np+(np>1?' peças':' peça')+'</span>':'')+(nf?'<span class="m-tag">📷 '+nf+'</span>':'')+
    (orc&&orc.local&&orc.local.lat!=null?'<span class="m-tag">📍 mapa</span>':'')+(nr?'<span class="m-tag">💬 '+nr+'</span>':'')+'</div></div>'+
-  '<div class="m-chev">›</div></div>';
+  (PRODUCAO?'<button class="btn ok sm" style="flex:none;padding:9px 12px" onclick="event.stopPropagation();marcarProducao(\''+p.id+'\',true)">✓ Pronto</button>':'<div class="m-chev">›</div>')+'</div>';
 }
 function setPedFilterM(f){pedFilter=f;renderPedidos();}
 function renderPedidosM(){
  const topo=$('mTopo'),el=$('pedidosList');
- const ativas=act(data.pedidos).filter(p=>p.status!=='concluido');
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido'&&(PRODUCAO?!prontoProd(p.id):prontoProd(p.id)));
  const atr=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d!=null&&d<0;}).length;
  const logo=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d===0||d===1;}).length;
  const hj=new Date(),nome=syncLS('nome')||'';
@@ -2723,10 +2728,11 @@ function renderPedidosM(){
   '<div class="m-stats">'+
    '<div class="m-stat" style="--mc:var(--st-pagat)"><b>'+atr+'</b><span>Atrasadas</span></div>'+
    '<div class="m-stat" style="--mc:var(--st-apag)"><b>'+logo+'</b><span>Hoje/amanhã</span></div>'+
-   '<div class="m-stat" style="--mc:var(--brand)"><b>'+ativas.length+'</b><span>A entregar</span></div></div>'+
-  '<div class="section-title" style="margin-top:4px">Obras para entregar</div>';
+   '<div class="m-stat" style="--mc:var(--brand)"><b>'+ativas.length+'</b><span>'+(PRODUCAO?'A produzir':'A entregar')+'</span></div></div>'+
+  '<div class="section-title" style="margin-top:4px">'+(PRODUCAO?'Obras para produzir':'Obras para entregar')+'</div>';
  const list=ativas.slice().sort(mOrdemEntrega);   // concluída pelo escritório some daqui
- el.innerHTML=list.length?list.map(mObraLinha).join(''):'<div class="m-vazio"><div style="font-size:40px">🧱</div><b>Nenhuma obra para entregar</b><span>'+(sync.user?'Quando o escritório lançar uma obra, ela aparece aqui sozinha.':'Entre para receber as obras.')+'</span></div>';
+ el.innerHTML=(list.length?list.map(mObraLinha).join(''):'<div class="m-vazio"><div style="font-size:40px">🧱</div><b>'+(PRODUCAO?'Nada para produzir':'Nenhuma obra para entregar')+'</b><span>'+(sync.user?(PRODUCAO?'Quando o escritório lançar uma obra, ela aparece aqui.':'A obra aparece aqui quando a produção terminar.'):'Entre para receber as obras.')+'</span></div>')+
+  (PRODUCAO?prontasProducaoHtml():'');
 }
 function viewPedidoM(id){
  const p=byId(data.pedidos,id);if(!p)return;
@@ -2748,20 +2754,22 @@ function viewPedidoM(id){
    '<span class="r">'+u.txt+'</span>'+
    '<div class="c">👤 '+esc(clienteName(p.clienteId))+'</div>'+
    ((temTel||temMapa)?'<div class="m-acts">'+
-    (temTel?'<button class="m-act" onclick="whatsEntregaM(\''+c.id+'\')">💬 Avisar entrega</button>':'')+
+    (temTel&&!PRODUCAO?'<button class="m-act" onclick="whatsEntregaM(\''+c.id+'\')">💬 Avisar entrega</button>':'')+
     (temMapa?'<button class="m-act" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Como chegar</button>':'')+'</div>':'')+
   '</div>'+
   (p.obs?'<div class="m-sec"><h3>📝 Observações</h3><div style="white-space:pre-wrap;font-size:15px;line-height:1.45">'+esc(p.obs)+'</div></div>':'')+
   (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
   (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
   (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+
+  (PRODUCAO?(prontoProd(id)?'<div class="m-sec" style="border:2px solid var(--st-rec)"><b style="color:var(--st-rec)">✓ Produção finalizada</b><div style="margin-top:8px"><button class="btn sec sm" onclick="marcarProducao(\''+id+'\',false)">↩ Voltar para produção</button></div></div>':
+   '<div style="margin-bottom:12px"><button class="btn ok" style="width:100%;padding:14px" onclick="marcarProducao(\''+id+'\',true)">✓ Produção finalizada</button></div>'):'')+
   retornoFormM(id)+
   '<div class="hint" style="margin:6px 2px 4px;text-align:center">Os dados da obra são alterados só pelo escritório.</div>');
  $('modalBox').scrollTop=0;
 }
 function retornoFormM(pid){
  const env=retornosDa(pid);
- return '<div class="m-sec m-ret"><h3>📤 Retorno para o escritório</h3>'+
+ return '<div class="m-sec m-ret"><h3>📤 '+(PRODUCAO?'Observação para o escritório':'Retorno para o escritório')+'</h3>'+
   '<div class="chip-row" style="margin-bottom:10px">'+RET_SUGESTOES.map(t=>'<button type="button" class="chip" onclick="retSugestaoM(\''+t+'\')">'+t+'</button>').join('')+'</div>'+
   '<textarea id="mRetTexto" style="min-height:84px" placeholder="Escreva aqui: faltou rodapé, não encaixou no esquadro, medida errada…"></textarea>'+
   '<div id="mRetFotosBox">'+retFotosPrevM(pid)+'</div>'+
@@ -2770,6 +2778,26 @@ function retornoFormM(pid){
   '<button class="btn" onclick="enviarRetornoM(\''+pid+'\')">Enviar</button></div>'+
   (env.length?'<div class="m-enviados"><div class="mat" style="margin:12px 0 6px;font-weight:700">Já enviado ('+env.length+')</div>'+env.map(retornoHtml).join('')+'</div>':'')+
   '</div>';
+}
+/* ---- 1.34.0: produção ---- */
+function prontoProd(pid){const st=(data.producaoStatus||[]).find(x=>x.id===pid&&!x.deleted);return !!(st&&st.pronto);}
+function infoProd(pid){return (data.producaoStatus||[]).find(x=>x.id===pid&&!x.deleted)||null;}
+async function marcarProducao(pid,pronto){
+ if(!sync.user||!sync.db){toast('Entre na sincronização (engrenagem) para marcar.');return;}
+ if(pronto&&!confirm('Marcar a produção desta obra como finalizada? Ela vai para o montador.'))return;
+ const t=now(),ant=infoProd(pid),doc={id:pid,pedidoId:pid,pronto:!!pronto,autor:syncLS('nome')||'',em:t,createdAt:(ant&&ant.createdAt)||t,updatedAt:t,deleted:false};
+ try{
+  await fsCol('producaoStatus').doc(pid).set(doc);
+  mergeRemoto('producaoStatus','producaoStatus',doc);save(true);closeModal();renderAll();
+  toast(pronto?'Produção finalizada. A obra foi para o montador.':'Voltou para a produção.');
+ }catch(e){toast(traduzErroFb(e));}
+}
+function prontasProducaoHtml(){
+ const pr=act(data.pedidos).filter(p=>p.status!=='concluido'&&prontoProd(p.id)).sort(mOrdemEntrega);
+ if(!pr.length)return '';
+ return '<details style="margin-top:14px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">✓ Já finalizadas na produção ('+pr.length+')</summary>'+
+  pr.map(p=>'<div class="list-item" style="cursor:default"><div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+(infoProd(p.id)&&infoProd(p.id).autor?' · por '+esc(infoProd(p.id).autor):'')+'</div></div>'+
+   '<button class="btn sec sm" onclick="marcarProducao(\''+p.id+'\',false)">↩ Desfazer</button></div>').join('')+'</details>';
 }
 function mOrdemEntrega(a,b){return (a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999')||(a.numero||0)-(b.numero||0);}
 function renderHomeM(){
@@ -2926,6 +2954,7 @@ async function syncLigar(){
   MONT_COLS.forEach(k=>ouvir('montador_'+k,r=>{const m=mergeRemoto('montador_'+k,k,r);if(m)data.recebidoEm=now();return m;}));
   ouvir('montador_fotos',aplicaFoto);
   ouvir('retornos',r=>mergeRemoto('retornos','retornos',r));
+  ouvir('producaoStatus',r=>mergeRemoto('producaoStatus','producaoStatus',r));
   return;
  }
  try{
@@ -2942,6 +2971,7 @@ async function syncLigar(){
  }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);atualizaSyncUI();return;}
  SYNC_COLS.forEach(k=>ouvir(k,r=>mergeRemoto(k,k,r)));
  ouvir('fotos',aplicaFoto);
+ ouvir('producaoStatus',r=>mergeRemoto('producaoStatus','producaoStatus',r));
  ouvir('retornos',r=>{const novo=!(data.retornos||[]).some(x=>x.id===r.id),m=mergeRemoto('retornos','retornos',r);if(novo&&m)avisaRetorno(r);return m;});
  ouvir('meta',r=>{
   if(r.id!=='config'||!r.config)return false;
@@ -3087,12 +3117,13 @@ async function openUsuarios(){
  openModal('Colaboradores',
   '<div class="hint" style="margin:0 0 10px">Montadores entram no app deles com o <b>nome</b> e a <b>senha de 6 números</b> que você cria aqui. Eles não veem valores.</div>'+
   (lista.length?'<div class="card">'+lista.map(u=>'<div class="list-item" style="cursor:default"><div class="av">'+esc(initials(u.nome))+'</div>'+
-   '<div class="body"><div class="t">'+esc(u.nome)+'</div><div class="s">Senha: '+esc(u.pin||'')+' · '+(u.ativo?'<span style="color:var(--st-rec)">ativo</span>':'<span style="color:var(--st-pagat)">bloqueado</span>')+'</div></div>'+
+   '<div class="body"><div class="t">'+esc(u.nome)+'</div><div class="s">'+(u.papel==='producao'?'🏭 Produção':'🔧 Montador')+' · Senha: '+esc(u.pin||'')+' · '+(u.ativo?'<span style="color:var(--st-rec)">ativo</span>':'<span style="color:var(--st-pagat)">bloqueado</span>')+'</div></div>'+
    '<div class="end" style="display:flex;flex-direction:column;gap:4px">'+
     '<button class="btn sec sm" style="padding:5px 9px" onclick="trocarSenhaColab(\''+u.uid+'\')">Trocar senha</button>'+
     '<button class="btn sec sm" style="padding:5px 9px" onclick="ativarColab(\''+u.uid+'\','+(!u.ativo)+')">'+(u.ativo?'Bloquear':'Liberar')+'</button></div></div>').join('')+'</div>':'<div class="empty" style="padding:18px">Nenhum colaborador ainda.</div>')+
   '<div class="section-title">Novo colaborador</div>'+
   '<label class="fld"><span>Nome do colaborador (é o login)</span><input id="ncNome" placeholder="Ex.: João Silva"></label>'+
+  '<label class="fld"><span>Função</span><select id="ncPapel"><option value="montador">Montador</option><option value="producao">Produção</option></select></label>'+
   '<label class="fld"><span>Senha (6 números)</span><input id="ncSenha" inputmode="numeric" maxlength="6" placeholder="Ex.: 482913"></label>'+
   '<div class="btn-row" style="margin-top:10px"><button class="btn sec" onclick="$(\'ncSenha\').value=String(Math.floor(100000+Math.random()*900000))">Gerar senha</button><button class="btn" onclick="criarColab()">Cadastrar</button></div>'+
   '<div style="margin-top:14px"><button class="btn sec" onclick="openSync()">Voltar</button></div>');
@@ -3105,7 +3136,7 @@ async function criarColab(){
  try{
   toast('Cadastrando…');
   const cred=await sec.auth().createUserWithEmailAndPassword(email,pin);
-  await fsCol('usuarios').doc(cred.user.uid).set({nome,email,pin,papel:'montador',ativo:true,criadoEm:now()});
+  await fsCol('usuarios').doc(cred.user.uid).set({nome,email,pin,papel:(($('ncPapel')||{}).value||'montador'),ativo:true,criadoEm:now()});
   await sec.auth().signOut();
   toast(nome+' cadastrado. Senha: '+pin);openUsuarios();
  }catch(e){try{await sec.auth().signOut();}catch(_){}toast(/email-already-in-use/.test((e&&e.code)||'')?'Já existe um colaborador com esse nome. Use outro (ex.: com sobrenome).':traduzErroFb(e));}
@@ -3141,7 +3172,7 @@ async function syncSair(){
    Cada foto/observação é um documento em empresas/itapiruba/retornos (o montador só pode CRIAR ali).
    O administrador vê tudo na tela da obra; obra com retorno novo ganha um aviso na lista.
    ============================================================ */
-const RET_SUGESTOES=['Faltou rodapé','Não encaixou no esquadro','Medida errada','Peça trincada/quebrada','Faltou material','Cliente pediu ajuste'];
+const RET_SUGESTOES=PRODUCAO?['Falta chapa','Medida a conferir','Material com defeito','Atraso na produção','Precisa falar com o escritório']:['Faltou rodapé','Não encaixou no esquadro','Medida errada','Peça trincada/quebrada','Faltou material','Cliente pediu ajuste'];
 let mRetFotos=[];   // fotos tiradas e ainda não enviadas
 const retornosDa=pid=>act(data.retornos||[]).filter(r=>r.pedidoId===pid).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
 function retornoHtml(r){
@@ -3149,7 +3180,7 @@ function retornoHtml(r){
  return '<div class="list-item" style="cursor:default;display:block">'+
   (r.foto?'<div class="foto-grid" style="margin-bottom:6px">'+fotoThumbHtml(r.foto,"verFotoRet('"+r.id+"')",'')+'</div>':'')+
   (r.texto?'<div style="white-space:pre-wrap;font-size:14px">'+esc(r.texto)+'</div>':'')+
-  '<div class="s" style="font-size:12px;color:var(--muted);margin-top:4px">'+esc(quando)+(r.autor&&!/@/.test(r.autor)?' · por '+esc(r.autor):'')+'</div></div>';
+  '<div class="s" style="font-size:12px;color:var(--muted);margin-top:4px">'+esc(quando)+(r.autor&&!/@/.test(r.autor)?' · por '+esc(r.autor):'')+(r.origem==='producao'?' · 🏭 produção':' · 🔧 montagem')+'</div></div>';
 }
 function verFotoRet(id){const r=(data.retornos||[]).find(x=>x.id===id);if(r&&r.foto)verFotoFull(r.foto);}
 // ---- montador: formulário no fim da tela da obra ----
@@ -3165,7 +3196,7 @@ async function enviarRetornoM(pid){
  const texto=(($('mRetTexto')||{}).value||'').trim();
  if(!texto&&!mRetFotos.length){toast('Escreva uma observação ou tire uma foto.');return;}
  if(!sync.user||!sync.db){toast('Entre na sincronização (engrenagem) para enviar ao escritório.');return;}
- const t=now(),base={pedidoId:pid,autor:syncLS('nome')||(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
+ const t=now(),base={pedidoId:pid,origem:PRODUCAO?'producao':'montador',autor:syncLS('nome')||(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
  const itens=[];
  if(texto)itens.push(Object.assign({id:uid(),texto},base));
  mRetFotos.forEach(f=>itens.push(Object.assign({id:uid(),foto:f,texto:''},base)));
@@ -3274,7 +3305,7 @@ if(!MONTADOR){
   el.innerHTML=list.map(p=>{
    const u=mUrgencia(p),falta=round2((+p.valorTotal||0)-pedRecebido(p.id)),nr=retNovos(p.id);
    return cartao({cor:u.cor,soft:u.soft,data:p.dataPrevista,titulo:clienteName(p.clienteId),sub:'Obra Nº '+(p.numero||'')+(p.dataPrevista?' · entrega '+DIAS_SEMANA[new Date(p.dataPrevista+'T12:00:00').getDay()]:' · sem data de entrega'),
-    tags:[nr?'<span class="m-tag st" style="--mcs:var(--st-pagat-soft);--mc:var(--st-pagat)">📷 retorno novo</span>':'',tag(u.txt,true),tag(money(p.valorTotal)),falta>0.009?tag('falta '+money(falta)):tag('pago ✓')].filter(Boolean),
+    tags:[nr?'<span class="m-tag st" style="--mcs:var(--st-pagat-soft);--mc:var(--st-pagat)">📷 retorno novo</span>':'',tag(u.txt,true),prontoProd(p.id)?tag('✓ produção pronta'):tag('🏭 em produção'),tag(money(p.valorTotal)),falta>0.009?tag('falta '+money(falta)):tag('pago ✓')].filter(Boolean),
     direita:'<button class="btn ok sm" style="padding:8px 10px" onclick="event.stopPropagation();finalizarPedido(\''+p.id+'\')">✓ Concluir</button>',
     onclick:"viewPedido('"+p.id+"')"});
   }).join('');
@@ -3312,17 +3343,18 @@ if(!MONTADOR){
      (temTel?'<button class="m-act" onclick="abrirWhatsAppCliente(\''+c.id+'\')">💬 WhatsApp</button>':'')+
      (temMapa?'<button class="m-act" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Como chegar</button>':'')+'</div>':'')+
    '</div>'+
-   (rs.length?'<div class="m-sec"'+(nNovos?' style="border:2px solid var(--st-pagat);background:var(--st-pagat-soft)"':'')+'><h3'+(nNovos?' style="color:var(--st-pagat)"':'')+'>📷 Retorno dos montadores ('+rs.length+')'+(nNovos?' · <b style="color:var(--st-pagat)">'+nNovos+' novo'+(nNovos>1?'s':'')+'</b>':'')+'</h3>'+rs.map(retornoHtml).join('')+'</div>':'')+
+   '<div class="m-sec"><h3>🏭 Produção</h3>'+(prontoProd(id)?'<b style="color:var(--st-rec)">✓ Finalizada</b>'+(infoProd(id).autor?' por '+esc(infoProd(id).autor):'')+' em '+fmtDate((infoProd(id).em||'').slice(0,10))+' · a obra já está com o montador':'<b style="color:var(--st-apag)">Em produção</b> · o montador só recebe depois que a produção marcar como pronta')+'</div>'+
+   (rs.length?'<div class="m-sec"'+(nNovos?' style="border:2px solid var(--st-pagat);background:var(--st-pagat-soft)"':'')+'><h3'+(nNovos?' style="color:var(--st-pagat)"':'')+'>📷 Retornos da produção e dos montadores ('+rs.length+')'+(nNovos?' · <b style="color:var(--st-pagat)">'+nNovos+' novo'+(nNovos>1?'s':'')+'</b>':'')+'</h3>'+rs.map(retornoHtml).join('')+'</div>':'')+
    '<div class="m-sec"><h3>💰 Valores</h3>'+
     '<div class="m-item"><span>Valor da obra</span><b>'+money(p.valorTotal)+'</b></div>'+
     '<div class="m-item"><span>Recebido</span><b style="color:var(--st-rec)">'+money(rec)+'</b></div>'+
     '<div class="m-item"><span>Falta receber</span><b style="color:'+(falta>0.009?'var(--st-arec)':'var(--st-rec)')+'">'+money(falta)+'</b></div>'+
     (act(data.lancamentos).some(l=>l.tipo==='receita'&&l.pedidoId===id)?'<div style="margin-top:10px"><button class="btn sec sm" style="width:100%" onclick="go(\'pageRecebimentos\');verParcelasObra(\''+id+'\')">Ver parcelas</button></div>':'')+
    '</div>'+
-   '<div class="m-sec"><h3>📝 Observações para o montador</h3>'+
+   '<div class="m-sec"><h3>📝 Observações para produção e montador</h3>'+
     '<textarea id="obsMontador" style="min-height:90px" placeholder="Ex.: entrar pela garagem, cliente só à tarde, levar cola extra…">'+esc(p.obs||'')+'</textarea>'+
     '<div style="margin-top:8px"><button class="btn sm" style="width:100%" onclick="salvarObsMontador(\''+id+'\')">Salvar observações</button></div>'+
-    '<div class="hint" style="margin-top:6px">O montador vê isso na tela da obra dele.</div></div>'+
+    '<div class="hint" style="margin-top:6px">A produção e o montador veem isso na tela da obra.</div></div>'+
    (pecas?'<div class="m-sec"><h3>📐 Peças e medidas</h3>'+pecas+'</div>':'')+
    (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
    (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+

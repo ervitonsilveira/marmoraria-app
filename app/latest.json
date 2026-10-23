@@ -1,12 +1,15 @@
 {
- "version": "1.33.1",
- "interfaceVersion": 13301,
- "notes": "Obra: campo de observações para o montador",
- "publishedAt": "2026-10-22T21:06:27",
+ "version": "1.34.0",
+ "interfaceVersion": 13400,
+ "notes": "App da Produção; montador só recebe depois da produção",
+ "publishedAt": "2026-10-22T21:29:46",
  "apkVersionName": "1.27.2",
  "apkVersionCode": 27,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.27.2/MarmorariaItapiruba-1.27.2.apk",
  "apkMontadorVersionName": "1.27.2",
  "apkMontadorVersionCode": 27,
- "apkMontadorUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/montador-1.27.2/ItapirubaMontador-1.27.2.apk"
+ "apkMontadorUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/montador-1.27.2/ItapirubaMontador-1.27.2.apk",
+ "apkProducaoVersionName": "1.34.0",
+ "apkProducaoVersionCode": 28,
+ "apkProducaoUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/producao-1.34.0/ItapirubaProducao-1.34.0.apk"
 }
