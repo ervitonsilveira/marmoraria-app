@@ -413,7 +413,7 @@ nav.tabbar button.active{color:var(--brand)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.36.2';
+const APP_VERSION='1.37.0';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -2740,12 +2740,13 @@ function mObraLinha(p){
    '<div class="s">Obra Nº '+(p.numero||'')+(dt?' · '+DIAS_SEMANA[dt.getDay()]:'')+'</div>'+
    '<div class="m-tags"><span class="m-tag st">'+u.txt+'</span>'+(np?'<span class="m-tag">'+np+(np>1?' peças':' peça')+'</span>':'')+(nf?'<span class="m-tag">📷 '+nf+'</span>':'')+
    (orc&&orc.local&&orc.local.lat!=null?'<span class="m-tag">📍 mapa</span>':'')+(nr?'<span class="m-tag">💬 '+nr+'</span>':'')+'</div></div>'+
-  (PRODUCAO?'<button class="btn ok sm" style="flex:none;padding:9px 12px" onclick="event.stopPropagation();marcarProducao(\''+p.id+'\',true)">✓ Pronto</button>':'<div class="m-chev">›</div>')+'</div>';
+  (PRODUCAO?'<button class="btn ok sm" style="flex:none;padding:9px 12px" onclick="event.stopPropagation();marcarProducao(\''+p.id+'\',true)">✓ Pronto</button>':
+   !montFinalizada(p.id)&&p.status!=='concluido'?'<button class="btn ok sm" style="flex:none;padding:9px 12px" onclick="event.stopPropagation();finalizarMontagem(\''+p.id+'\',true)">✓ Finalizar</button>':'<div class="m-chev">›</div>')+'</div>';
 }
 function setPedFilterM(f){pedFilter=f;renderPedidos();}
 function renderPedidosM(){
  const topo=$('mTopo'),el=$('pedidosList');
- const ativas=act(data.pedidos).filter(p=>p.status!=='concluido'&&(PRODUCAO?!prontoProd(p.id):prontoProd(p.id)));
+ const ativas=act(data.pedidos).filter(p=>p.status!=='concluido'&&(PRODUCAO?!prontoProd(p.id):prontoProd(p.id)&&!montFinalizada(p.id)));
  const atr=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d!=null&&d<0;}).length;
  const logo=ativas.filter(p=>{const d=mDiasAte(p.dataPrevista);return d===0||d===1;}).length;
  const hj=new Date(),nome=syncLS('nome')||'';
@@ -2759,7 +2760,7 @@ function renderPedidosM(){
   '<div class="section-title" style="margin-top:4px">'+(PRODUCAO?'Obras para produzir':'Obras para entregar')+'</div>';
  const list=ativas.slice().sort(mOrdemEntrega);   // concluída pelo escritório some daqui
  el.innerHTML=(list.length?list.map(mObraLinha).join(''):'<div class="m-vazio"><div style="font-size:40px">🧱</div><b>'+(PRODUCAO?'Nada para produzir':'Nenhuma obra para entregar')+'</b><span>'+(sync.user?(PRODUCAO?'Quando o escritório lançar uma obra, ela aparece aqui.':'A obra aparece aqui quando a produção terminar.'):'Entre para receber as obras.')+'</span></div>')+
-  (PRODUCAO?prontasProducaoHtml():'');
+  (PRODUCAO?prontasProducaoHtml():finalizadasMontHtml());
 }
 function viewPedidoM(id){
  const p=byId(data.pedidos,id);if(!p)return;
@@ -2790,7 +2791,9 @@ function viewPedidoM(id){
   (itens?'<div class="m-sec"><h3>📦 Produtos</h3>'+itens+'</div>':'')+
   (nf?'<div class="m-sec"><h3>🖼️ Fotos do local ('+nf+')</h3>'+fotosOrcHtml(orc,'ped',id,false)+'</div>':'')+
   (PRODUCAO?(prontoProd(id)?'<div class="m-sec" style="border:2px solid var(--st-rec)"><b style="color:var(--st-rec)">✓ Produção finalizada</b><div style="margin-top:8px"><button class="btn sec sm" onclick="marcarProducao(\''+id+'\',false)">↩ Voltar para produção</button></div></div>':
-   '<div style="margin-bottom:12px"><button class="btn ok" style="width:100%;padding:14px" onclick="marcarProducao(\''+id+'\',true)">✓ Produção finalizada</button></div>'):'')+
+   '<div style="margin-bottom:12px"><button class="btn ok" style="width:100%;padding:14px" onclick="marcarProducao(\''+id+'\',true)">✓ Produção finalizada</button></div>'):
+   montFinalizada(id)?'<div class="m-sec" style="border:2px solid var(--st-rec)"><b style="color:var(--st-rec)">✓ Obra finalizada por você</b><div style="margin-top:8px"><button class="btn sec sm" onclick="finalizarMontagem(\''+id+'\',false)">↩ Desfazer</button></div></div>':
+   '<div style="margin-bottom:12px"><button class="btn ok" style="width:100%;padding:14px" onclick="finalizarMontagem(\''+id+'\',true)">✓ Finalizar obra</button></div>')+
   retornoFormM(id)+
   '<div class="hint" style="margin:6px 2px 4px;text-align:center">Os dados da obra são alterados só pelo escritório.</div>');
  $('modalBox').scrollTop=0;
@@ -2826,6 +2829,30 @@ function prontasProducaoHtml(){
  return '<details style="margin-top:14px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">✓ Já finalizadas na produção ('+pr.length+')</summary>'+
   pr.map(p=>'<div class="list-item" style="cursor:default"><div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+(infoProd(p.id)&&infoProd(p.id).autor?' · por '+esc(infoProd(p.id).autor):'')+'</div></div>'+
    '<button class="btn sec sm" onclick="marcarProducao(\''+p.id+'\',false)">↩ Desfazer</button></div>').join('')+'</details>';
+}
+/* ---- 1.37.0: montador finaliza a obra ----
+   Vai como um retorno com o campo montagem ('finalizada' | 'reaberta'): o montador já pode criar retornos,
+   então as regras do Firebase não mudam. Vale o último. O escritório recebe o aviso e conclui a obra (pagamentos). */
+function montInfo(pid){return act(data.retornos||[]).filter(r=>r.pedidoId===pid&&r.montagem).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''))[0]||null;}
+function montFinalizada(pid){const r=montInfo(pid);return !!(r&&r.montagem==='finalizada');}
+async function finalizarMontagem(pid,fim){
+ if(!sync.user||!sync.db){toast('Entre na sincronização (engrenagem) para finalizar.');return;}
+ if(!confirm(fim?'Finalizar esta obra? O escritório recebe o aviso de que a montagem terminou.':'Desfazer a finalização? A obra volta para a sua lista.'))return;
+ const t=now(),it={id:uid(),pedidoId:pid,origem:'montador',montagem:fim?'finalizada':'reaberta',
+  texto:fim?'✓ Obra finalizada pelo montador':'↩ Montador desfez a finalização da obra',
+  autor:syncLS('nome')||(sync.user&&sync.user.email)||'',createdAt:t,updatedAt:t,deleted:false};
+ try{
+  await fsCol('retornos').doc(it.id).set(it);
+  if(!(data.retornos||[]).some(x=>x.id===it.id))data.retornos.push(it);save(true);closeModal();renderAll();
+  toast(fim?'Obra finalizada. O escritório foi avisado.':'A obra voltou para a sua lista.');
+ }catch(e){toast(traduzErroFb(e));}
+}
+function finalizadasMontHtml(){
+ const fz=act(data.pedidos).filter(p=>p.status!=='concluido'&&montFinalizada(p.id)).sort(mOrdemEntrega);
+ if(!fz.length)return '';
+ return '<details style="margin-top:14px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">✓ Finalizadas por você ('+fz.length+')</summary>'+
+  fz.map(p=>'<div class="list-item" style="cursor:default"><div class="body"><div class="t">'+esc(clienteName(p.clienteId))+'</div><div class="s">Obra Nº '+(p.numero||'')+' · aguardando o escritório</div></div>'+
+   '<button class="btn sec sm" onclick="finalizarMontagem(\''+p.id+'\',false)">↩ Desfazer</button></div>').join('')+'</details>';
 }
 function mOrdemEntrega(a,b){return (a.dataPrevista||'9999').localeCompare(b.dataPrevista||'9999')||(a.numero||0)-(b.numero||0);}
 function renderHomeM(){
@@ -3375,7 +3402,7 @@ if(!MONTADOR){
   el.innerHTML=list.map(p=>{
    const u=mUrgencia(p),falta=round2((+p.valorTotal||0)-pedRecebido(p.id)),nr=retNovos(p.id);
    return cartao({cor:u.cor,soft:u.soft,data:p.dataPrevista,titulo:clienteName(p.clienteId),sub:'Obra Nº '+(p.numero||'')+(p.dataPrevista?' · entrega '+DIAS_SEMANA[new Date(p.dataPrevista+'T12:00:00').getDay()]:' · sem data de entrega'),
-    tags:[nr?'<span class="m-tag st" style="--mcs:var(--st-pagat-soft);--mc:var(--st-pagat)">📷 retorno novo</span>':'',tag(u.txt,true),prontoProd(p.id)?tag('✓ produção pronta'):tag('🏭 em produção'),tag(money(p.valorTotal)),falta>0.009?tag('falta '+money(falta)):tag('pago ✓')].filter(Boolean),
+    tags:[nr?'<span class="m-tag st" style="--mcs:var(--st-pagat-soft);--mc:var(--st-pagat)">📷 retorno novo</span>':'',tag(u.txt,true),montFinalizada(p.id)?'<span class="m-tag st" style="--mcs:var(--st-rec-soft);--mc:var(--st-rec)">✓ montador finalizou</span>':prontoProd(p.id)?tag('✓ produção pronta'):tag('🏭 em produção'),tag(money(p.valorTotal)),falta>0.009?tag('falta '+money(falta)):tag('pago ✓')].filter(Boolean),
     direita:'<button class="btn ok sm" style="padding:8px 10px" onclick="event.stopPropagation();finalizarPedido(\''+p.id+'\')">✓ Concluir</button>',
     onclick:"viewPedido('"+p.id+"')"});
   }).join('');
@@ -3414,6 +3441,7 @@ if(!MONTADOR){
      (temMapa?'<button class="m-act" onclick="abrirMapa(byId(data.orcamentos,\''+orc.id+'\').local)">📍 Como chegar</button>':'')+'</div>':'')+
    '</div>'+
    '<div class="m-sec"><h3>🏭 Produção</h3>'+(prontoProd(id)?'<b style="color:var(--st-rec)">✓ Finalizada</b>'+(infoProd(id).autor?' por '+esc(infoProd(id).autor):'')+' em '+fmtDate((infoProd(id).em||'').slice(0,10))+' · a obra já está com o montador':'<b style="color:var(--st-apag)">Em produção</b> · o montador só recebe depois que a produção marcar como pronta')+'</div>'+
+   (montFinalizada(id)?'<div class="m-sec" style="border:2px solid var(--st-rec);background:var(--st-rec-soft)"><h3 style="color:var(--st-rec)">🔧 Montagem finalizada</h3>'+(montInfo(id).autor&&!/@/.test(montInfo(id).autor)?'Por '+esc(montInfo(id).autor)+' ':'')+'em '+new Date(montInfo(id).createdAt).toLocaleDateString('pt-BR')+'. Toque em <b>✓ Concluir</b> na lista de obras para lançar os pagamentos e encerrar.</div>':'')+
    (rs.length?'<div class="m-sec"'+(nNovos?' style="border:2px solid var(--st-pagat);background:var(--st-pagat-soft)"':'')+'><h3'+(nNovos?' style="color:var(--st-pagat)"':'')+'>📷 Retornos da produção e dos montadores ('+rs.length+')'+(nNovos?' · <b style="color:var(--st-pagat)">'+nNovos+' novo'+(nNovos>1?'s':'')+'</b>':'')+'</h3>'+rs.map(retornoHtml).join('')+'</div>':'')+
    '<div class="m-sec"><h3>💰 Valores</h3>'+
     '<div class="m-item"><span>Valor da obra</span><b>'+money(p.valorTotal)+'</b></div>'+
