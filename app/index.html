@@ -453,7 +453,7 @@ nav.tabbar button.active svg{background:var(--brand-soft)}
    soft-delete (deleted:true), updatedAt para sincronizar depois,
    ponte nativa Android.* protegida (funciona no navegador agora).
    ============================================================ */
-const APP_VERSION='1.40.2';
+const APP_VERSION='1.40.3';
 // App dos montadores: pacote ...montador (APK) ou ?montador (navegador). Mesmo arquivo, telas sem valores.
 // 1.34.0: terceiro app "Produção" (pacote ...producao ou ?producao). Usa as telas restritas do montador (MONTADOR=true).
 const APP_PAPEL=(function(){
@@ -3160,20 +3160,55 @@ function syncPendentes(){
  pk.orcamentos.forEach(o=>(Array.isArray(o.fotos)?o.fotos:[]).forEach(f=>{if(f.id&&f.data&&!(P.montador_fotos||{})[f.id])ops.push({nome:'montador_fotos',id:f.id,obj:{id:f.id,data:f.data},h:'1'});}));
  return ops;
 }
+// 1.40.3: diagnóstico da sincronização (aparelho x nuvem) e reenvio completo
+async function syncDiagnostico(){
+ const el=$('syncDiag');if(!el||!sync.db)return;
+ el.textContent='Conferindo…';
+ const cols=[['clientes','Clientes'],['orcamentos','Orçamentos'],['pedidos','Obras'],['lancamentos','Lançamentos']];
+ try{
+  const linhas=[];
+  for(const [k,l] of cols){
+   const qs=await fsCol(k).get(),nuvem=qs.docs.filter(d=>!(d.data()||{}).deleted).length,aqui=act(data[k]).length;
+   linhas.push((aqui===nuvem?'✅ ':'⚠️ ')+l+': aparelho '+aqui+' · nuvem '+nuvem);
+  }
+  const pend=syncPendentes().length;
+  el.innerHTML=esc(linhas.join('\n')).replace(/\n/g,'<br>')+'<br>'+(pend?'⏳ '+pend+' item(ns) esperando para subir':'✅ nada pendente para subir')+
+   '<br>Conta: '+esc((sync.user&&sync.user.email)||'—')+(sync.erro?'<br>⚠ '+esc(sync.erro):'')+(sync.ultimo?'<br>Último envio: '+new Date(sync.ultimo).toLocaleString('pt-BR'):'');
+ }catch(e){el.textContent='Não consegui conferir: '+traduzErroFb(e);}
+}
+async function syncTudoDeNovo(){
+ if(!sync.user||!sync.db){toast('Entre na sincronização primeiro.');return;}
+ if(!confirm('Reenviar tudo deste aparelho para a nuvem e baixar tudo da nuvem de novo?'))return;
+ sync.pushed={};syncLS('pushed',{});
+ toast('Sincronizando tudo… pode levar um pouco.');
+ await syncLigar();await syncEnviar();
+ atualizaSyncUI();syncDiagnostico();
+ toast(sync.status==='erro'?'Terminou com aviso: '+sync.erro:'Tudo sincronizado.');
+}
 async function syncEnviar(){
  if(sync.resetando||MONTADOR||!sync.user||!sync.db)return;
  if(sync.enviando){syncAgendar(1500);return;}
  sync.enviando=true;
  try{
-  const ops=syncPendentes();
-  for(let i=0;i<ops.length;i+=200){
-   const parte=ops.slice(i,i+200),b=sync.db.batch();
-   parte.forEach(o=>b.set(fsCol(o.nome).doc(o.id),o.obj));
-   await b.commit();
-   parte.forEach(o=>{(sync.pushed[o.nome]=sync.pushed[o.nome]||{});if(o.meta)sync.pushed.meta=o.h;else sync.pushed[o.nome][o.id]=o.h;});
+  // 1.40.3: pacotes pequenos (o Firebase recusa pacote > 10 MB, e fotos pesam). Se um pacote falhar,
+  // envia item por item: um item com problema não trava mais a sincronização inteira.
+  const ops=syncPendentes(),marca=o=>{(sync.pushed[o.nome]=sync.pushed[o.nome]||{});if(o.meta)sync.pushed.meta=o.h;else sync.pushed[o.nome][o.id]=o.h;};
+  const pacotes=[];let atual=[],tam=0;
+  ops.forEach(o=>{const t=JSON.stringify(o.obj).length;if(atual.length&&(tam+t>3500000||atual.length>=250)){pacotes.push(atual);atual=[];tam=0;}atual.push(o);tam+=t;});
+  if(atual.length)pacotes.push(atual);
+  let falhas=0,ultErro=null;
+  for(const parte of pacotes){
+   try{const b=sync.db.batch();parte.forEach(o=>b.set(fsCol(o.nome).doc(o.id),o.obj));await b.commit();parte.forEach(marca);}
+   catch(e){
+    if(/permission|unauthenticated/i.test((e&&e.code)||''))throw e;
+    for(const o of parte){try{await fsCol(o.nome).doc(o.id).set(o.obj);marca(o);}catch(e2){falhas++;ultErro=e2;console.warn('sync item',o.nome,o.id,e2);}}
+   }
    syncLS('pushed',sync.pushed);
   }
-  sync.status='ok';sync.erro='';sync.ultimo=now();
+  sync.falhas=falhas;
+  if(falhas){sync.status='erro';sync.erro=falhas+' item(ns) não subiram: '+traduzErroFb(ultErro);syncAgendar(60000);}
+  else{sync.status='ok';sync.erro='';}
+  sync.ultimo=now();
  }catch(e){sync.status='erro';sync.erro=traduzErroFb(e);syncAgendar(30000);}
  sync.enviando=false;atualizaSyncUI();
 }
@@ -3186,7 +3221,7 @@ function traduzErroFb(e){
  if(/weak-password/.test(c))return 'A senha precisa ter pelo menos 6 caracteres.';
  if(/operation-not-allowed|configuration-not-found/i.test(c+m))return 'O login por e-mail ainda não foi ativado no Firebase.';
  if(/too-many-requests/.test(c))return 'Muitas tentativas. Espere alguns minutos.';
- if(/resource-exhausted|too large|maximum size/i.test(c+m))return 'Algum registro ficou grande demais (muitas fotos?).';
+ if(/resource-exhausted|too large|maximum size|payload size|exceeds/i.test(c+m))return 'Algum registro ficou grande demais (muitas fotos?).';
  return 'Erro: '+m.slice(0,140);
 }
 function syncResumo(){
@@ -3220,6 +3255,8 @@ async function openSync(){
    '<div class="hint" id="syncStatus" style="margin:0 0 12px;font-weight:600;color:var(--brand)">'+esc(syncResumo())+'</div>'+
    '<div class="detail-row"><span class="dk">Conectado como</span><span class="dv">'+esc(MONTADOR?(syncLS('nome')||u.email):u.email)+'</span></div>'+
    (MONTADOR?'':'<div style="margin-top:14px"><button class="btn" onclick="syncEnviar();toast(\'Enviando…\')">Sincronizar agora</button></div>'+
+    '<div class="m-sec" style="margin-top:12px"><h3>🔍 Diagnóstico</h3><div id="syncDiag" class="hint" style="margin:0">Toque em "Conferir" para comparar este aparelho com a nuvem.</div>'+
+    '<div class="btn-row" style="margin-top:10px"><button class="btn sec sm" onclick="syncDiagnostico()">Conferir</button><button class="btn sec sm" onclick="syncTudoDeNovo()">🔄 Sincronizar tudo de novo</button></div></div>'+
     '<div style="margin-top:10px"><button class="btn sec" onclick="openUsuarios()">👥 Colaboradores (logins e senhas)</button></div>')+
    '<div style="margin-top:10px"><button class="btn sec" onclick="syncSair()">Sair deste aparelho</button></div>'+voltar);
   return;

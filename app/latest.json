@@ -1,8 +1,8 @@
 {
- "version": "1.40.2",
- "interfaceVersion": 14002,
- "notes": "Mensagem clara quando as regras do Firebase não foram atualizadas",
- "publishedAt": "2026-10-23T00:28:37",
+ "version": "1.40.3",
+ "interfaceVersion": 14003,
+ "notes": "Sincronização em pacotes menores (fotos travavam); diagnóstico e Sincronizar tudo de novo",
+ "publishedAt": "2026-10-23T21:08:33",
  "apkVersionName": "1.40.0",
  "apkVersionCode": 31,
  "apkUrl": "https://github.com/ervitonsilveira/marmoraria-app/releases/download/admin-1.40.0/MarmorariaItapiruba-1.40.0.apk",
